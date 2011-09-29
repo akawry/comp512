@@ -1,3 +1,7 @@
+
+// Client.java
+
+
 import java.rmi.*;
 import ResInterface.*;
 import java.rmi.registry.LocateRegistry;
