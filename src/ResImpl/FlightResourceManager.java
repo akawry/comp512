@@ -60,7 +60,7 @@ public class FlightResourceManager extends AbstractResourceManager implements IF
 	@Override
 	public void register() throws Exception {
 		Remote rm = (Remote) UnicastRemoteObject.exportObject(this, 0);
-		Registry registry = LocateRegistry.getRegistry();
+		Registry registry = LocateRegistry.getRegistry(port);
 		registry.rebind("MyFlightResourceManager", rm);
 	}
 	

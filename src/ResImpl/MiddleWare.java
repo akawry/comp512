@@ -211,7 +211,7 @@ public class MiddleWare implements IResourceManager {
 								
 								// setting host of car resource manager 
 								if (s.equals("car")){
-									
+									 System.out.println("trying to connect car on host " + host);
 									ICarResourceManager crm = (ICarResourceManager) registry.lookup("MyCarResourceManager");
 									if(crm != null) {
 										System.out.println("Got the CarResourceManager");

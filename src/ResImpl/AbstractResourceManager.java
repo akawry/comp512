@@ -11,6 +11,7 @@ import ResInterface.IResourceManager;
 public abstract class AbstractResourceManager implements Remote {
 
 	protected RMHashtable m_itemHT = new RMHashtable();
+    protected int port = 1099 ;
 	
 	// Reads a data item
 	protected RMItem readData( int id, String key )
@@ -124,6 +125,7 @@ public abstract class AbstractResourceManager implements Remote {
         String server = "localhost";
 
          if (args.length == 1) {
+	     port = Integer.parseInt(args[0]) ;
              server = server + ":" + args[0];
          } else if (args.length != 0 &&  args.length != 1) {
              System.err.println ("Wrong usage");
@@ -133,9 +135,9 @@ public abstract class AbstractResourceManager implements Remote {
 		 
 		 try  {
 			register();
-			System.err.println("Server ready");
+			System.err.println("Server "  + this.toString() + " ready on port " + port);
 		}  catch (Exception e) {
-			System.err.println("Server exception: " + e.toString());
+			System.err.println("[ERROR] Server "  + this.toString() + " on port " + port);
 			e.printStackTrace();
 		}
 
