@@ -3,6 +3,8 @@ package ResInterface;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
+import ResImpl.Hotel;
+
 public interface IRoomResourceManager extends Remote{
 
 	   
@@ -27,10 +29,7 @@ public interface IRoomResourceManager extends Remote{
 
     /* return the price of a room at a location */
     public int queryRoomsPrice(int id, String location) 
-	throws RemoteException; 
+	throws RemoteException;
     
-
-    /* reserve a room certain at this location */
-    public boolean reserveRoom(int id, int customer, String locationd) 
-	throws RemoteException; 
+    public Hotel getRoom(int id, String location) throws RemoteException;
 }

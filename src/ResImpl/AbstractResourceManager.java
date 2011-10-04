@@ -6,13 +6,14 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
+import ResInterface.ICustomerResourceManager;
 import ResInterface.IResourceManager;
 
 public abstract class AbstractResourceManager {
 
 	protected RMHashtable m_itemHT = new RMHashtable();
     protected int port = 1099 ;
-	
+    
 	// Reads a data item
 	protected RMItem readData( int id, String key )
 	{
@@ -84,13 +85,14 @@ public abstract class AbstractResourceManager {
 		return value;		
 	}
 	
+	
 	// reserve an item
 	protected boolean reserveItem(int id, int customerID, String key, String location){
 		Trace.info("RM::reserveItem( " + id + ", customer=" + customerID + ", " +key+ ", "+location+" ) called" );		
 		// Read customer object if it exists (and read lock it)
 		Customer cust = (Customer) readData( id, Customer.getKey(customerID) );		
 		if( cust == null ) {
-			Trace.warn("RM::reserveCar( " + id + ", " + customerID + ", " + key + ", "+location+")  failed--customer doesn't exist" );
+			Trace.warn("RM::reserveItem( " + id + ", " + customerID + ", " + key + ", "+location+")  failed--customer doesn't exist" );
 			return false;
 		} 
 		
@@ -115,6 +117,43 @@ public abstract class AbstractResourceManager {
 		}		
 	}
 	
+	// reserve an item
+	protected boolean reserveItem(int id, int customerID, ReservableItem item, String location){
+		
+		// check if the item is available
+		if(item==null){
+			Trace.warn("RM::reserveItem( " + id + ", " + customerID + ", " + item +", " +location+") failed--item doesn't exist" );
+			return false;
+		}else {
+			String key = item.getKey();
+			if(item.getCount()==0){
+				Trace.warn("RM::reserveItem( " + id + ", " + customerID + ", " + key+", " + location+") failed--No more items" );
+				return false;
+			}else{	
+				
+				Trace.info("RM::reserveItem( " + id + ", customer=" + customerID + ", " +key+ ", "+location+" ) called" );		
+				// Read customer object if it exists (and read lock it)
+				Customer cust = (Customer) readData( id, Customer.getKey(customerID) );		
+				if( cust == null ) {
+					Trace.warn("RM::reserveItem( " + id + ", " + customerID + ", " + key + ", "+location+")  failed--customer doesn't exist" );
+					return false;
+				} 
+				
+				cust.reserve( key, location, item.getPrice());		
+				writeData( id, cust.getKey(), cust );
+				
+				// decrease the number of available items in the storage
+				item.setCount(item.getCount() - 1);
+				item.setReserved(item.getReserved()+1);
+				
+				Trace.info("RM::reserveItem( " + id + ", " + customerID + ", " + key + ", " +location+") succeeded" );
+				return true;
+			}
+
+		}
+					
+	}
+	
 	protected abstract String usage();
 	
 	protected abstract void register() throws Exception;
@@ -132,7 +171,7 @@ public abstract class AbstractResourceManager {
              System.out.println(usage());
              System.exit(1);
          }
-		 
+         
 		 try  {
 			register();
 			System.err.println("Server "  + this.toString() + " ready on port " + port);

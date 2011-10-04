@@ -47,10 +47,10 @@ public class FlightResourceManager extends AbstractResourceManager implements Re
 		return queryPrice(id, Flight.getKey(flightNum));
 	}
 
-	@Override
+	/*@Override
 	public boolean reserveFlight(int id, int customerID, int flightNum) throws RemoteException {
-		return reserveItem(id, customerID, Flight.getKey(flightNum), String.valueOf(flightNum));
-	}
+		return reserveItem(id, customerRM.getCustomer(customerID), Flight.getKey(flightNum), String.valueOf(flightNum));
+	}*/
 
 	@Override
 	public String usage() {
@@ -60,7 +60,7 @@ public class FlightResourceManager extends AbstractResourceManager implements Re
 	@Override
 	public void register() throws Exception {
 		System.out.println(" Starting registry on port " + port) ;
-	    IFlightResourceManager rm = (IFlightResourceManager) UnicastRemoteObject.exportObject((FlightResourceManager) this, port);
+	    IFlightResourceManager rm = (IFlightResourceManager) UnicastRemoteObject.exportObject((IFlightResourceManager) this, port);
 		Registry registry = LocateRegistry.getRegistry();
 		registry.rebind("akawry_MyFlightResourceManager", rm);
 	}
@@ -68,6 +68,11 @@ public class FlightResourceManager extends AbstractResourceManager implements Re
 	public static void main(String[] args) {
 		FlightResourceManager rm = new FlightResourceManager();
 		rm.launch(args);
+	}
+
+	@Override
+	public Flight getFlight(int id, int flightNumber) throws RemoteException {
+		return (Flight) readData(id, Flight.getKey(flightNumber));
 	}
 	
 

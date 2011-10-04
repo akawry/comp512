@@ -25,7 +25,7 @@ public interface IResourceManager extends Remote, IFlightResourceManager, IRoomR
 				ICarResourceManager, ICustomerResourceManager {
     
 	/* reserve an itinerary */
-    public boolean itinerary(int id,int customer,Vector flightNumbers,String location, boolean Car, boolean Room)
+    public boolean itinerary(int id,int customer,Vector<String> flightNumbers,String location, boolean Car, boolean Room)
 	throws RemoteException; 
     			
 }

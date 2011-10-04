@@ -46,10 +46,10 @@ public class RoomResourceManager extends AbstractResourceManager implements Remo
 		return queryPrice(id, Hotel.getKey(location));
 	}
 
-	@Override
+	/*@Override
 	public boolean reserveRoom(int id, int customerID, String location) throws RemoteException {
-		return reserveItem(id, customerID, Hotel.getKey(location), location);
-	}
+		return reserveItem(id, customerRM.getCustomer(customerID), Hotel.getKey(location), location);
+	}*/
 	
 	@Override
 	public String usage() {
@@ -67,6 +67,11 @@ public class RoomResourceManager extends AbstractResourceManager implements Remo
 	public static void main(String[] args) {
 		RoomResourceManager rm = new RoomResourceManager();
 		rm.launch(args);
+	}
+
+	@Override
+	public Hotel getRoom(int id, String location) throws RemoteException {
+		return (Hotel) readData(id, Hotel.getKey(location));
 	}
 
 }

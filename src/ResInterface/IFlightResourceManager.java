@@ -3,6 +3,8 @@ package ResInterface;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
+import ResImpl.Flight;
+
 public interface IFlightResourceManager extends Remote{
 
     /* Add seats to a flight.  In general this will be used to create a new
@@ -34,8 +36,6 @@ public interface IFlightResourceManager extends Remote{
     public int queryFlightPrice(int id, int flightNumber) 
 	throws RemoteException; 
     
-    /* Reserve a seat on this flight*/
-    public boolean reserveFlight(int id, int customer, int flightNumber) 
-	throws RemoteException; 
+    public Flight getFlight(int id, int flightNumber) throws RemoteException;
 	
 }

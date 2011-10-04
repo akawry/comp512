@@ -3,6 +3,9 @@ package ResInterface;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
+import ResImpl.Car;
+import ResImpl.Customer;
+
 public interface ICarResourceManager extends Remote{
 
     
@@ -30,11 +33,8 @@ public interface ICarResourceManager extends Remote{
 
     /* return the price of a car at a location */
     public int queryCarsPrice(int id, String location) 
-	throws RemoteException; 
+	throws RemoteException;
     
-
-    /* reserve a car at this location */
-    public boolean reserveCar(int id, int customer, String location) 
-	throws RemoteException; 
+    public Car getCar(int id, String location) throws RemoteException;
 	
 }

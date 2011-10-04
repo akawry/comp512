@@ -1,4 +1,4 @@
-package ResImpl;
+/*package ResImpl;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
@@ -96,8 +96,14 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 		registry.rebind("akawry_MyCustomerResourceManager", rm);
 	}
 	
+	@Override
+	public Customer getCustomer(int customerID){
+		System.out.println("Getting customer " + customerID);
+		return (Customer) readData(customerID, Customer.getKey(customerID));
+	}
+	
 	public static void main(String[] args) {
 		CustomerResourceManager rm = new CustomerResourceManager();
 		rm.launch(args);
 	}
-}
+}*/

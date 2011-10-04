@@ -49,10 +49,12 @@ public class CarResourceManager extends AbstractResourceManager implements ICarR
 		return queryPrice(id, Car.getKey(location));
 	}
 
-	@Override
+	/*@Override
 	public boolean reserveCar(int id, int customerID, String location) throws RemoteException {
-		return reserveItem(id, customerID, Car.getKey(location), location);
-	}
+		Customer cust = customerRM.getCustomer(customerID);;
+		System.err.println("Got customer: "+cust);
+		return reserveItem(id, cust, Car.getKey(location), location);
+	}*/
 
 	@Override
 	public String usage() {
@@ -70,6 +72,11 @@ public class CarResourceManager extends AbstractResourceManager implements ICarR
 	public static void main(String[] args) {
 		CarResourceManager rm = new CarResourceManager();
 		rm.launch(args);
+	}
+
+	@Override
+	public Car getCar(int id, String location) throws RemoteException {
+		return (Car) readData(id, Car.getKey(location));
 	}
 
 }
