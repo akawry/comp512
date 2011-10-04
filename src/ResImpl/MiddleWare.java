@@ -250,6 +250,7 @@ public class MiddleWare extends AbstractResourceManager implements Remote, IReso
 			String[] valid = {"car", "flight", "room", "port"};
 			String flag, host;
 			Registry registry;
+			int port = 0;
 			
 			for (String arg : args){
 				
@@ -261,6 +262,7 @@ public class MiddleWare extends AbstractResourceManager implements Remote, IReso
 						// setting the port where this middleware runs  
 						if (s.equals("port")){
 							mw.port = Integer.parseInt(host);
+
 						} else {
 							
 							try  {

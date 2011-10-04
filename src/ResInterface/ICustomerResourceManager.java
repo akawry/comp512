@@ -3,8 +3,6 @@ package ResInterface;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-import ResImpl.Customer;
-
 public interface ICustomerResourceManager extends Remote{
 
     /* new customer just returns a unique customer identifier */

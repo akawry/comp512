@@ -2,9 +2,7 @@ package ResInterface;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
-
 import ResImpl.Car;
-import ResImpl.Customer;
 
 public interface ICarResourceManager extends Remote{
 

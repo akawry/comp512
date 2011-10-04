@@ -2,7 +2,6 @@ package ResInterface;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
-
 import ResImpl.Hotel;
 
 public interface IRoomResourceManager extends Remote{

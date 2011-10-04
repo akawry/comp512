@@ -116,7 +116,7 @@ public abstract class AbstractResourceManager {
 			return true;
 		}		
 	}
-	
+
 	// reserve an item
 	protected boolean reserveItem(int id, int customerID, ReservableItem item, String location){
 		
@@ -153,7 +153,7 @@ public abstract class AbstractResourceManager {
 		}
 					
 	}
-	
+
 	protected abstract String usage();
 	
 	protected abstract void register() throws Exception;

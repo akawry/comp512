@@ -94,12 +94,15 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 	    ICustomerResourceManager rm = (ICustomerResourceManager) UnicastRemoteObject.exportObject(this, port);
 		Registry registry = LocateRegistry.getRegistry();
 		registry.rebind("akawry_MyCustomerResourceManager", rm);
+<<<<<<< HEAD:src/ResImpl/CustomerResourceManager.java
 	}
 	
 	@Override
 	public Customer getCustomer(int customerID){
 		System.out.println("Getting customer " + customerID);
 		return (Customer) readData(customerID, Customer.getKey(customerID));
+=======
+>>>>>>> b5b37c62beeb614ae60fa06ee3110a8ce956993b:src/ResImpl/CustomerResourceManager.java
 	}
 	
 	public static void main(String[] args) {
