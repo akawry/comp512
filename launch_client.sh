@@ -1,5 +1,4 @@
 #!/bin/sh
-
 chmod 711 bin/
 chmod 644 bin/Client/*.class
 cd bin

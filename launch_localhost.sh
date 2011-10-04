@@ -8,3 +8,4 @@ chmod -R 644 bin/ResInterface/*.class
 ( ./launch_flightRM.sh 2002 )
 ( ./launch_roomRM.sh 2003 )
 ( ./launch_middlewareRM.sh 2004 -car=localhost -room=localhost -flight=localhost )
+( ./launch_client.sh localhost:2004 )
