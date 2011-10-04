@@ -1,5 +1,4 @@
-package Client;
-
+package Client; 
 // Client.java
 
 
@@ -32,12 +31,13 @@ public class Client extends AbstractClient
 		{
 			Registry registry = LocateRegistry.getRegistry(serverhost,serverport);
 			rm = (IResourceManager) registry.lookup("akawry_MyGroupResourceManager");
-			System.out.println("Client successfully connected to server at " + serverhost  + " on port " + serverport);
+			System.out.println("[OK] Client successfully connected to server at " + serverhost  + " on port " + serverport);
 		} 
 		catch (Exception e) 
 		{	
-			System.err.println("[ERROR] Client exception: " + e.toString());
+			System.err.println("[ERROR] Client exception while connecting to " + serverhost + " on port " + serverport + e.toString() ) ;
 			e.printStackTrace();
+			System.exit(1);
 		}
 
 		// begin input loop 
