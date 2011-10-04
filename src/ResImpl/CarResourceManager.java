@@ -62,8 +62,8 @@ public class CarResourceManager extends AbstractResourceManager implements ICarR
 
 	@Override
 	public void register() throws Exception {
-	    	ICarResourceManager rm = (ICarResourceManager) UnicastRemoteObject.exportObject((ICarResourceManager) this, 0);
-		registry.rebind("akawry_MyCarResourceManager", rm);
+	    //ICarResourceManager rm = (ICarResourceManager) UnicastRemoteObject.exportObject((ICarResourceManager) this, 0);
+	    registry.bind("akawry_MyCarResourceManager", UnicastRemoteObject.exportObject(this, 0));
 	}
 	
 	public static void main(String[] args) {

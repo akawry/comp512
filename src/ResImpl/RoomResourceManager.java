@@ -58,10 +58,7 @@ public class RoomResourceManager extends AbstractResourceManager implements Remo
 	
 	@Override
 	public void register() throws Exception {
-		System.out.println(" Starting registry on port " + port) ;
-	    IRoomResourceManager rm = (IRoomResourceManager) UnicastRemoteObject.exportObject((IRoomResourceManager) this, port);
-		Registry registry = LocateRegistry.getRegistry();
-		registry.rebind("akawry_MyRoomResourceManager", rm);
+	    registry.bind("akawry_MyRoomResourceManager", UnicastRemoteObject.exportObject(this,0));
 	}
 	
 	public static void main(String[] args) {

@@ -59,10 +59,7 @@ public class FlightResourceManager extends AbstractResourceManager implements Re
 
 	@Override
 	public void register() throws Exception {
-		System.out.println(" Starting registry on port " + port) ;
-	    IFlightResourceManager rm = (IFlightResourceManager) UnicastRemoteObject.exportObject((IFlightResourceManager) this, port);
-		Registry registry = LocateRegistry.getRegistry();
-		registry.rebind("akawry_MyFlightResourceManager", rm);
+	    registry.bind("akawry_MyFlightResourceManager", UnicastRemoteObject.exportObject(this, 0));
 	}
 	
 	public static void main(String[] args) {
