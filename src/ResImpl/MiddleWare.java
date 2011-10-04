@@ -296,7 +296,11 @@ public class MiddleWare extends AbstractResourceManager implements Remote, IReso
 		carRM = (ICarResourceManager)LocateRegistry.getRegistry(carserver,carport).lookup("akawry_MyCarResourceManager");
 		roomRM = (IRoomResourceManager)LocateRegistry.getRegistry(roomserver,roomport).lookup("akawry_MyRoomResourceManager");
 		flightRM = (IFlightResourceManager)LocateRegistry.getRegistry(flightserver,flightport).lookup("akawry_MyFlightResourceManager");
-		} catch (Exception e) {}
+		} catch (Exception e) {
+		    System.out.println("[ERROR] Middleware cannot get rmi object") ;
+		    e.printStackTrace() ;
+		    System.exit(1) ;
+		}
 
 		// Check if we have everything we need
 		if (getCarResourceManager() == null){
