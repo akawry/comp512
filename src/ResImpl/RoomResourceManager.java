@@ -8,7 +8,7 @@ import java.rmi.server.UnicastRemoteObject;
 
 import ResInterface.IRoomResourceManager;
 
-public class RoomResourceManager extends AbstractResourceManager implements IRoomResourceManager {
+public class RoomResourceManager extends AbstractResourceManager implements Remote, IRoomResourceManager {
 
 	@Override
 	public boolean addRooms(int id, String location, int count, int price) throws RemoteException {
@@ -58,9 +58,10 @@ public class RoomResourceManager extends AbstractResourceManager implements IRoo
 	
 	@Override
 	public void register() throws Exception {
-		Remote rm = (Remote) UnicastRemoteObject.exportObject(this, 0);
+		System.out.println(" Starting registry on port " + port) ;
+	    IRoomResourceManager rm = (IRoomResourceManager) UnicastRemoteObject.exportObject((IRoomResourceManager) this, port);
 		Registry registry = LocateRegistry.getRegistry();
-		registry.rebind("MyRoomResourceManager", rm);
+		registry.rebind("akawry_MyRoomResourceManager", rm);
 	}
 	
 	public static void main(String[] args) {

@@ -1,8 +1,9 @@
 package ResInterface;
 
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-public interface ICarResourceManager {
+public interface ICarResourceManager extends Remote{
 
     
     /* Add cars to a location.  

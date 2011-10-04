@@ -1,8 +1,9 @@
 package ResInterface;
 
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-public interface IFlightResourceManager {
+public interface IFlightResourceManager extends Remote{
 
     /* Add seats to a flight.  In general this will be used to create a new
      * flight, but it should be possible to add seats to an existing flight.

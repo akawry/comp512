@@ -10,7 +10,7 @@ import java.util.Enumeration;
 
 import ResInterface.ICustomerResourceManager;
 
-public class CustomerResourceManager extends AbstractResourceManager implements ICustomerResourceManager {
+public class CustomerResourceManager extends AbstractResourceManager implements Remote, ICustomerResourceManager {
 
 	@Override
 	public int newCustomer(int id) throws RemoteException {
@@ -90,9 +90,10 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 
 	@Override
 	public void register() throws Exception {
-		Remote rm = (Remote) UnicastRemoteObject.exportObject(this, 0);
+		System.out.println(" Starting registry on port " + port) ;
+	    ICustomerResourceManager rm = (ICustomerResourceManager) UnicastRemoteObject.exportObject(this, port);
 		Registry registry = LocateRegistry.getRegistry();
-		registry.rebind("MyCustomerResourceManager", rm);
+		registry.rebind("akawry_MyCustomerResourceManager", rm);
 	}
 	
 	public static void main(String[] args) {

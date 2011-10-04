@@ -8,7 +8,7 @@ import java.rmi.server.UnicastRemoteObject;
 
 import ResInterface.IResourceManager;
 
-public abstract class AbstractResourceManager implements Remote {
+public abstract class AbstractResourceManager {
 
 	protected RMHashtable m_itemHT = new RMHashtable();
     protected int port = 1099 ;
@@ -115,17 +115,17 @@ public abstract class AbstractResourceManager implements Remote {
 		}		
 	}
 	
-	public abstract String usage();
+	protected abstract String usage();
 	
-	public abstract void register() throws Exception;
+	protected abstract void register() throws Exception;
 	
-	public void launch(String[] args){
+	protected void launch(String[] args){
 		
 		// Figure out where server is running
         String server = "localhost";
 
          if (args.length == 1) {
-	     port = Integer.parseInt(args[0]) ;
+        	 port = Integer.parseInt(args[0]);
              server = server + ":" + args[0];
          } else if (args.length != 0 &&  args.length != 1) {
              System.err.println ("Wrong usage");
@@ -139,6 +139,7 @@ public abstract class AbstractResourceManager implements Remote {
 		}  catch (Exception e) {
 			System.err.println("[ERROR] Server "  + this.toString() + " on port " + port);
 			e.printStackTrace();
+			System.exit(1);
 		}
 
 	}
