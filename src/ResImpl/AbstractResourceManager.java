@@ -12,8 +12,14 @@ import ResInterface.IResourceManager;
 public abstract class AbstractResourceManager {
 
 	protected RMHashtable m_itemHT = new RMHashtable();
-    protected int port = 1099 ;
+ 	protected int port ;
+	protected Registry registry ;
     
+	//Constructor
+	AbstractResourceManager() {
+		port = 1099 ;
+	}
+	
 	// Reads a data item
 	protected RMItem readData( int id, String key )
 	{
@@ -159,22 +165,22 @@ public abstract class AbstractResourceManager {
 	protected abstract void register() throws Exception;
 	
 	protected void launch(String[] args){
-		
 		// Figure out where server is running
-        String server = "localhost";
+		String server = "localhost";
 
-         if (args.length == 1) {
-        	 port = Integer.parseInt(args[0]);
-             server = server + ":" + args[0];
-         } else if (args.length != 0 &&  args.length != 1) {
-             System.err.println ("Wrong usage");
-             System.out.println(usage());
-             System.exit(1);
-         }
-         
-		 try  {
+		try  {
+		registry = LocateRegistry.getRegistry(port) ;
+		if (args.length == 1) {
+			port = Integer.parseInt(args[0]);
+			server = server + ":" + args[0];
+		} else if (args.length != 0 &&  args.length != 1) {
+			System.err.println ("Wrong usage");
+			System.out.println(usage());
+			System.exit(1);
+		}
+
 			register();
-			System.err.println("Server "  + this.toString() + " ready on port " + port);
+			System.err.println("[OK] Server "  + this.toString() + " ready on port " + port);
 		}  catch (Exception e) {
 			System.err.println("[ERROR] Server "  + this.toString() + " on port " + port);
 			e.printStackTrace();

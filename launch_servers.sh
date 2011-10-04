@@ -1,8 +1,8 @@
 #!/bin/sh
 echo $1
-chmod 711 bin/
-chmod 644 bin/ResImpl/*.class
-chmod 644 bin/ResInterface/*.class
+chmod -R 711 bin/
+chmod -R 644 bin/ResImpl/*.class
+chmod -R 644 bin/ResInterface/*.class
 cd bin
 java -Djava.security.policy=client.policy -Djava.rmi.server.codebase=file:`pwd`/ ResImpl.CarResourceManager 2000 & 
 java -Djava.security.policy=client.policy -Djava.rmi.server.codebase=file:`pwd`/ ResImpl.FlightResourceManager 2001 &

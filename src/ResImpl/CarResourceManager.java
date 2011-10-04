@@ -20,8 +20,7 @@ public class CarResourceManager extends AbstractResourceManager implements ICarR
 		if( curObj == null ) {
 			// car location doesn't exist...add it
 			Car newObj = new Car( location, count, price );
-			writeData( id, newObj.getKey(), newObj );
-			Trace.info("RM::addCars(" + id + ") created new location " + location + ", count=" + count + ", price=$" + price );
+			writeData( id, newObj.getKey(), newObj ); Trace.info("RM::addCars(" + id + ") created new location " + location + ", count=" + count + ", price=$" + price );
 		} else {
 			// add count to existing car location and update price...
 			curObj.setCount( curObj.getCount() + count );
@@ -63,9 +62,7 @@ public class CarResourceManager extends AbstractResourceManager implements ICarR
 
 	@Override
 	public void register() throws Exception {
-		System.out.println(" Starting registry on port " + port) ;
-	    ICarResourceManager rm = (ICarResourceManager) UnicastRemoteObject.exportObject((ICarResourceManager) this, 0);
-		Registry registry = LocateRegistry.getRegistry();
+	    	ICarResourceManager rm = (ICarResourceManager) UnicastRemoteObject.exportObject((ICarResourceManager) this, 0);
 		registry.rebind("akawry_MyCarResourceManager", rm);
 	}
 	
