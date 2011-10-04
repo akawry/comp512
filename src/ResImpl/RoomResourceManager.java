@@ -63,7 +63,8 @@ public class RoomResourceManager extends AbstractResourceManager implements Remo
 	
 	public static void main(String[] args) {
 		RoomResourceManager rm = new RoomResourceManager();
-		rm.launch(args);
+		rm.parseArgs(args) ;
+		rm.launch();
 	}
 
 	@Override

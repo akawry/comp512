@@ -21,6 +21,15 @@ public class MiddleWare extends AbstractResourceManager implements Remote, IReso
 	private IFlightResourceManager flightRM;
 	private IRoomResourceManager roomRM;
 	
+		// By default, if there is no args for car/room/flight, we try localhost:1099	
+		// Explicit is better than implicit
+		String carserver = new String("localhost") ;
+		String flightserver = new String("localhost") ;
+		String roomserver = new String("localhost") ;
+		int carport = 1099 ;
+		int flightport = 1099 ;
+		int roomport = 1099 ;
+
 	public ICarResourceManager getCarResourceManager() {
 		return carRM;
 	}
@@ -240,109 +249,71 @@ public class MiddleWare extends AbstractResourceManager implements Remote, IReso
 	public static void main(String[] args) {
 		
 		MiddleWare mw = new MiddleWare();
-		
-		if (args.length != 4 && args.length != 3){
-			System.err.println("Wrong usage.");
-			System.err.println(mw.usage());
-			System.exit(1);
-		} else {
-			
-			String[] valid = {"car", "flight", "room", "port"};
-			String flag, host;
-			Registry registry;
-			int port = 0;
-			
-			for (String arg : args){
-				
-				for (String s : valid){
-					flag = "-" + s + "=";
-					if (flag.equals(arg.substring(0, flag.length())) && arg.length() > flag.length()){
-						host = arg.split("=")[1];
-						
-						// setting the port where this middleware runs  
-						if (s.equals("port")){
-							mw.port = Integer.parseInt(host);
+		mw.parseArgs(args) ;
+		mw.launch() ;
 
-						} else {
-							
-							try  {
-								registry = LocateRegistry.getRegistry(host);
-								
-								// setting host of car resource manager 
-								if (s.equals("car")){
-									ICarResourceManager crm = (ICarResourceManager) registry.lookup("akawry_MyCarResourceManager");
-									if(crm != null) {
-										System.out.println("Got the CarResourceManager");
-									} else {
-										System.out.println("Could not load the CarResourceManager");
-									}
-									
-									mw.setCarResourceManager(crm);
-									
-								// setting host of flight resource manager 
-								} else if (s.equals("flight")){
-									
-									IFlightResourceManager frm = (IFlightResourceManager) registry.lookup("akawry_MyFlightResourceManager");
-									if(frm != null) {
-										System.out.println("Got the FlightResourceManager");
-									} else {
-										System.out.println("Could not load the FlightResourceManager");
-									}
-									
-									mw.setFlightResourceManager(frm);
-									
-								// setting host of room resource manager 
-								} else if (s.equals("room")){
-									
-									IRoomResourceManager rrm = (IRoomResourceManager) registry.lookup("akawry_MyRoomResourceManager");
-									if(rrm != null) {
-										System.out.println("Got the RoomResourceManager");
-									} else {
-										System.out.println("Could not load the RoomResourceManager");
-									}
-									
-									mw.setRoomResourceManager(rrm);
-								}
-								
-							} catch (Exception e)  {	
-								System.err.println("Middleware exception: " + e.toString());
-								e.printStackTrace();
-							}
-							
-						}
-						
+	}
+
+	protected void parseArgs(String[] args) {
+
+		if (args.length != 4 && args.length != 3){
+			System.err.println(usage());
+			System.exit(1);
+		}
+
+		String[] valid = {"car", "flight", "room", "port"};
+		String flag;
+
+
+		for (String arg : args){
+
+			for (String s : valid){
+				flag = "-" + s + "=";
+				if (flag.equals(arg.substring(0, flag.length())) && arg.length() > flag.length()){
+					String argval = arg.split("=")[1];
+					// if : setting the port where this middleware runs  
+					// else : we need to parse the server name and server port	
+					if (s.equals("port")){
+						this.port = Integer.parseInt(argval);
+					} else if (s.equals("car") ) {
+						carserver = argval.split(":")[0] ;
+						carport = Integer.parseInt(argval.split(":")[1]) ;
+					} else if (s.equals("room") ) {
+						roomserver = argval.split(":")[0] ;
+						roomport = Integer.parseInt(argval.split(":")[1]) ;
+					} else if (s.equals("flight") ) {
+						flightserver = argval.split(":")[0] ;
+						flightport = Integer.parseInt(argval.split(":")[1]) ;
 					}
 				}
-				
 			}
-			
-			if (mw.getCarResourceManager() == null){
-				System.out.println("Middleware was unable to establish a connection with the CarResourceManager");
-			} else if (mw.getFlightResourceManager() == null){
-				System.out.println("Middleware was unable to establish a connection with the FlightResourceManager");
-			} else if (mw.getRoomResourceManager() == null){
-				System.out.println("Middleware was unable to establish a connection with the RoomResourceManager");
-			
-			// all resource managers successfully loaded 
-			} else {
-				
-				try {
-					mw.register();
-					System.out.println("Middleware server running on port "+mw.port);
-				} catch (Exception e){
-					System.err.println("Middleware exception: " + e.toString());
-					e.printStackTrace();
-				}
-			}
-			
 		}
+	}
+
+	protected void launch() {
+
+		try {
+		carRM = (ICarResourceManager)LocateRegistry.getRegistry(carserver,carport).lookup("akawry_MyCarResourceManager");
+		roomRM = (IRoomResourceManager)LocateRegistry.getRegistry(roomserver,roomport).lookup("akawry_MyRoomResourceManager");
+		flightRM = (IFlightResourceManager)LocateRegistry.getRegistry(flightserver,flightport).lookup("akawry_MyFlightResourceManager");
+		} catch (Exception e) {}
+
+		// Check if we have everything we need
+		if (getCarResourceManager() == null){
+			System.out.println("Middleware was unable to establish a connection with the CarResourceManager");
+		} else if (getFlightResourceManager() == null){
+			System.out.println("Middleware was unable to establish a connection with the FlightResourceManager");
+		} else if (getRoomResourceManager() == null){
+			System.out.println("Middleware was unable to establish a connection with the RoomResourceManager");
+		}
+
+		//start his own rmi
+		super.launch() ; 			
 	}
 
 	@Override
 	protected void register() throws Exception {
-		IResourceManager rm = (IResourceManager) UnicastRemoteObject.exportObject((IResourceManager) this, port);
-		Registry registry = LocateRegistry.getRegistry();
-		registry.rebind("akawry_MyGroupResourceManager", rm);
+		registry.bind("akawry_MyGroupResourceManager", UnicastRemoteObject.exportObject(this,0));
 	}
 
 	@Override

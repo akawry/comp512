@@ -159,17 +159,18 @@ public abstract class AbstractResourceManager {
 	
     protected abstract void register() throws Exception;
 	
-    protected void launch(String[] args){
+    protected void parseArgs(String[] args) {
+	    // If you don't expect one arg wich is the port, you should override
+	    // Get correct port from args
+	    if (args.length == 1) {
+		    port = Integer.parseInt(args[0]);
+	    } else if (args.length > 1) {
+		    System.out.println(usage());
+		    System.exit(1);
+	    }
+    }
 
-	// Get correct port from args
-	if (args.length == 1) {
-	    port = Integer.parseInt(args[0]);
-	} else if (args.length > 1) {
-	    System.out.println(usage());
-	    System.exit(1);
-	}
-
-	// Do the work
+    protected void launch(){
 	try  {
 	    registry = LocateRegistry.getRegistry("localhost", port) ;
 	    register();
@@ -183,3 +184,4 @@ public abstract class AbstractResourceManager {
     }
 	
 }
+

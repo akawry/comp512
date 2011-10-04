@@ -68,7 +68,8 @@ public class CarResourceManager extends AbstractResourceManager implements ICarR
 	
 	public static void main(String[] args) {
 		CarResourceManager rm = new CarResourceManager();
-		rm.launch(args);
+		rm.parseArgs(args) ;
+		rm.launch();
 	}
 
 	@Override

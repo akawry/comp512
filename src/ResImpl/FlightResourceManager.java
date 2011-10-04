@@ -64,7 +64,8 @@ public class FlightResourceManager extends AbstractResourceManager implements Re
 	
 	public static void main(String[] args) {
 		FlightResourceManager rm = new FlightResourceManager();
-		rm.launch(args);
+		rm.parseArgs(args) ;
+		rm.launch();
 	}
 
 	@Override
