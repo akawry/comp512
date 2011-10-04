@@ -1,8 +1,9 @@
 package ResInterface;
 
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-public interface IRoomResourceManager {
+public interface IRoomResourceManager extends Remote{
 
 	   
     /* Add rooms to a location.  

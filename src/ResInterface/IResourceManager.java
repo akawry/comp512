@@ -21,8 +21,7 @@ import java.util.*;
  * has succeeded.
  */
 
-public interface IResourceManager extends Remote, 
-			IFlightResourceManager, IRoomResourceManager, 
+public interface IResourceManager extends Remote, IFlightResourceManager, IRoomResourceManager, 
 				ICarResourceManager, ICustomerResourceManager {
     
 	/* reserve an itinerary */

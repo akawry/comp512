@@ -61,10 +61,10 @@ public class CarResourceManager extends AbstractResourceManager implements ICarR
 
 	@Override
 	public void register() throws Exception {
-	    System.out.println(" Starting registry on port " + port) ;
-	    Remote rm = (Remote) UnicastRemoteObject.exportObject(this);
+		System.out.println(" Starting registry on port " + port) ;
+	    ICarResourceManager rm = (ICarResourceManager) UnicastRemoteObject.exportObject((ICarResourceManager) this, 0);
 		Registry registry = LocateRegistry.getRegistry();
-		registry.rebind("MyCarResourceManager", rm);
+		registry.rebind("akawry_MyCarResourceManager", rm);
 	}
 	
 	public static void main(String[] args) {

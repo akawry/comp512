@@ -8,7 +8,7 @@ import java.rmi.server.UnicastRemoteObject;
 
 import ResInterface.IFlightResourceManager;
 
-public class FlightResourceManager extends AbstractResourceManager implements IFlightResourceManager {
+public class FlightResourceManager extends AbstractResourceManager implements Remote, IFlightResourceManager {
 
 	@Override
 	public boolean addFlight(int id, int flightNum, int flightSeats, int flightPrice) throws RemoteException {
@@ -59,9 +59,10 @@ public class FlightResourceManager extends AbstractResourceManager implements IF
 
 	@Override
 	public void register() throws Exception {
-		Remote rm = (Remote) UnicastRemoteObject.exportObject(this, 0);
-		Registry registry = LocateRegistry.getRegistry(port);
-		registry.rebind("MyFlightResourceManager", rm);
+		System.out.println(" Starting registry on port " + port) ;
+	    IFlightResourceManager rm = (IFlightResourceManager) UnicastRemoteObject.exportObject((FlightResourceManager) this, port);
+		Registry registry = LocateRegistry.getRegistry();
+		registry.rebind("akawry_MyFlightResourceManager", rm);
 	}
 	
 	public static void main(String[] args) {

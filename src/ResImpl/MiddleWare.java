@@ -13,7 +13,7 @@ import ResInterface.IFlightResourceManager;
 import ResInterface.IResourceManager;
 import ResInterface.IRoomResourceManager;
 
-public class MiddleWare implements IResourceManager {
+public class MiddleWare implements Remote, IResourceManager {
 
 	private ICarResourceManager carRM;
 	private IFlightResourceManager flightRM;
@@ -193,6 +193,7 @@ public class MiddleWare implements IResourceManager {
 			String[] valid = {"car", "flight", "room", "customer", "port"};
 			String flag, host, server = "localhost";
 			Registry registry;
+			int port = 0;
 			
 			for (String arg : args){
 				
@@ -203,7 +204,7 @@ public class MiddleWare implements IResourceManager {
 						
 						// setting the port where this middleware runs  
 						if (s.equals("port")){
-							server += ":" + host;
+							port = Integer.parseInt(host);
 						} else {
 							
 							try  {
@@ -211,8 +212,7 @@ public class MiddleWare implements IResourceManager {
 								
 								// setting host of car resource manager 
 								if (s.equals("car")){
-									 System.out.println("trying to connect car on host " + host);
-									ICarResourceManager crm = (ICarResourceManager) registry.lookup("MyCarResourceManager");
+									ICarResourceManager crm = (ICarResourceManager) registry.lookup("akawry_MyCarResourceManager");
 									if(crm != null) {
 										System.out.println("Got the CarResourceManager");
 									} else {
@@ -224,7 +224,7 @@ public class MiddleWare implements IResourceManager {
 								// setting host of flight resource manager 
 								} else if (s.equals("flight")){
 									
-									IFlightResourceManager frm = (IFlightResourceManager) registry.lookup("MyFlightResourceManager");
+									IFlightResourceManager frm = (IFlightResourceManager) registry.lookup("akawry_MyFlightResourceManager");
 									if(frm != null) {
 										System.out.println("Got the FlightResourceManager");
 									} else {
@@ -236,7 +236,7 @@ public class MiddleWare implements IResourceManager {
 								// setting host of room resource manager 
 								} else if (s.equals("room")){
 									
-									IRoomResourceManager rrm = (IRoomResourceManager) registry.lookup("MyRoomResourceManager");
+									IRoomResourceManager rrm = (IRoomResourceManager) registry.lookup("akawry_MyRoomResourceManager");
 									if(rrm != null) {
 										System.out.println("Got the RoomResourceManager");
 									} else {
@@ -248,7 +248,7 @@ public class MiddleWare implements IResourceManager {
 								// setting host of customer resource manager 
 								} else if (s.equals("customer")){
 									
-									ICustomerResourceManager custrm = (ICustomerResourceManager) registry.lookup("MyCustomerResourceManager");
+									ICustomerResourceManager custrm = (ICustomerResourceManager) registry.lookup("akawry_MyCustomerResourceManager");
 									if(custrm != null) {
 										System.out.println("Got the CustomerResourceManager");
 									} else {
@@ -283,9 +283,11 @@ public class MiddleWare implements IResourceManager {
 			} else {
 				
 				try {
-					Remote rm = (Remote) UnicastRemoteObject.exportObject(mw, 0);
+					IResourceManager rm = (IResourceManager) UnicastRemoteObject.exportObject(mw, port);
 					registry = LocateRegistry.getRegistry(server);
-					registry.rebind("MyGroupResourceManager", rm);
+					registry.rebind("akawry_MyGroupResourceManager", rm);
+					
+					System.out.println("Middleware server running on port "+port);
 				} catch (Exception e){
 					System.err.println("Middleware exception: " + e.toString());
 					e.printStackTrace();
