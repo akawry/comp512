@@ -1,5 +1,12 @@
 package ResImpl.TCP;
 
+import java.rmi.RemoteException;
+import java.util.Vector;
+
+import ResImpl.CarResourceManager;
+import ResImpl.CustomerResourceManager;
+import ResImpl.FlightResourceManager;
+import ResImpl.RoomResourceManager;
 import ResImpl.RMI.RMIMiddleWare;
 import ResInterface.IResourceManager;
 
@@ -12,16 +19,17 @@ public class TCPMiddleWareServer extends AbstractTCPResourceManager {
 	private int flightRMPort;
 	private int roomRMPort;
 	private int port;
-	private IResourceManager rm;
+	private CustomerResourceManager rm;
 	
-	public TCPMiddleWareServer(IResourceManager rm){
-		this.rm = rm;
+	public TCPMiddleWareServer(){
+		this.rm = new CustomerResourceManager(new CarResourceManager(), new FlightResourceManager(), new RoomResourceManager());
 	}
 	
 	@Override
 	public String processInput(String line) {
 		String res = null;
-		String type = line.split(",")[0];
+		String[] toks = line.split(",");
+		String type = toks[0];
 		
 		// forward request to car rm
 		if (type.contains("car")){
@@ -38,6 +46,48 @@ public class TCPMiddleWareServer extends AbstractTCPResourceManager {
 		// handle locally 
 		} else if (type.contains("customer")){
 			
+			int id = Integer.parseInt(toks[1]),
+				cid = Integer.parseInt(toks[2]);
+			
+			if (type.startsWith("new")){
+				res = "" + (toks.length == 2 ? rm.newCustomer(id) : rm.newCustomer(id, cid));
+			} else if (type.startsWith("delete")){
+				res = "" + rm.deleteCustomer(id, cid);
+			} else if (type.startsWith("query")){
+				res = "" + rm.queryCustomerInfo(id, cid);
+			}
+			
+		// handle locally
+		} else if (type.contains("reserve")){
+			
+			try {
+				int id = Integer.parseInt(toks[1]),
+					cid = Integer.parseInt(toks[2]);
+	
+				if (type.contains("car")){
+					res = "" + rm.reserveCar(id, cid, toks[3]);
+				} else if (type.contains("flight")){
+					res = "" + rm.reserveFlight(id, cid, Integer.parseInt(toks[3]));
+				} else if (type.contains("room")){
+					res = "" + rm.reserveRoom(id, cid, toks[3]);
+				}
+			
+			} catch(Exception e){
+				e.printStackTrace();
+			}
+			
+		} else if (type.contains("itinerary")){
+			
+			Vector<String> flights = new Vector<String>();
+			for (int i = 3; i < toks.length - 3; i++){
+				flights.add(toks[i]);
+			}
+			try {
+				res = "" + rm.itinerary(Integer.parseInt(toks[1]), Integer.parseInt(toks[2]), 
+						flights, toks[toks.length - 3], new Boolean(toks[toks.length - 2]), new Boolean(toks[toks.length - 1]));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 			
 		}
 		
@@ -84,7 +134,7 @@ public class TCPMiddleWareServer extends AbstractTCPResourceManager {
 	}
 
 	public static void main(String[] args) {
-		TCPMiddleWareServer mw = new TCPMiddleWareServer(new RMIMiddleWare());
+		TCPMiddleWareServer mw = new TCPMiddleWareServer();
 		mw.parseArgs(args);
 		mw.listen(mw.port);
 	}

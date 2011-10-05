@@ -2,6 +2,7 @@ package ResInterface;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.Vector;
 
 public interface ICustomerResourceManager extends Remote{
 
@@ -27,5 +28,8 @@ public interface ICustomerResourceManager extends Remote{
     
     /* reserve a room certain at this location */
     public boolean reserveRoom(int id, int customer, String location) throws RemoteException; 
+
+	/* reserve an itinerary */
+    public boolean itinerary(int id,int customer,Vector<String> flightNumbers,String location, boolean Car, boolean Room) throws RemoteException; 
 	
 }

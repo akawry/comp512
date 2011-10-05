@@ -12,6 +12,7 @@ import java.util.Vector;
 import ResImpl.AbstractResourceManager;
 import ResImpl.Car;
 import ResImpl.Customer;
+import ResImpl.CustomerResourceManager;
 import ResImpl.Flight;
 import ResImpl.Hotel;
 import ResImpl.RMHashtable;
@@ -24,11 +25,12 @@ import ResInterface.IFlightResourceManager;
 import ResInterface.IResourceManager;
 import ResInterface.IRoomResourceManager;
 
-public class RMIMiddleWare extends AbstractResourceManager implements Remote, IResourceManager {
+public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote, IResourceManager {
 
 	private ICarResourceManager carRM;
 	private IFlightResourceManager flightRM;
 	private IRoomResourceManager roomRM;
+	private CustomerResourceManager customerRM;
 	
 	// By default, if there is no args for car/room/flight, we try localhost:1099	
 	// Explicit is better than implicit
@@ -86,7 +88,7 @@ public class RMIMiddleWare extends AbstractResourceManager implements Remote, IR
 
 	@Override
 	public boolean reserveFlight(int id, int customer, int flightNumber) throws RemoteException {
-		return reserveItem(id, customer, flightRM.getFlight(id, flightNumber), String.valueOf(flightNumber));
+		return customerRM.reserveFlight(id, customer, flightNumber);
 	}
 
 	@Override
@@ -111,7 +113,7 @@ public class RMIMiddleWare extends AbstractResourceManager implements Remote, IR
 
 	@Override
 	public boolean reserveRoom(int id, int customer, String location) throws RemoteException {
-		return reserveItem(id, customer, roomRM.getRoom(id, location), location);
+		return customerRM.reserveRoom(id, customer, location);
 	}
 
 	@Override
@@ -136,100 +138,33 @@ public class RMIMiddleWare extends AbstractResourceManager implements Remote, IR
 
 	@Override
 	public boolean reserveCar(int id, int customer, String location) throws RemoteException {
-		return reserveItem(id, customer, carRM.getCar(id, location), location);
+		return customerRM.reserveCar(id, customer, location);
 	}
 
 	@Override
-	public int newCustomer(int id) {
-		Trace.info("INFO: RM::newCustomer(" + id + ") called" );
-		// Generate a globally unique ID for the new customer
-		int cid = Integer.parseInt( String.valueOf(id) +
-								String.valueOf(Calendar.getInstance().get(Calendar.MILLISECOND)) +
-								String.valueOf( Math.round( Math.random() * 100 + 1 )));
-		Customer cust = new Customer( cid );
-		writeData( id, cust.getKey(), cust );
-		Trace.info("RM::newCustomer(" + cid + ") returns ID=" + cid );
-		return cid;
+	public int newCustomer(int id) throws RemoteException {
+		return customerRM.newCustomer(id);
 	}
 
 	@Override
-	public boolean newCustomer(int id, int customerID ) {
-		Trace.info("INFO: RM::newCustomer(" + id + ", " + customerID + ") called" );
-		Customer cust = (Customer) readData( id, Customer.getKey(customerID) );
-		if( cust == null ) {
-			cust = new Customer(customerID);
-			writeData( id, cust.getKey(), cust );
-			Trace.info("INFO: RM::newCustomer(" + id + ", " + customerID + ") created a new customer" );
-			return true;
-		} else {
-			Trace.info("INFO: RM::newCustomer(" + id + ", " + customerID + ") failed--customer already exists");
-			return false;
-		}
+	public boolean newCustomer(int id, int customerID ) throws RemoteException {
+		return customerRM.newCustomer(id, customerID);
 	}
 
 	@Override
 	public boolean deleteCustomer(int id, int customerID) {
-		Trace.info("RM::deleteCustomer(" + id + ", " + customerID + ") called" );
-		Customer cust = (Customer) readData( id, Customer.getKey(customerID) );
-		if( cust == null ) {
-			Trace.warn("RM::deleteCustomer(" + id + ", " + customerID + ") failed--customer doesn't exist" );
-			return false;
-		} else {			
-			// Increase the reserved numbers of all reservable items which the customer reserved. 
-			RMHashtable reservationHT = cust.getReservations();
-			for(Enumeration e = reservationHT.keys(); e.hasMoreElements();){		
-				String reservedkey = (String) (e.nextElement());
-				ReservedItem reserveditem = cust.getReservedItem(reservedkey);
-				Trace.info("RM::deleteCustomer(" + id + ", " + customerID + ") has reserved " + reserveditem.getKey() + " " +  reserveditem.getCount() +  " times"  );
-				ReservableItem item  = (ReservableItem) readData(id, reserveditem.getKey());
-				Trace.info("RM::deleteCustomer(" + id + ", " + customerID + ") has reserved " + reserveditem.getKey() + "which is reserved" +  item.getReserved() +  " times and is still available " + item.getCount() + " times"  );
-				item.setReserved(item.getReserved()-reserveditem.getCount());
-				item.setCount(item.getCount()+reserveditem.getCount());
-			}
-			
-			// remove the customer from the storage
-			removeData(id, cust.getKey());
-			
-			Trace.info("RM::deleteCustomer(" + id + ", " + customerID + ") succeeded" );
-			return true;
-		}
+		return customerRM.deleteCustomer(id, customerID);
 	}
 
 	@Override
 	public String queryCustomerInfo(int id, int customerID) {
-		Trace.info("RM::queryCustomerInfo(" + id + ", " + customerID + ") called" );
-		Customer cust = (Customer) readData( id, Customer.getKey(customerID) );
-		if( cust == null ) {
-			Trace.warn("RM::queryCustomerInfo(" + id + ", " + customerID + ") failed--customer doesn't exist" );
-			return "";   // NOTE: don't change this--WC counts on this value indicating a customer does not exist...
-		} else {
-				String s = cust.printBill();
-				Trace.info("RM::queryCustomerInfo(" + id + ", " + customerID + "), bill follows..." );
-				System.out.println( s );
-				return s;
-		} 
+		return customerRM.queryCustomerInfo(id, customerID);
 	}
 
 	@Override
 	public boolean itinerary(int id, int customer, Vector<String> flightNumbers,
 			String location, boolean Car, boolean Room) throws RemoteException {
-		
-		boolean success = true;
-		
-		// reserve flights 
-		for (String s : flightNumbers){
-			success &= this.reserveFlight(id, customer, Integer.parseInt(s));
-		}
-		
-		// reserve car
-		if (Car)
-			success &= this.reserveCar(id, customer, location);
-		
-		// reserve room
-		if (Room)
-			success &= this.reserveRoom(id, customer, location);
-		
-		return success;
+		return customerRM.itinerary(id, customer, flightNumbers, location, Car, Room);
 	}
 
 	public String usage(){
@@ -256,6 +191,7 @@ public class RMIMiddleWare extends AbstractResourceManager implements Remote, IR
 
 	}
 
+	@Override
 	protected void parseArgs(String[] args) {
 
 		if (args.length != 4 && args.length != 3){
@@ -292,12 +228,14 @@ public class RMIMiddleWare extends AbstractResourceManager implements Remote, IR
 		}
 	}
 
+	@Override
 	protected void launch() {
 
 		try {
 			carRM = (ICarResourceManager)LocateRegistry.getRegistry(carserver,carport).lookup("akawry_MyCarResourceManager");
 			roomRM = (IRoomResourceManager)LocateRegistry.getRegistry(roomserver,roomport).lookup("akawry_MyRoomResourceManager");
 			flightRM = (IFlightResourceManager)LocateRegistry.getRegistry(flightserver,flightport).lookup("akawry_MyFlightResourceManager");
+			customerRM = new CustomerResourceManager(carRM, flightRM, roomRM);
 		} catch (Exception e) {
 		    System.out.println("[ERROR] Middleware cannot get rmi object") ;
 		    e.printStackTrace() ;
@@ -314,17 +252,10 @@ public class RMIMiddleWare extends AbstractResourceManager implements Remote, IR
 		}
 
 		//start his own rmi
-		try {
-			registry = LocateRegistry.getRegistry("localhost", port);
-			register();
-			System.err.println("[OK] Server " + this.toString() + " ready on port " + port);
-		} catch (Exception e) {
-			System.err.println("[ERROR] Server " + this.toString() + " on port " + port);
-			e.printStackTrace();
-			System.exit(1);
-		}			
+		super.launch();			
 	}
 
+	@Override 
 	protected void register() throws Exception {
 		registry.bind("akawry_MyGroupResourceManager", UnicastRemoteObject.exportObject(this,0));
 	}

@@ -1,4 +1,4 @@
-/*package ResImpl;
+package ResImpl;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
@@ -7,13 +7,27 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Calendar;
 import java.util.Enumeration;
+import java.util.Vector;
 
+import ResInterface.ICarResourceManager;
 import ResInterface.ICustomerResourceManager;
+import ResInterface.IFlightResourceManager;
+import ResInterface.IRoomResourceManager;
 
 public class CustomerResourceManager extends AbstractResourceManager implements ICustomerResourceManager {
 
+	private IFlightResourceManager flightRM;
+	private IRoomResourceManager roomRM;
+	private ICarResourceManager carRM;
+	
+	public CustomerResourceManager(ICarResourceManager carRM, IFlightResourceManager flightRM, IRoomResourceManager roomRM){
+		this.carRM = carRM;
+		this.roomRM = roomRM;
+		this.flightRM = flightRM;
+	}
+	
 	@Override
-	public int newCustomer(int id) throws RemoteException {
+	public int newCustomer(int id) {
 		Trace.info("INFO: RM::newCustomer(" + id + ") called" );
 		// Generate a globally unique ID for the new customer
 		int cid = Integer.parseInt( String.valueOf(id) +
@@ -26,7 +40,7 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 	}
 
 	@Override
-	public boolean newCustomer(int id, int customerID ) throws RemoteException {
+	public boolean newCustomer(int id, int customerID ) {
 		Trace.info("INFO: RM::newCustomer(" + id + ", " + customerID + ") called" );
 		Customer cust = (Customer) readData( id, Customer.getKey(customerID) );
 		if( cust == null ) {
@@ -41,7 +55,7 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 	}
 
 	@Override
-	public boolean deleteCustomer(int id, int customerID) throws RemoteException {
+	public boolean deleteCustomer(int id, int customerID) {
 		Trace.info("RM::deleteCustomer(" + id + ", " + customerID + ") called" );
 		Customer cust = (Customer) readData( id, Customer.getKey(customerID) );
 		if( cust == null ) {
@@ -69,7 +83,7 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 	}
 
 	@Override
-	public String queryCustomerInfo(int id, int customerID) throws RemoteException {
+	public String queryCustomerInfo(int id, int customerID) {
 		Trace.info("RM::queryCustomerInfo(" + id + ", " + customerID + ") called" );
 		Customer cust = (Customer) readData( id, Customer.getKey(customerID) );
 		if( cust == null ) {
@@ -84,10 +98,8 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 	}
 
 	@Override
-	public boolean reserveCar(int id, int customer, String location)
-			throws RemoteException {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean reserveCar(int id, int customer, String location) throws RemoteException {
+		return reserveItem(id, customer, carRM.getCar(id, location), location);
 	}
 
 	@Override
@@ -97,9 +109,28 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 	}
 
 	@Override
-	public boolean reserveRoom(int id, int customer, String locationd)
+	public boolean reserveRoom(int id, int customer, String location)
 			throws RemoteException {
-		// TODO Auto-generated method stub
-		return false;
+		return reserveItem(id, customer, roomRM.getRoom(id, location), location);
 	}
-}*/
+
+	@Override
+	public boolean itinerary(int id, int customer, Vector<String> flightNumbers, String location, boolean Car, boolean Room) throws RemoteException {
+		boolean success = true;
+		
+		// reserve flights 
+		for (String s : flightNumbers){
+			success &= reserveFlight(id, customer, Integer.parseInt(s));
+		}
+		
+		// reserve car
+		if (Car)
+			success &= reserveCar(id, customer, location);
+		
+		// reserve room
+		if (Room)
+			success &= reserveRoom(id, customer, location);
+		
+		return success;
+	}
+}
