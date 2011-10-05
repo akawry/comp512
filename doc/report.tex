@@ -18,15 +18,54 @@ Alexander \textsc{Kawrykow} \\ \\ \\
 
 \begin{document}
 \maketitle
-%\includegraphics{mcgill_logo.png}
-
-\clearpage
+\begin{figure}
+  \centering
+	\includegraphics[scale=0.8]{mcgill_logo.png}
+  \caption{McGill University}
+  \label{mcgill}
+\end{figure}
 \tableofcontents
 \clearpage
-\section{Introduction}
+
+%\section{Introduction}
 \section{Project Part 1: Distributing an Application}
 \subsection{Design}
 
+We decided to separate the ResourceManager interface to split the concerns. 
+
+Accordingly, we created one type of Interface for each kind of resource (room, car, flight, customer), and finally aggregated all these into one large interface (the IResourceManager). 
+
+We then looked at the functionality common to anything Resource-Manager related: reading data, writing data, querying data, etc. In particular,
+these are functions which have no semantic meaning specific to any of the resources. We extracted these into an AbstractResourceManager.
+For each kind of resource, we implemented a concrete ResourceManager who was able to reuse the functionality in the AbstractResourceManager, 
+but in the context of a particular resource. 
+
+
+Both our RMI and TCP implementations of the ResourceManagers act as wrappers for their underlying ResourceManager. That is, a RMI car resource manager
+takes care of binding to the registry and remote method calls, but the underlying logic happens by delegating to a concrete car resource manager. A
+similiar approach was taken for the TCP car resource manager. In this way, we were able to maximize code reuse. 
+
+
+Another step taken to maximize code reuse was our treatment of the Client. Rather than re-writing the client for TCP, we created a TCP "proxy" resource
+manager which implements IResourceManager, but simply passes on the exact command to the remote middleware server. Here, the proxy is simply a local
+reference we can create when the client is launched.
+
+
+The remote middleware server listens for the TCP/IP messages, looks at the first few letters, and 
+then delegates the exact command. For example, we know a command containing the substring "car" must be sent, via TCP/IP, to the car resource manager server,
+so little processing of the commands ever needs to take place. The car resource manager can then just look at the first few letters of his received command,
+and delegate to his reference to a local concret car resourcemanager depending on the type of query. For example, if the command starts with 'new', we know
+we can call the newCar method on the local reference and have him take care of the logic. 
+
+
+For the UML diagram, please refere to Figure~\ref{uml}.
+
+\begin{figure}
+  \centering
+	\includegraphics[scale=0.6,angle=90]{classhierarchy.png}
+  \caption{UML Class Diagram}
+  \label{uml}
+\end{figure}
 
 
 \subsection{Testing}
