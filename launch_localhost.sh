@@ -13,4 +13,4 @@ sleep 1
 sleep 1 
 ( ./launch.sh $1 middleware $5 -car=localhost:$2 -flight=localhost:$3 -room=localhost:$4 )
 sleep 1
-( ./launch_client.sh $1 localhost:$5 )
+( ./launch_client.sh $1 localhost:$5 < input1 )

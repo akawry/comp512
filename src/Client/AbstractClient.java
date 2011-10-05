@@ -157,7 +157,7 @@ public abstract class AbstractClient {
 					e.printStackTrace();
 				}
 				break;
-
+		
 			case 6: // delete Flight
 				if (arguments.size() != 3) {
 					wrongNumber();
