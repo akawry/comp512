@@ -22,18 +22,17 @@ public class TCPClient extends AbstractClient
 		String serverhost = "localhost";
 		int serverport = 1099; 
 
-		if (args.length == 1) { 
-			serverhost = args[0].split(":")[0]; 
-			serverport = Integer.parseInt( args[0].split(":")[1] ); 
-		} else if (args.length > 1) {
+		if (args.length != 1) {
 			System.out.println ("Usage: java client [rmihost]"); 
 			System.exit(1); 
+		} else {
+			serverhost = args[0].split(":")[0]; 
+			serverport = Integer.parseInt( args[0].split(":")[1] ); 
+			rm = new TCPMiddleWareClient(serverhost, serverport);
+			// begin input loop 
+			acceptInput();
+			
 		}
-		
-		rm = new TCPMiddleWareClient();
-
-		// begin input loop 
-		acceptInput();
 
 	}
 }

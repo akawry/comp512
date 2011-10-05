@@ -9,7 +9,7 @@ public class TCPMiddleWareServer extends AbstractTCPResourceManager {
 	private String flightRMHost = "localhost";
 	private String roomRMHost = "localhost";
 	private int carRMPort;
-	private int flightRMPort = 2034;
+	private int flightRMPort;
 	private int roomRMPort;
 	private int port;
 	private IResourceManager rm;

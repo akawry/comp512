@@ -11,7 +11,12 @@ import ResInterface.IResourceManager;
 public class TCPMiddleWareClient extends AbstractTCPResourceManager implements IResourceManager {
 
 	private String middleWareServerHost = "localhost";
-	private int middleWareServerPort = 2033;
+	private int middleWareServerPort = 1099;
+	
+	public TCPMiddleWareClient(String host, int port){
+		middleWareServerHost = host;
+		middleWareServerPort = port;
+	}
 	
 	@Override
 	public boolean addFlight(int id, int flightNum, int flightSeats,
