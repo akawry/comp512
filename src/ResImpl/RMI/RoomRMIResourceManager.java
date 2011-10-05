@@ -1,0 +1,60 @@
+package ResImpl.RMI;
+
+import java.rmi.Remote;
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
+
+import ResImpl.Hotel;
+import ResImpl.RoomResourceManager;
+import ResInterface.IRoomResourceManager;
+
+public class RoomRMIResourceManager extends AbstractRMIResourceManager implements Remote, IRoomResourceManager {
+
+	private RoomResourceManager rm;
+	
+	public RoomRMIResourceManager(RoomResourceManager rm) {
+		this.rm = rm;
+	}
+	
+	@Override
+	public String usage() {
+		return "Usage: java ResImpl.RoomResourceManager [port]";
+	}
+	
+	@Override
+	public void register() throws Exception {
+	    registry.bind("akawry_MyRoomResourceManager", UnicastRemoteObject.exportObject(this,0));
+	}
+
+	@Override
+	public boolean addRooms(int id, String location, int numRooms, int price) throws RemoteException {
+		return rm.addRooms(id, location, numRooms, price);
+	}
+
+	@Override
+	public boolean deleteRooms(int id, String location) throws RemoteException {
+		return rm.deleteRooms(id, location);
+	}
+
+	@Override
+	public int queryRooms(int id, String location) throws RemoteException {
+		return rm.queryRooms(id, location);
+	}
+
+	@Override
+	public int queryRoomsPrice(int id, String location) throws RemoteException {
+		return rm.queryRoomsPrice(id, location);
+	}
+
+	@Override
+	public Hotel getRoom(int id, String location) throws RemoteException {
+		return rm.getRoom(id, location);
+	}
+
+	public static void main(String[] args) {
+		RoomRMIResourceManager rm = new RoomRMIResourceManager(new RoomResourceManager());
+		rm.parseArgs(args) ;
+		rm.launch();
+	}
+
+}

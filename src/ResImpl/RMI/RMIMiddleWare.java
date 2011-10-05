@@ -1,4 +1,4 @@
-package ResImpl;
+package ResImpl.RMI;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
@@ -9,26 +9,35 @@ import java.util.Calendar;
 import java.util.Enumeration;
 import java.util.Vector;
 
+import ResImpl.AbstractResourceManager;
+import ResImpl.Car;
+import ResImpl.Customer;
+import ResImpl.Flight;
+import ResImpl.Hotel;
+import ResImpl.RMHashtable;
+import ResImpl.ReservableItem;
+import ResImpl.ReservedItem;
+import ResImpl.Trace;
 import ResInterface.ICarResourceManager;
 import ResInterface.ICustomerResourceManager;
 import ResInterface.IFlightResourceManager;
 import ResInterface.IResourceManager;
 import ResInterface.IRoomResourceManager;
 
-public class MiddleWare extends AbstractResourceManager implements Remote, IResourceManager {
+public class RMIMiddleWare extends AbstractResourceManager implements Remote, IResourceManager {
 
 	private ICarResourceManager carRM;
 	private IFlightResourceManager flightRM;
 	private IRoomResourceManager roomRM;
 	
-		// By default, if there is no args for car/room/flight, we try localhost:1099	
-		// Explicit is better than implicit
-		String carserver = new String("localhost") ;
-		String flightserver = new String("localhost") ;
-		String roomserver = new String("localhost") ;
-		int carport = 1099 ;
-		int flightport = 1099 ;
-		int roomport = 1099 ;
+	// By default, if there is no args for car/room/flight, we try localhost:1099	
+	// Explicit is better than implicit
+	private String carserver = new String("localhost") ;
+	private String flightserver = new String("localhost") ;
+	private String roomserver = new String("localhost") ;
+	private int carport = 1099 ;
+	private int flightport = 1099 ;
+	private int roomport = 1099 ;
 
 	public ICarResourceManager getCarResourceManager() {
 		return carRM;
@@ -71,20 +80,17 @@ public class MiddleWare extends AbstractResourceManager implements Remote, IReso
 	}
 
 	@Override
-	public int queryFlightPrice(int id, int flightNumber)
-			throws RemoteException {
+	public int queryFlightPrice(int id, int flightNumber) throws RemoteException {
 		return flightRM.queryFlightPrice(id, flightNumber);
 	}
 
 	@Override
-	public boolean reserveFlight(int id, int customer, int flightNumber)
-			throws RemoteException {
+	public boolean reserveFlight(int id, int customer, int flightNumber) throws RemoteException {
 		return reserveItem(id, customer, flightRM.getFlight(id, flightNumber), String.valueOf(flightNumber));
 	}
 
 	@Override
-	public boolean addRooms(int id, String location, int numRooms, int price)
-			throws RemoteException {
+	public boolean addRooms(int id, String location, int numRooms, int price) throws RemoteException {
 		return roomRM.addRooms(id, location, numRooms, price);
 	}
 
@@ -104,14 +110,12 @@ public class MiddleWare extends AbstractResourceManager implements Remote, IReso
 	}
 
 	@Override
-	public boolean reserveRoom(int id, int customer, String location)
-			throws RemoteException {
+	public boolean reserveRoom(int id, int customer, String location) throws RemoteException {
 		return reserveItem(id, customer, roomRM.getRoom(id, location), location);
 	}
 
 	@Override
-	public boolean addCars(int id, String location, int numCars, int price)
-			throws RemoteException {
+	public boolean addCars(int id, String location, int numCars, int price) throws RemoteException {
 		return carRM.addCars(id, location, numCars, price);
 	}
 
@@ -131,13 +135,12 @@ public class MiddleWare extends AbstractResourceManager implements Remote, IReso
 	}
 
 	@Override
-	public boolean reserveCar(int id, int customer, String location)
-			throws RemoteException {
+	public boolean reserveCar(int id, int customer, String location) throws RemoteException {
 		return reserveItem(id, customer, carRM.getCar(id, location), location);
 	}
 
 	@Override
-	public int newCustomer(int id) throws RemoteException {
+	public int newCustomer(int id) {
 		Trace.info("INFO: RM::newCustomer(" + id + ") called" );
 		// Generate a globally unique ID for the new customer
 		int cid = Integer.parseInt( String.valueOf(id) +
@@ -150,7 +153,7 @@ public class MiddleWare extends AbstractResourceManager implements Remote, IReso
 	}
 
 	@Override
-	public boolean newCustomer(int id, int customerID ) throws RemoteException {
+	public boolean newCustomer(int id, int customerID ) {
 		Trace.info("INFO: RM::newCustomer(" + id + ", " + customerID + ") called" );
 		Customer cust = (Customer) readData( id, Customer.getKey(customerID) );
 		if( cust == null ) {
@@ -165,7 +168,7 @@ public class MiddleWare extends AbstractResourceManager implements Remote, IReso
 	}
 
 	@Override
-	public boolean deleteCustomer(int id, int customerID) throws RemoteException {
+	public boolean deleteCustomer(int id, int customerID) {
 		Trace.info("RM::deleteCustomer(" + id + ", " + customerID + ") called" );
 		Customer cust = (Customer) readData( id, Customer.getKey(customerID) );
 		if( cust == null ) {
@@ -193,7 +196,7 @@ public class MiddleWare extends AbstractResourceManager implements Remote, IReso
 	}
 
 	@Override
-	public String queryCustomerInfo(int id, int customerID) throws RemoteException {
+	public String queryCustomerInfo(int id, int customerID) {
 		Trace.info("RM::queryCustomerInfo(" + id + ", " + customerID + ") called" );
 		Customer cust = (Customer) readData( id, Customer.getKey(customerID) );
 		if( cust == null ) {
@@ -228,8 +231,7 @@ public class MiddleWare extends AbstractResourceManager implements Remote, IReso
 		
 		return success;
 	}
-	
-	@Override
+
 	public String usage(){
 		return "Usage: java MiddleWare [opts]\n"+
 				"where opts must include all of:\n\n"+
@@ -248,7 +250,7 @@ public class MiddleWare extends AbstractResourceManager implements Remote, IReso
 	 */
 	public static void main(String[] args) {
 		
-		MiddleWare mw = new MiddleWare();
+		RMIMiddleWare mw = new RMIMiddleWare();
 		mw.parseArgs(args) ;
 		mw.launch() ;
 
@@ -293,9 +295,9 @@ public class MiddleWare extends AbstractResourceManager implements Remote, IReso
 	protected void launch() {
 
 		try {
-		carRM = (ICarResourceManager)LocateRegistry.getRegistry(carserver,carport).lookup("akawry_MyCarResourceManager");
-		roomRM = (IRoomResourceManager)LocateRegistry.getRegistry(roomserver,roomport).lookup("akawry_MyRoomResourceManager");
-		flightRM = (IFlightResourceManager)LocateRegistry.getRegistry(flightserver,flightport).lookup("akawry_MyFlightResourceManager");
+			carRM = (ICarResourceManager)LocateRegistry.getRegistry(carserver,carport).lookup("akawry_MyCarResourceManager");
+			roomRM = (IRoomResourceManager)LocateRegistry.getRegistry(roomserver,roomport).lookup("akawry_MyRoomResourceManager");
+			flightRM = (IFlightResourceManager)LocateRegistry.getRegistry(flightserver,flightport).lookup("akawry_MyFlightResourceManager");
 		} catch (Exception e) {
 		    System.out.println("[ERROR] Middleware cannot get rmi object") ;
 		    e.printStackTrace() ;
@@ -303,19 +305,26 @@ public class MiddleWare extends AbstractResourceManager implements Remote, IReso
 		}
 
 		// Check if we have everything we need
-		if (getCarResourceManager() == null){
+		if (carRM == null){
 			System.out.println("Middleware was unable to establish a connection with the CarResourceManager");
-		} else if (getFlightResourceManager() == null){
+		} else if (flightRM == null){
 			System.out.println("Middleware was unable to establish a connection with the FlightResourceManager");
-		} else if (getRoomResourceManager() == null){
+		} else if (roomRM == null){
 			System.out.println("Middleware was unable to establish a connection with the RoomResourceManager");
 		}
 
 		//start his own rmi
-		super.launch() ; 			
+		try {
+			registry = LocateRegistry.getRegistry("localhost", port);
+			register();
+			System.err.println("[OK] Server " + this.toString() + " ready on port " + port);
+		} catch (Exception e) {
+			System.err.println("[ERROR] Server " + this.toString() + " on port " + port);
+			e.printStackTrace();
+			System.exit(1);
+		}			
 	}
 
-	@Override
 	protected void register() throws Exception {
 		registry.bind("akawry_MyGroupResourceManager", UnicastRemoteObject.exportObject(this,0));
 	}

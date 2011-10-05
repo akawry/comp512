@@ -37,6 +37,8 @@ public abstract class AbstractTCPResourceManager {
             System.exit(-1);
         }
  
+        System.out.println(this+" listening on port "+port);
+        
         while (listening) {
 			try {
 				new MultiServerThread(serverSocket.accept(), this).start();

@@ -11,8 +11,7 @@ public interface ICarResourceManager extends Remote{
      * This should look a lot like addFlight, only keyed on a string location
      * instead of a flight number.
      */
-    public boolean addCars(int id, String location, int numCars, int price) 
-	throws RemoteException; 
+    public boolean addCars(int id, String location, int numCars, int price) throws RemoteException; 
     
     
     /* Delete all Cars from a location.
@@ -20,18 +19,15 @@ public interface ICarResourceManager extends Remote{
      *
      * @return success
      */		    
-    public boolean deleteCars(int id, String location) 
-	throws RemoteException; 
+    public boolean deleteCars(int id, String location) throws RemoteException; 
     
 
     /* return the number of cars available at a location */
-    public int queryCars(int id, String location) 
-	throws RemoteException; 
+    public int queryCars(int id, String location) throws RemoteException; 
     
 
     /* return the price of a car at a location */
-    public int queryCarsPrice(int id, String location) 
-	throws RemoteException;
+    public int queryCarsPrice(int id, String location) throws RemoteException;
     
     public Car getCar(int id, String location) throws RemoteException;
 	
