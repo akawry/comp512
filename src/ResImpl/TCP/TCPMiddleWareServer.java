@@ -23,7 +23,7 @@ public class TCPMiddleWareServer extends AbstractTCPResourceManager {
 	private CustomerResourceManager rm;
 	
 	public TCPMiddleWareServer(){
-		this.rm = new CustomerResourceManager(new CarResourceManager(), new FlightResourceManager(), new RoomResourceManager());
+		this.rm = new CustomerResourceManager(); //Weird customer manager
 	}
 	
 	@Override

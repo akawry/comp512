@@ -20,6 +20,9 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 	private IRoomResourceManager roomRM;
 	private ICarResourceManager carRM;
 	
+	public CustomerResourceManager(){
+	}
+
 	public CustomerResourceManager(ICarResourceManager carRM, IFlightResourceManager flightRM, IRoomResourceManager roomRM){
 		this.carRM = carRM;
 		this.roomRM = roomRM;
