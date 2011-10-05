@@ -96,7 +96,6 @@ public class TCPMiddleWareServer extends AbstractTCPResourceManager {
 				res = "" + (toks.length == 2 ? rm.newCustomer(id) : rm.newCustomer(id, cid));
 			} else if (type.startsWith("delete")){
 				res = "" + rm.deleteCustomer(id, cid);
-				//TODO
 			} else if (type.startsWith("query")){
 				res = "" + rm.queryCustomerInfo(id, cid);
 			}
