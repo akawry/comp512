@@ -11,7 +11,7 @@ import java.util.*;
 import java.io.*;
 
 
-public class Client extends AbstractClient
+public class RMIClient extends AbstractClient
 {
 
 	public static void main(String args[])
@@ -23,7 +23,7 @@ public class Client extends AbstractClient
 			serverhost = args[0].split(":")[0]; 
 			serverport = Integer.parseInt( args[0].split(":")[1] ); 
 		} else if (args.length > 1) {
-			System.out.println ("Usage: java client [rmihost]"); 
+			System.out.println ("Usage: java RMIClient [rmihost]"); 
 			System.exit(1); 
 		}
 
