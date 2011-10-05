@@ -11,7 +11,7 @@ import ResInterface.IRoomResourceManager;
 public class RoomResourceManager extends AbstractResourceManager implements Remote, IRoomResourceManager {
 
 	@Override
-	public boolean addRooms(int id, String location, int count, int price) throws RemoteException {
+	public boolean addRooms(int id, String location, int count, int price) {
 		Trace.info("RM::addRooms(" + id + ", " + location + ", " + count + ", $" + price + ") called" );
 		Hotel curObj = (Hotel) readData( id, Hotel.getKey(location) );
 		if( curObj == null ) {
@@ -32,43 +32,22 @@ public class RoomResourceManager extends AbstractResourceManager implements Remo
 	}
 
 	@Override
-	public boolean deleteRooms(int id, String location) throws RemoteException {
+	public boolean deleteRooms(int id, String location) {
 		return deleteItem(id, Hotel.getKey(location));	
 	}
 
 	@Override
-	public int queryRooms(int id, String location) throws RemoteException {
+	public int queryRooms(int id, String location) {
 		return queryNum(id, Hotel.getKey(location));
 	}
 
 	@Override
-	public int queryRoomsPrice(int id, String location) throws RemoteException {
+	public int queryRoomsPrice(int id, String location) {
 		return queryPrice(id, Hotel.getKey(location));
 	}
 
-	/*@Override
-	public boolean reserveRoom(int id, int customerID, String location) throws RemoteException {
-		return reserveItem(id, customerRM.getCustomer(customerID), Hotel.getKey(location), location);
-	}*/
-	
 	@Override
-	public String usage() {
-		return "Usage: java ResImpl.RoomResourceManager [port]";
-	}
-	
-	@Override
-	public void register() throws Exception {
-	    registry.bind("akawry_MyRoomResourceManager", UnicastRemoteObject.exportObject(this,0));
-	}
-	
-	public static void main(String[] args) {
-		RoomResourceManager rm = new RoomResourceManager();
-		rm.parseArgs(args) ;
-		rm.launch();
-	}
-
-	@Override
-	public Hotel getRoom(int id, String location) throws RemoteException {
+	public Hotel getRoom(int id, String location) {
 		return (Hotel) readData(id, Hotel.getKey(location));
 	}
 

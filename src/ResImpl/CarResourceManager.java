@@ -14,7 +14,7 @@ public class CarResourceManager extends AbstractResourceManager implements ICarR
 	@Override
 	// Create a new car location or add cars to an existing location
 	//  NOTE: if price <= 0 and the location already exists, it maintains its current price
-	public boolean addCars(int id, String location, int count, int price) throws RemoteException {
+	public boolean addCars(int id, String location, int count, int price) {
 		Trace.info("RM::addCars(" + id + ", " + location + ", " + count + ", $" + price + ") called" );
 		Car curObj = (Car) readData( id, Car.getKey(location) );
 		if( curObj == null ) {
@@ -34,46 +34,22 @@ public class CarResourceManager extends AbstractResourceManager implements ICarR
 	}
 
 	@Override
-	public boolean deleteCars(int id, String location) throws RemoteException {
+	public boolean deleteCars(int id, String location) {
 		return deleteItem(id, Car.getKey(location));
 	}
 
 	@Override
-	public int queryCars(int id, String location) throws RemoteException {
+	public int queryCars(int id, String location) {
 		return queryNum(id, Car.getKey(location));
 	}
 
 	@Override
-	public int queryCarsPrice(int id, String location) throws RemoteException {
+	public int queryCarsPrice(int id, String location) {
 		return queryPrice(id, Car.getKey(location));
 	}
 
-	/*@Override
-	public boolean reserveCar(int id, int customerID, String location) throws RemoteException {
-		Customer cust = customerRM.getCustomer(customerID);;
-		System.err.println("Got customer: "+cust);
-		return reserveItem(id, cust, Car.getKey(location), location);
-	}*/
-
 	@Override
-	public String usage() {
-		return "Usage: ResImpl.CarResourceManager [port]";
-	}
-
-	@Override
-	public void register() throws Exception {
-	    //ICarResourceManager rm = (ICarResourceManager) UnicastRemoteObject.exportObject((ICarResourceManager) this, 0);
-	    registry.bind("akawry_MyCarResourceManager", UnicastRemoteObject.exportObject(this, 0));
-	}
-	
-	public static void main(String[] args) {
-		CarResourceManager rm = new CarResourceManager();
-		rm.parseArgs(args) ;
-		rm.launch();
-	}
-
-	@Override
-	public Car getCar(int id, String location) throws RemoteException {
+	public Car getCar(int id, String location) {
 		return (Car) readData(id, Car.getKey(location));
 	}
 

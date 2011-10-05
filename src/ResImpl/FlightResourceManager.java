@@ -6,12 +6,13 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
+import ResImpl.RMI.FlightRMIResourceManager;
 import ResInterface.IFlightResourceManager;
 
-public class FlightResourceManager extends AbstractResourceManager implements Remote, IFlightResourceManager {
+public class FlightResourceManager extends AbstractResourceManager implements IFlightResourceManager {
 
 	@Override
-	public boolean addFlight(int id, int flightNum, int flightSeats, int flightPrice) throws RemoteException {
+	public boolean addFlight(int id, int flightNum, int flightSeats, int flightPrice) {
 		Trace.info("RM::addFlight(" + id + ", " + flightNum + ", $" + flightPrice + ", " + flightSeats + ") called" );
 		Flight curObj = (Flight) readData( id, Flight.getKey(flightNum) );
 		if( curObj == null ) {
@@ -33,43 +34,22 @@ public class FlightResourceManager extends AbstractResourceManager implements Re
 	}
 
 	@Override
-	public boolean deleteFlight(int id, int flightNum) throws RemoteException {
+	public boolean deleteFlight(int id, int flightNum) {
 		return deleteItem(id, Flight.getKey(flightNum));
 	}
 
 	@Override
-	public int queryFlight(int id, int flightNum) throws RemoteException {
+	public int queryFlight(int id, int flightNum) {
 		return queryNum(id, Flight.getKey(flightNum));
 	}
 
 	@Override
-	public int queryFlightPrice(int id, int flightNum ) throws RemoteException {
+	public int queryFlightPrice(int id, int flightNum ) {
 		return queryPrice(id, Flight.getKey(flightNum));
 	}
 
-	/*@Override
-	public boolean reserveFlight(int id, int customerID, int flightNum) throws RemoteException {
-		return reserveItem(id, customerRM.getCustomer(customerID), Flight.getKey(flightNum), String.valueOf(flightNum));
-	}*/
-
 	@Override
-	public String usage() {
-		return "Usage: ResImpl.FlightResourceManager [port]";
-	}
-
-	@Override
-	public void register() throws Exception {
-	    registry.bind("akawry_MyFlightResourceManager", UnicastRemoteObject.exportObject(this, 0));
-	}
-	
-	public static void main(String[] args) {
-		FlightResourceManager rm = new FlightResourceManager();
-		rm.parseArgs(args) ;
-		rm.launch();
-	}
-
-	@Override
-	public Flight getFlight(int id, int flightNumber) throws RemoteException {
+	public Flight getFlight(int id, int flightNumber) {
 		return (Flight) readData(id, Flight.getKey(flightNumber));
 	}
 	

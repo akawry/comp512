@@ -10,7 +10,7 @@ import java.util.Enumeration;
 
 import ResInterface.ICustomerResourceManager;
 
-public class CustomerResourceManager extends AbstractResourceManager implements Remote, ICustomerResourceManager {
+public class CustomerResourceManager extends AbstractResourceManager implements ICustomerResourceManager {
 
 	@Override
 	public int newCustomer(int id) throws RemoteException {
@@ -82,31 +82,24 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 				return s;
 		} 
 	}
-	
+
 	@Override
-	public String usage() {
-		return "Usage: ResImpl.CustomerResourceManager [port]";
+	public boolean reserveCar(int id, int customer, String location)
+			throws RemoteException {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 	@Override
-	public void register() throws Exception {
-		System.out.println(" Starting registry on port " + port) ;
-	    ICustomerResourceManager rm = (ICustomerResourceManager) UnicastRemoteObject.exportObject(this, port);
-		Registry registry = LocateRegistry.getRegistry();
-		registry.rebind("akawry_MyCustomerResourceManager", rm);
-<<<<<<< HEAD:src/ResImpl/CustomerResourceManager.java
+	public boolean reserveFlight(int id, int customer, int flightNumber)
+			throws RemoteException {
+		return reserveItem(id, customer, flightRM.getFlight(id, flightNumber), String.valueOf(flightNumber));
 	}
-	
+
 	@Override
-	public Customer getCustomer(int customerID){
-		System.out.println("Getting customer " + customerID);
-		return (Customer) readData(customerID, Customer.getKey(customerID));
-=======
->>>>>>> b5b37c62beeb614ae60fa06ee3110a8ce956993b:src/ResImpl/CustomerResourceManager.java
-	}
-	
-	public static void main(String[] args) {
-		CustomerResourceManager rm = new CustomerResourceManager();
-		rm.launch(args);
+	public boolean reserveRoom(int id, int customer, String locationd)
+			throws RemoteException {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }*/

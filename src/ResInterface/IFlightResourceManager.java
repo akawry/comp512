@@ -13,8 +13,7 @@ public interface IFlightResourceManager extends Remote{
      *
      * @return success.
      */
-    public boolean addFlight(int id, int flightNum, int flightSeats, int flightPrice) 
-	throws RemoteException; 
+    public boolean addFlight(int id, int flightNum, int flightSeats, int flightPrice) throws RemoteException; 
     
     /**
      *   Delete the entire flight.
@@ -24,16 +23,13 @@ public interface IFlightResourceManager extends Remote{
      *
      * @return success.
      */   
-    public boolean deleteFlight(int id, int flightNum) 
-	throws RemoteException; 
+    public boolean deleteFlight(int id, int flightNum) throws RemoteException; 
 
     /* queryFlight returns the number of empty seats. */
-    public int queryFlight(int id, int flightNumber) 
-	throws RemoteException;
+    public int queryFlight(int id, int flightNumber) throws RemoteException;
      
     /* queryFlightPrice returns the price of a seat on this flight. */
-    public int queryFlightPrice(int id, int flightNumber) 
-	throws RemoteException; 
+    public int queryFlightPrice(int id, int flightNumber) throws RemoteException; 
     
     public Flight getFlight(int id, int flightNumber) throws RemoteException;
 	
