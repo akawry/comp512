@@ -40,13 +40,13 @@ public class TCPMiddleWareServer extends AbstractTCPResourceManager {
 					cid = Integer.parseInt(toks[2]);
 	
 				if (type.contains("car")){
-
+					String[] info = send(concat("getcar", id, cid, toks[3]), carRMHost, carRMPort).split(",");
+					Car car = new Car(info[0], Integer.parseInt(info[1]), Integer.parseInt(toks[2]));
+					res = "" + rm.reserveCar(id, cid, car, toks[3]);
 				} else if (type.contains("flight")){
-
-					
+					res = "" + rm.reserveFlight(id, cid, Integer.parseInt(toks[3]));
 				} else if (type.contains("room")){
-
-					
+					res = "" + rm.reserveRoom(id, cid, toks[3]);
 				}
 			
 			} catch(Exception e){
