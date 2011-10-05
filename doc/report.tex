@@ -9,35 +9,66 @@
 \usepackage{graphicx}
 \setlength{\skip\footins}{2cm}
 
-%\renewcommand\listingscaption{Code}
-%%%%%%%%%%%%%
-%\begin{listing}[H]
-%\caption{Factorial in Ruby.}
-%\label{code:ruby_fact}
-
-%\end{listing}
-%%%%%%%%%%%%%
-
 \title{COMP-512 Distributed Systems, Fall 2011}
 \author{
 Matthieu \textsc{Dubet} \\
-Alexander \textsc{Kawrykow} \\
-%\emph{McGill University}
+Alexander \textsc{Kawrykow} \\ \\ \\
+\emph{School of Computer Science, McGill University }
 }
 
 \begin{document}
 \maketitle
-\includegraphics{mcgill_logo.png}
-\includegraphics[width=60mm]{mcgill_logo.png}
-\includegraphics[height=60mm]{mcgill_logo.png}
-%\includegraphics[scale=0.75]{myfig.pdf}
-%\includegraphics[angle=45,width=52mm]{myfig.jpg}
+%\includegraphics{mcgill_logo.png}
 
 \clearpage
 \tableofcontents
 \clearpage
 \section{Introduction}
-\section{Milestone 1}
+\section{Project Part 1: Distributing an Application}
+\subsection{Design}
+
+
+
+\subsection{Testing}
+\subsubsection{Bash scripts}
+To facilitate the testing of the system, Bash scripts are available.
+\begin{itemize}
+\item{
+{\tt launch.sh [tcp/rmi] [car/room/flight/middleware] [port] [.....]}.
+
+It take several arguments to launch each of the service (CarResourceManager,Room,Flight,Middleware or Client), either via TCP or RMI.
+}
+\item{
+{\tt launch-localhost.sh [tcp/rmi] [portcar] [portroom] [portflight] [portmiddleware]}.
+
+It deploys all the services all at a time on localhost.
+}
+\item{
+{\tt launch-client.sh [tcp/rmi] [host:port]} is used to launch a client (either RMI or TCP) 
+allowing fast testing when it's combined with the {\tt input1} file which contains multiple testcases.
+}
+\end{itemize}
+
+\subsubsection{Example}
+A traditional runcase with 3 servers would be :
+
+First, login to server1 and launch all the resource managers.
+
+{\tt ./launch.sh rmi flight 2000}
+
+{\tt ./launch.sh rmi car 2001}
+
+{\tt ./launch.sh rmi room 2002}
+
+Then, login to server2 and launch the middleware.
+
+{\tt ./launch.sh rmi middleware 2003 -flight=server1:2000 -car=server1:2001 -room=server1:2002}
+
+Finaly, login to server3 and use the client redirecting stdin from the input1 file
+ 
+{\tt ./launch-client.sh rmi client server2:2003 < input1}
+
+
 
 %\bibliographystyle{plain}
 %\bibliography{bib}
