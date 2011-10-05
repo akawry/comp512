@@ -63,7 +63,7 @@ public abstract class AbstractTCPResourceManager {
 	protected String send(String msg, String host, int port){
 		
 		String result = null;
-		
+		System.out.println("[OK] "+this+ " sending message: "+msg+", to host: "+host+", on port: "+port);
 		try {
 			Socket socket = new Socket(host, port);
 			PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
@@ -74,7 +74,7 @@ public abstract class AbstractTCPResourceManager {
             in.close();
             socket.close();
 		} catch (Exception e){
-			e.printStackTrace();
+			System.out.println("[ERROR] "+e.getMessage());
 		}
 		
 		return result;
