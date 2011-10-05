@@ -1,5 +1,14 @@
 #!/bin/bash
 
+function print_usage() {
+	echo "Usage: $0 tcp/rmi [.....]"
+	exit 1
+}
+
+if [ $# -lt 1 ] ; then
+	print_usage ;
+fi
+
 cd bin/
 java_run="java -Djava.security.policy=client.policy -Djava.rmi.server.codebase=file:`pwd`/"
 
@@ -42,6 +51,5 @@ elif [ $1 == "rmi" ] ; then
 		exit 1
 	esac
 else 
-	echo "First argument should be either tcp or rmi"
-	exit 1
+	print_usage ;
 fi
