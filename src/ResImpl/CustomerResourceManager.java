@@ -101,17 +101,29 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 	public boolean reserveCar(int id, int customer, String location) throws RemoteException {
 		return reserveItem(id, customer, carRM.getCar(id, location), location);
 	}
+	
+	public boolean reserveCar(int id, int customer, Car car, String location) {
+		return reserveItem(id, customer, car, location);
+	}
 
 	@Override
 	public boolean reserveFlight(int id, int customer, int flightNumber)
 			throws RemoteException {
 		return reserveItem(id, customer, flightRM.getFlight(id, flightNumber), String.valueOf(flightNumber));
 	}
+	
+	public boolean reserveFlight(int id, int customer, Flight flight, int flightNumber) {
+		return reserveItem(id, customer, flight, String.valueOf(flightNumber));
+	}
 
 	@Override
 	public boolean reserveRoom(int id, int customer, String location)
 			throws RemoteException {
 		return reserveItem(id, customer, roomRM.getRoom(id, location), location);
+	}
+	
+	public boolean reserveRoom(int id, int customer, Hotel room, String location) {
+		return reserveItem(id, customer, room, location);
 	}
 
 	@Override

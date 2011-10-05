@@ -3,6 +3,7 @@ package ResImpl.TCP;
 import java.rmi.RemoteException;
 import java.util.Vector;
 
+import ResImpl.Car;
 import ResImpl.CarResourceManager;
 import ResImpl.CustomerResourceManager;
 import ResImpl.FlightResourceManager;
@@ -31,8 +32,31 @@ public class TCPMiddleWareServer extends AbstractTCPResourceManager {
 		String[] toks = line.split(",");
 		String type = toks[0];
 		
+		// handle locally 
+		if (type.contains("reserve")){
+			
+			try {
+				int id = Integer.parseInt(toks[1]),
+					cid = Integer.parseInt(toks[2]);
+	
+				if (type.contains("car")){
+
+				} else if (type.contains("flight")){
+
+					
+				} else if (type.contains("room")){
+
+					
+				}
+			
+			} catch(Exception e){
+				e.printStackTrace();
+			}
+			
+		}
+		
 		// forward request to car rm
-		if (type.contains("car")){
+		else if (type.contains("car")){
 			res = send(line, carRMHost, carRMPort);
 	
 		// forward request to flight rm 	
@@ -47,7 +71,7 @@ public class TCPMiddleWareServer extends AbstractTCPResourceManager {
 		} else if (type.contains("customer")){
 			
 			int id = Integer.parseInt(toks[1]),
-				cid = Integer.parseInt(toks[2]);
+				cid = toks.length == 3 ? Integer.parseInt(toks[2]) : 1;
 			
 			if (type.startsWith("new")){
 				res = "" + (toks.length == 2 ? rm.newCustomer(id) : rm.newCustomer(id, cid));
@@ -58,24 +82,6 @@ public class TCPMiddleWareServer extends AbstractTCPResourceManager {
 			}
 			
 		// handle locally
-		} else if (type.contains("reserve")){
-			
-			try {
-				int id = Integer.parseInt(toks[1]),
-					cid = Integer.parseInt(toks[2]);
-	
-				if (type.contains("car")){
-					res = "" + rm.reserveCar(id, cid, toks[3]);
-				} else if (type.contains("flight")){
-					res = "" + rm.reserveFlight(id, cid, Integer.parseInt(toks[3]));
-				} else if (type.contains("room")){
-					res = "" + rm.reserveRoom(id, cid, toks[3]);
-				}
-			
-			} catch(Exception e){
-				e.printStackTrace();
-			}
-			
 		} else if (type.contains("itinerary")){
 			
 			Vector<String> flights = new Vector<String>();
