@@ -33,11 +33,11 @@ public abstract class AbstractTCPResourceManager {
         try {
             serverSocket = new ServerSocket(port);
         } catch (IOException e) {
-            System.err.println("Could not listen on port: "+port);
-            System.exit(-1);
+            System.err.println("[ERROR] TCP Server " + this + " could not listen on port: "+port);
+            System.exit(1);
         }
  
-        System.out.println(this+" listening on port "+port);
+        System.out.println("[OK] TCP Server " + this + "is listening on port "+port);
         
         while (listening) {
 			try {

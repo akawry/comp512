@@ -257,7 +257,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 
 	@Override 
 	protected void register() throws Exception {
-		registry.bind("akawry_MyGroupResourceManager", UnicastRemoteObject.exportObject(this,0));
+		registry.bind("RMIMiddleware", UnicastRemoteObject.exportObject(this,0));
 	}
 
 	@Override
