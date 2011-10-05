@@ -20,4 +20,12 @@ so little processing of the commands ever needs to take place. The car resource 
 and delegate to his reference to a local concret car resourcemanager depending on the type of query. For example, if the command starts with 'new', we know
 we can call the newCar method on the local reference and have him take care of the logic. 
 
+To handle customers, we decided to treat the MiddleWare as a kind of resource manager himself. In both implementations, the Middleware server has a local reference
+to a CustomerResourceManager object to handle all of the logic pertaining to customers, as well as reservations and the itinerary feature. In the case of RMI,
+the CustomerResourceManager can use his remote object references to easily handle reservations. By contrast, for the TCP implementation, we had to reconstruct 
+the objects the CustomerResourceManager would put in his hashtable. We did this by exchanging the objects over sockets in string form, as a list of attributes
+corresponding to the id, location, price, etc. For example, to reserve a car, the flow goes something like: send message to middleware, middleware constructs Car
+object by sending message to car resource manager to obtain the state of the specific car, middleware passes the car object to his local customer resource manager
+who places it in his hashtable to keep track of the reference. 
+
 For more details, please view <insert reference>.
