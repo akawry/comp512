@@ -137,8 +137,10 @@ public class TCPMiddleWareClient extends AbstractTCPResourceManager implements I
 			Vector<String> flightNumbers, String location, boolean Car,
 			boolean Room) {
 		String flights = "";
-		for (String s : flightNumbers){
-			flights += s + ",";
+		for (int i = 0; i < flightNumbers.size(); i++){
+			flights += flightNumbers.get(i);
+			if (i < flightNumbers.size() - 1)
+				flights += ",";
 		}
 		return new Boolean(send(concat("itinerary", id, customer, flights, location, Car, Room), middleWareServerHost, middleWareServerPort));
 	}

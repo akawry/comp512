@@ -4,6 +4,7 @@ import java.rmi.RemoteException;
 
 import ResImpl.Car;
 import ResImpl.CarResourceManager;
+import ResImpl.Flight;
 import ResImpl.FlightResourceManager;
 import ResImpl.RoomResourceManager;
 import ResInterface.ICarResourceManager;
@@ -30,6 +31,9 @@ public class FlightTCPResourceManager extends AbstractTCPResourceManager {
 			res = "" + rm.queryFlightPrice(Integer.parseInt(toks[1]), Integer.parseInt(toks[2]));
 		} else if (type.startsWith("queryflight")){
 			res = "" + rm.queryFlight(Integer.parseInt(toks[1]), Integer.parseInt(toks[2]));
+		} else if (type.startsWith("getflight")){
+			Flight flight = rm.getFlight(Integer.parseInt(toks[1]), Integer.parseInt(toks[2]));
+			res = toks[2] + "," + flight.getCount() + "," + flight.getPrice();
 		}
 		
 		return res;

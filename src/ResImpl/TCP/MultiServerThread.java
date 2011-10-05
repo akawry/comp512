@@ -47,7 +47,7 @@ public class MultiServerThread extends Thread {
 
     public void run() {
 
-    	System.out.println("[OK] + " + rm + " got a connection");
+    	System.out.println("[OK] " + rm + " got a connection");
     	
 		try {
 		    PrintWriter out = new PrintWriter(socket.getOutputStream(), true);

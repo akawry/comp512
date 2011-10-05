@@ -6,7 +6,9 @@ import java.util.Vector;
 import ResImpl.Car;
 import ResImpl.CarResourceManager;
 import ResImpl.CustomerResourceManager;
+import ResImpl.Flight;
 import ResImpl.FlightResourceManager;
+import ResImpl.Hotel;
 import ResImpl.RoomResourceManager;
 import ResImpl.RMI.RMIMiddleWare;
 import ResInterface.IResourceManager;
@@ -26,6 +28,21 @@ public class TCPMiddleWareServer extends AbstractTCPResourceManager {
 		this.rm = new CustomerResourceManager(); //Weird customer manager
 	}
 	
+	private Car getCar(int id, String location){
+		String[] info = send(concat("getcar", id, location), carRMHost, carRMPort).split(",");
+		return new Car(info[0], Integer.parseInt(info[1]), Integer.parseInt(info[2]));
+	}
+	
+	private Hotel getRoom(int id, String location){
+		String[] info = send(concat("getroom", id, location), roomRMHost, roomRMPort).split(",");
+		return new Hotel(info[0], Integer.parseInt(info[1]), Integer.parseInt(info[2]));
+	}
+	
+	private Flight getFlight(int id, int flightNum){
+		String[] info = send(concat("getflight", id, flightNum), flightRMHost, flightRMPort).split(",");
+		return new Flight(Integer.parseInt(info[0]), Integer.parseInt(info[1]), Integer.parseInt(info[2]));
+	}
+	
 	@Override
 	public String processInput(String line) {
 		String res = null;
@@ -39,14 +56,16 @@ public class TCPMiddleWareServer extends AbstractTCPResourceManager {
 				int id = Integer.parseInt(toks[1]),
 					cid = Integer.parseInt(toks[2]);
 	
+				String[] info;
 				if (type.contains("car")){
-					String[] info = send(concat("getcar", id, cid, toks[3]), carRMHost, carRMPort).split(",");
-					Car car = new Car(info[0], Integer.parseInt(info[1]), Integer.parseInt(toks[2]));
+					Car car = getCar(id, toks[3]);
 					res = "" + rm.reserveCar(id, cid, car, toks[3]);
 				} else if (type.contains("flight")){
-					res = "" + rm.reserveFlight(id, cid, Integer.parseInt(toks[3]));
+					Flight flight = getFlight(id, Integer.parseInt(toks[3]));
+					res = "" + rm.reserveFlight(id, cid, flight, Integer.parseInt(toks[3]));
 				} else if (type.contains("room")){
-					res = "" + rm.reserveRoom(id, cid, toks[3]);
+					Hotel room = getRoom(id, toks[3]);
+					res = "" + rm.reserveRoom(id, cid, room, toks[3]);
 				}
 			
 			} catch(Exception e){
@@ -85,16 +104,24 @@ public class TCPMiddleWareServer extends AbstractTCPResourceManager {
 		// handle locally
 		} else if (type.contains("itinerary")){
 			
-			Vector<String> flights = new Vector<String>();
+			int id = Integer.parseInt(toks[1]);
+			String location = toks[toks.length - 3];
+			
+			Vector<Integer> flightNums = new Vector<Integer>();
 			for (int i = 3; i < toks.length - 3; i++){
-				flights.add(toks[i]);
+				flightNums.add(Integer.parseInt(toks[i]));
 			}
-			try {
-				res = "" + rm.itinerary(Integer.parseInt(toks[1]), Integer.parseInt(toks[2]), 
-						flights, toks[toks.length - 3], new Boolean(toks[toks.length - 2]), new Boolean(toks[toks.length - 1]));
-			} catch (Exception e) {
-				e.printStackTrace();
+			
+			Vector<Flight> flights = new Vector<Flight>();
+			for (int i : flightNums){
+				Flight flight = this.getFlight(id, i);
+				flights.add(flight);
 			}
+			
+			Car car = toks[toks.length - 2].equals("true") ? this.getCar(id, location) : null;
+			Hotel room = toks[toks.length - 1].equals("true") ? this.getRoom(id, location) : null;
+			res = "" + rm.itinerary(Integer.parseInt(toks[1]), Integer.parseInt(toks[2]), 
+					flights, flightNums, location, car, room);
 			
 		}
 		

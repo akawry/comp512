@@ -148,4 +148,20 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 		
 		return success;
 	}
+	
+	public boolean itinerary(int id, int cid, Vector<Flight> flights, Vector<Integer> flightNumbers, String location, Car car, Hotel room){
+		boolean success = true;
+		
+		for (int i = 0; i < flights.size(); i++){
+			success &= reserveFlight(id, cid, flights.get(i), flightNumbers.get(i));
+		}
+		
+		if (car != null)
+			success &= reserveCar(id, cid, car, location);
+		
+		if (room != null)
+			success &= reserveRoom(id, cid, room, location);
+		
+		return success;
+	}
 }

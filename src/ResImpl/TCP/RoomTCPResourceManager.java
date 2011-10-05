@@ -4,6 +4,8 @@ import java.rmi.RemoteException;
 
 import ResImpl.Car;
 import ResImpl.CarResourceManager;
+import ResImpl.Flight;
+import ResImpl.Hotel;
 import ResImpl.RoomResourceManager;
 import ResInterface.ICarResourceManager;
 
@@ -29,6 +31,9 @@ public class RoomTCPResourceManager extends AbstractTCPResourceManager {
 			res = "" + rm.queryRoomsPrice(Integer.parseInt(toks[1]), toks[2]);
 		} else if (type.startsWith("queryroom")){
 			res = "" + rm.queryRooms(Integer.parseInt(toks[1]), toks[2]);
+		} else if (type.startsWith("getroom")){
+			Hotel room = rm.getRoom(Integer.parseInt(toks[1]), toks[2]);
+			res = room.getLocation() + "," + room.getCount() + "," + room.getPrice();
 		}
 		
 		return res;
