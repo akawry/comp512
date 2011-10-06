@@ -76,7 +76,6 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 					if (key.startsWith("car")){
 						String mkey = key.substring("car-".length()); 
 						Car item = carRM.getCar(-1, mkey);
-						System.out.println("Looking for car with key: " +mkey);
 						Trace.info("RM::deleteCustomer(" + id + ", " + customerID + ") has reserved " + reserveditem.getKey() + "which is reserved" +  item.getReserved() +  " times and is still available " + item.getCount() + " times"  );
 						item.setReserved(item.getReserved()-reserveditem.getCount());
 						item.setCount(item.getCount()+reserveditem.getCount());
@@ -84,7 +83,6 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 					} else if (key.startsWith("flight")){
 						int mkey = Integer.parseInt(key.substring("flight-".length())); 
 						Flight item = flightRM.getFlight(-1, mkey);
-						System.out.println("Looking for flight with key: " +mkey);
 						Trace.info("RM::deleteCustomer(" + id + ", " + customerID + ") has reserved " + reserveditem.getKey() + "which is reserved" +  item.getReserved() +  " times and is still available " + item.getCount() + " times"  );
 						item.setReserved(item.getReserved()-reserveditem.getCount());
 						item.setCount(item.getCount()+reserveditem.getCount());
@@ -92,7 +90,6 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 					} else if (key.startsWith("room")){
 						String mkey = key.substring("room-".length()); 
 						Hotel item = roomRM.getRoom(-1, mkey);
-						System.out.println("Looking for room with key: " +mkey);
 						Trace.info("RM::deleteCustomer(" + id + ", " + customerID + ") has reserved " + reserveditem.getKey() + "which is reserved" +  item.getReserved() +  " times and is still available " + item.getCount() + " times"  );
 						item.setReserved(item.getReserved()-reserveditem.getCount());
 						item.setCount(item.getCount()+reserveditem.getCount());
