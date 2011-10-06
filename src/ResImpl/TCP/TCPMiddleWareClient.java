@@ -150,4 +150,22 @@ public class TCPMiddleWareClient extends AbstractTCPResourceManager implements I
 		return null;
 	}
 
+	@Override
+	public void updateCar(int id, String location, Car car)
+			throws RemoteException {
+		// shouldn't be visible 
+	}
+
+	@Override
+	public void updateFlight(int id, int flightNumber, Flight flight)
+			throws RemoteException {
+		// shouldn't be visible 
+	}
+
+	@Override
+	public void updateRoom(int id, String location, Hotel room)
+			throws RemoteException {
+		// shouldn't be visible
+	}
+
 }

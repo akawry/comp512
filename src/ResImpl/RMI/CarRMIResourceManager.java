@@ -56,5 +56,12 @@ public class CarRMIResourceManager extends AbstractRMIResourceManager implements
 		rm.parseArgs(args) ;
 		rm.launch();
 	}
+
+	@Override
+	public void updateCar(int id, String location, Car car)
+			throws RemoteException {
+		rm.updateCar(id, location, car);
+		
+	}
 	
 }

@@ -57,4 +57,10 @@ public class RoomRMIResourceManager extends AbstractRMIResourceManager implement
 		rm.launch();
 	}
 
+	@Override
+	public void updateRoom(int id, String location, Hotel room)
+			throws RemoteException {
+		rm.updateRoom(id, location, room);
+	}
+
 }

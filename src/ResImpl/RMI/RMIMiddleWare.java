@@ -123,6 +123,8 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 
 	@Override
 	public boolean deleteCars(int id, String location) throws RemoteException {
+		// ask customer if this car is reserved
+		
 		return carRM.deleteCars(id, location);
 	}
 
@@ -273,5 +275,25 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	@Override
 	public Car getCar(int id, String location) throws RemoteException {
 		return carRM.getCar(id, location);
+	}
+
+	@Override
+	public void updateCar(int id, String location, Car car)
+			throws RemoteException {
+		
+		// shouldn't be visible to clients 
+		
+	}
+
+	@Override
+	public void updateFlight(int id, int flightNumber, Flight flight)
+			throws RemoteException {
+		// shouldn't be visible 
+	}
+
+	@Override
+	public void updateRoom(int id, String location, Hotel room)
+			throws RemoteException {
+		// shouldn't be visible
 	}
 }

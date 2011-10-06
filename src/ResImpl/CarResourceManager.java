@@ -53,4 +53,11 @@ public class CarResourceManager extends AbstractResourceManager implements ICarR
 		return (Car) readData(id, Car.getKey(location));
 	}
 
+	@Override
+	public void updateCar(int id, String location, Car car)
+			throws RemoteException {
+		writeData(id, Car.getKey(location), car);
+		
+	}
+
 }

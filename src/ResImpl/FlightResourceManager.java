@@ -52,6 +52,12 @@ public class FlightResourceManager extends AbstractResourceManager implements IF
 	public Flight getFlight(int id, int flightNumber) {
 		return (Flight) readData(id, Flight.getKey(flightNumber));
 	}
+
+	@Override
+	public void updateFlight(int id, int flightNumber, Flight flight)
+			throws RemoteException {
+		writeData(id, Flight.getKey(flightNumber), flight);
+	}
 	
 
 }

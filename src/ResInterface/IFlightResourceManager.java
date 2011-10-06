@@ -32,5 +32,7 @@ public interface IFlightResourceManager extends Remote{
     public int queryFlightPrice(int id, int flightNumber) throws RemoteException; 
     
     public Flight getFlight(int id, int flightNumber) throws RemoteException;
+    
+    public void updateFlight(int id, int flightNumber, Flight flight) throws RemoteException;
 	
 }

@@ -60,4 +60,10 @@ public class FlightRMIResourceManager extends AbstractRMIResourceManager impleme
 		rm.launch();
 	}
 
+	@Override
+	public void updateFlight(int id, int flightNumber, Flight flight)
+			throws RemoteException {
+		rm.updateFlight(id, flightNumber, flight);
+	}
+
 }

@@ -31,6 +31,16 @@ public class CarTCPResourceManager extends AbstractTCPResourceManager {
 		} else if (type.startsWith("getcar")){
 			Car car = rm.getCar(Integer.parseInt(toks[1]), toks[2]);
 			res = car.getLocation() + "," + car.getCount() + "," + car.getPrice();
+		} else if (type.startsWith("updatecar")){
+			Car car = rm.getCar(Integer.parseInt(toks[1]), toks[2]); // construct this car from the arguments 
+			car.setCount(Integer.parseInt(toks[3]));
+			car.setReserved(Integer.parseInt(toks[4]));
+			try {
+				rm.updateCar(Integer.parseInt(toks[1]), toks[2], car);	
+				res = "true";
+			} catch (Exception e){
+				e.printStackTrace();
+			}
 		}
 		
 		return res;

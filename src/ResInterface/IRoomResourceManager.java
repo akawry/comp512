@@ -27,4 +27,6 @@ public interface IRoomResourceManager extends Remote{
     public int queryRoomsPrice(int id, String location) throws RemoteException;
     
     public Hotel getRoom(int id, String location) throws RemoteException;
+    
+    public void updateRoom(int id, String location, Hotel room) throws RemoteException;
 }

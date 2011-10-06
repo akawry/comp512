@@ -51,4 +51,10 @@ public class RoomResourceManager extends AbstractResourceManager implements Remo
 		return (Hotel) readData(id, Hotel.getKey(location));
 	}
 
+	@Override
+	public void updateRoom(int id, String location, Hotel room)
+			throws RemoteException {
+		writeData(id, Hotel.getKey(location), room);
+	}
+
 }

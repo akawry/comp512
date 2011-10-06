@@ -30,5 +30,7 @@ public interface ICarResourceManager extends Remote{
     public int queryCarsPrice(int id, String location) throws RemoteException;
     
     public Car getCar(int id, String location) throws RemoteException;
+    
+    public void updateCar(int id, String location, Car car) throws RemoteException;
 	
 }

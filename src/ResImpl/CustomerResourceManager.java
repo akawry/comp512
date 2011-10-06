@@ -71,11 +71,37 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 				String reservedkey = (String) (e.nextElement());
 				ReservedItem reserveditem = cust.getReservedItem(reservedkey);
 				Trace.info("RM::deleteCustomer(" + id + ", " + customerID + ") has reserved " + reserveditem.getKey() + " " +  reserveditem.getCount() +  " times"  );
+				String key = reserveditem.getKey();
+				try {
+					if (key.startsWith("car")){
+						String mkey = key.substring("car-".length()); 
+						Car item = carRM.getCar(-1, mkey);
+						System.out.println("Looking for car with key: " +mkey);
+						Trace.info("RM::deleteCustomer(" + id + ", " + customerID + ") has reserved " + reserveditem.getKey() + "which is reserved" +  item.getReserved() +  " times and is still available " + item.getCount() + " times"  );
+						item.setReserved(item.getReserved()-reserveditem.getCount());
+						item.setCount(item.getCount()+reserveditem.getCount());
+						carRM.updateCar(-1, mkey, item);
+					} else if (key.startsWith("flight")){
+						int mkey = Integer.parseInt(key.substring("flight-".length())); 
+						Flight item = flightRM.getFlight(-1, mkey);
+						System.out.println("Looking for flight with key: " +mkey);
+						Trace.info("RM::deleteCustomer(" + id + ", " + customerID + ") has reserved " + reserveditem.getKey() + "which is reserved" +  item.getReserved() +  " times and is still available " + item.getCount() + " times"  );
+						item.setReserved(item.getReserved()-reserveditem.getCount());
+						item.setCount(item.getCount()+reserveditem.getCount());
+						flightRM.updateFlight(-1, mkey, item);
+					} else if (key.startsWith("room")){
+						String mkey = key.substring("room-".length()); 
+						Hotel item = roomRM.getRoom(-1, mkey);
+						System.out.println("Looking for room with key: " +mkey);
+						Trace.info("RM::deleteCustomer(" + id + ", " + customerID + ") has reserved " + reserveditem.getKey() + "which is reserved" +  item.getReserved() +  " times and is still available " + item.getCount() + " times"  );
+						item.setReserved(item.getReserved()-reserveditem.getCount());
+						item.setCount(item.getCount()+reserveditem.getCount());
+						roomRM.updateRoom(-1, mkey, item);
+					}
+				} catch (Exception exc){
+					exc.printStackTrace();
+				}
 				
-				ReservableItem item  = (ReservableItem) readData(id, reserveditem.getKey());
-				Trace.info("RM::deleteCustomer(" + id + ", " + customerID + ") has reserved " + reserveditem.getKey() + "which is reserved" +  item.getReserved() +  " times and is still available " + item.getCount() + " times"  );
-				item.setReserved(item.getReserved()-reserveditem.getCount());
-				item.setCount(item.getCount()+reserveditem.getCount());
 			}
 			
 			// remove the customer from the storage
@@ -103,31 +129,57 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 
 	@Override
 	public boolean reserveCar(int id, int customer, String location) throws RemoteException {
-		return reserveItem(id, customer, carRM.getCar(id, location), location);
+		Car car = carRM.getCar(id, location);
+		boolean success = this.reserveItem(id, customer, car, location);
+		if (success){
+			// send back
+			carRM.updateCar(id, location, car);
+		}
+		return success;
 	}
 	
-	public boolean reserveCar(int id, int customer, Car car, String location) {
-		return reserveItem(id, customer, car, location);
-	}
+	/*public boolean reserveCar(int id, int customer, Car car, String location) {
+		boolean success = reserveItem(id, customer, car, location);
+		if (success){
+			// send back
+		}
+		return success;
+	}*/
 
 	@Override
 	public boolean reserveFlight(int id, int customer, int flightNumber)
 			throws RemoteException {
-		return reserveItem(id, customer, flightRM.getFlight(id, flightNumber), String.valueOf(flightNumber));
+		Flight flight = flightRM.getFlight(id, flightNumber);
+		boolean success = reserveItem(id, customer, flight, String.valueOf(flightNumber));
+		if (success)
+			flightRM.updateFlight(id, flightNumber, flight);
+		return success;
 	}
 	
 	public boolean reserveFlight(int id, int customer, Flight flight, int flightNumber) {
-		return reserveItem(id, customer, flight, String.valueOf(flightNumber));
+		boolean success = reserveItem(id, customer, flight, String.valueOf(flightNumber));
+		if (success){
+			//send
+		}
+		return success;
 	}
 
 	@Override
 	public boolean reserveRoom(int id, int customer, String location)
 			throws RemoteException {
-		return reserveItem(id, customer, roomRM.getRoom(id, location), location);
+		Hotel room = roomRM.getRoom(id, location);
+		boolean success = reserveItem(id, customer, room, location);
+		if (success)
+			roomRM.updateRoom(id, location, room);
+		return success;
 	}
 	
 	public boolean reserveRoom(int id, int customer, Hotel room, String location) {
-		return reserveItem(id, customer, room, location);
+		boolean success = reserveItem(id, customer, room, location);
+		if (success){
+			//send
+		}
+		return success;
 	}
 
 	@Override
@@ -164,5 +216,89 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 			success &= reserveRoom(id, cid, room, location);
 		
 		return success;
+	}
+	
+	// reserve an item
+	protected boolean reserveItem(int id, int customerID, String key,
+			String location) {
+		Trace.info("RM::reserveItem( " + id + ", customer=" + customerID + ", "
+				+ key + ", " + location + " ) called");
+		// Read customer object if it exists (and read lock it)
+		Customer cust = (Customer) readData(id, Customer.getKey(customerID));
+		if (cust == null) {
+			Trace.warn("RM::reserveItem( " + id + ", " + customerID + ", "
+					+ key + ", " + location
+					+ ")  failed--customer doesn't exist");
+			return false;
+		}
+
+		// check if the item is available
+		ReservableItem item = (ReservableItem) readData(id, key);
+		if (item == null) {
+			Trace.warn("RM::reserveItem( " + id + ", " + customerID + ", "
+					+ key + ", " + location + ") failed--item doesn't exist");
+			return false;
+		} else if (item.getCount() == 0) {
+			Trace.warn("RM::reserveItem( " + id + ", " + customerID + ", "
+					+ key + ", " + location + ") failed--No more items");
+			return false;
+		} else {
+			cust.reserve(key, location, item.getPrice());
+			writeData(id, cust.getKey(), cust);
+
+			// decrease the number of available items in the storage
+			item.setCount(item.getCount() - 1);
+			item.setReserved(item.getReserved() + 1);
+
+			Trace.info("RM::reserveItem( " + id + ", " + customerID + ", "
+					+ key + ", " + location + ") succeeded");
+			return true;
+		}
+	}
+
+	// reserve an item
+	protected boolean reserveItem(int id, int customerID, ReservableItem item,
+			String location) {
+
+		// check if the item is available
+		if (item == null) {
+			Trace.warn("RM::reserveItem( " + id + ", " + customerID + ", "
+					+ item + ", " + location + ") failed--item doesn't exist");
+			return false;
+		} else {
+			String key = item.getKey();
+			if (item.getCount() == 0) {
+				Trace.warn("RM::reserveItem( " + id + ", " + customerID + ", "
+						+ key + ", " + location + ") failed--No more items");
+				return false;
+			} else {
+
+				Trace.info("RM::reserveItem( " + id + ", customer="
+						+ customerID + ", " + key + ", " + location
+						+ " ) called");
+				// Read customer object if it exists (and read lock it)
+				Customer cust = (Customer) readData(id,
+						Customer.getKey(customerID));
+				if (cust == null) {
+					Trace.warn("RM::reserveItem( " + id + ", " + customerID
+							+ ", " + key + ", " + location
+							+ ")  failed--customer doesn't exist");
+					return false;
+				}
+
+				cust.reserve(key, location, item.getPrice());
+				writeData(id, cust.getKey(), cust);
+
+				// decrease the number of available items in the storage
+				item.setCount(item.getCount() - 1);
+				item.setReserved(item.getReserved() + 1);
+
+				Trace.info("RM::reserveItem( " + id + ", " + customerID + ", "
+						+ key + ", " + location + ") succeeded");
+				return true;
+			}
+
+		}
+
 	}
 }

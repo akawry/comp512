@@ -1,0 +1,8 @@
+newcustomerid,1,1
+newcar,1,abc,1,3434
+querycar,1,abc
+reservecar,1,1,abc
+querycar,1,abc
+deletecustomer,1,1
+querycar,1,abc
+quit

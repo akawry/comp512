@@ -58,8 +58,8 @@ public class TCPMiddleWareServer extends AbstractTCPResourceManager {
 	
 				String[] info;
 				if (type.contains("car")){
-					Car car = getCar(id, toks[3]);
-					res = "" + rm.reserveCar(id, cid, car, toks[3]);
+					//Car car = getCar(id, toks[3]);
+					res = "" + rm.reserveCar(id, cid, toks[3]);
 				} else if (type.contains("flight")){
 					Flight flight = getFlight(id, Integer.parseInt(toks[3]));
 					res = "" + rm.reserveFlight(id, cid, flight, Integer.parseInt(toks[3]));
@@ -154,6 +154,7 @@ public class TCPMiddleWareServer extends AbstractTCPResourceManager {
 					} else if (s.equals("car") ) {
 						carRMHost = argval.split(":")[0] ;
 						carRMPort = Integer.parseInt(argval.split(":")[1]) ;
+						
 					} else if (s.equals("room") ) {
 						roomRMHost = argval.split(":")[0] ;
 						roomRMPort = Integer.parseInt(argval.split(":")[1]) ;
