@@ -28,21 +28,6 @@ public class TCPMiddleWareServer extends AbstractTCPResourceManager {
 		this.rm = new CustomerResourceManager(); //Weird customer manager
 	}
 	
-	private Car getCar(int id, String location){
-		String[] info = send(concat("getcar", id, location), carRMHost, carRMPort).split(",");
-		return new Car(info[0], Integer.parseInt(info[1]), Integer.parseInt(info[2]));
-	}
-	
-	private Hotel getRoom(int id, String location){
-		String[] info = send(concat("getroom", id, location), roomRMHost, roomRMPort).split(",");
-		return new Hotel(info[0], Integer.parseInt(info[1]), Integer.parseInt(info[2]));
-	}
-	
-	private Flight getFlight(int id, int flightNum){
-		String[] info = send(concat("getflight", id, flightNum), flightRMHost, flightRMPort).split(",");
-		return new Flight(Integer.parseInt(info[0]), Integer.parseInt(info[1]), Integer.parseInt(info[2]));
-	}
-	
 	@Override
 	public String processInput(String line) {
 		String res = null;

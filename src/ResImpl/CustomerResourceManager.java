@@ -134,14 +134,6 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 		}
 		return success;
 	}
-	
-	/*public boolean reserveCar(int id, int customer, Car car, String location) {
-		boolean success = reserveItem(id, customer, car, location);
-		if (success){
-			// send back
-		}
-		return success;
-	}*/
 
 	@Override
 	public boolean reserveFlight(int id, int customer, int flightNumber)
@@ -152,14 +144,6 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 			flightRM.updateFlight(id, flightNumber, flight);
 		return success;
 	}
-	
-	public boolean reserveFlight(int id, int customer, Flight flight, int flightNumber) {
-		boolean success = reserveItem(id, customer, flight, String.valueOf(flightNumber));
-		if (success){
-			//send
-		}
-		return success;
-	}
 
 	@Override
 	public boolean reserveRoom(int id, int customer, String location)
@@ -168,14 +152,6 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 		boolean success = reserveItem(id, customer, room, location);
 		if (success)
 			roomRM.updateRoom(id, location, room);
-		return success;
-	}
-	
-	public boolean reserveRoom(int id, int customer, Hotel room, String location) {
-		boolean success = reserveItem(id, customer, room, location);
-		if (success){
-			//send
-		}
 		return success;
 	}
 
