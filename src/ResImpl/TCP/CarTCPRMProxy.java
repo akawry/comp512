@@ -42,8 +42,8 @@ public class CarTCPRMProxy extends AbstractTCPResourceManager implements ICarRes
 
 	@Override
 	public Car getCar(int id, String location) throws RemoteException {
-		// TODO Auto-generated method stub
-		return null;
+		String[] info = send(concat("getcar", id, location), carRMHost, carRMPort).split(",");
+		return new Car(info[0], Integer.parseInt(info[1]), Integer.parseInt(info[2]));
 	}
 
 	@Override

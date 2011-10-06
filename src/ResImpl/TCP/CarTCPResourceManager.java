@@ -20,23 +20,28 @@ public class CarTCPResourceManager extends AbstractTCPResourceManager {
 		String[] toks = line.split(",");
 		String type = toks[0];
 		String res = "false";
+		
+		int id = Integer.parseInt(toks[1]);
+		String location = toks[2];
+		
 		if (type.startsWith("new")){
-			res = "" + rm.addCars(Integer.parseInt(toks[1]), toks[2], Integer.parseInt(toks[3]), Integer.parseInt(toks[4]));
+			res = "" + rm.addCars(id, location, Integer.parseInt(toks[3]), Integer.parseInt(toks[4]));
 		} else if (type.startsWith("delete")){
-			res = "" + rm.deleteCars(Integer.parseInt(toks[1]), toks[2]);
+			res = "" + rm.deleteCars(id, location);
 		} else if (type.startsWith("querycarprice")){
-			res = "" + rm.queryCarsPrice(Integer.parseInt(toks[1]), toks[2]);
+			res = "" + rm.queryCarsPrice(id, location);
 		} else if (type.startsWith("querycar")){
-			res = "" + rm.queryCars(Integer.parseInt(toks[1]), toks[2]);
+			res = "" + rm.queryCars(id, location);
 		} else if (type.startsWith("getcar")){
-			Car car = rm.getCar(Integer.parseInt(toks[1]), toks[2]);
+			Car car = rm.getCar(id, location);
 			res = car.getLocation() + "," + car.getCount() + "," + car.getPrice();
 		} else if (type.startsWith("updatecar")){
-			Car car = rm.getCar(Integer.parseInt(toks[1]), toks[2]); // construct this car from the arguments 
+			Car car = rm.getCar(id, location);  
 			car.setCount(Integer.parseInt(toks[3]));
 			car.setReserved(Integer.parseInt(toks[4]));
+			car.setPrice(Integer.parseInt(toks[5]));
 			try {
-				rm.updateCar(Integer.parseInt(toks[1]), toks[2], car);	
+				rm.updateCar(id, location, car);	
 				res = "true";
 			} catch (Exception e){
 				e.printStackTrace();

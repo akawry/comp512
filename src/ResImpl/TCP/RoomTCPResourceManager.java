@@ -23,17 +23,32 @@ public class RoomTCPResourceManager extends AbstractTCPResourceManager {
 		String[] toks = line.split(",");
 		String type = toks[0];
 		String res = "false";
+		
+		int id = Integer.parseInt(toks[1]);
+		String location = toks[2];
+		
 		if (type.startsWith("new")){
-			res = "" + rm.addRooms(Integer.parseInt(toks[1]), toks[2], Integer.parseInt(toks[3]), Integer.parseInt(toks[4]));
+			res = "" + rm.addRooms(id, location, Integer.parseInt(toks[3]), Integer.parseInt(toks[4]));
 		} else if (type.startsWith("delete")){
-			res = "" + rm.deleteRooms(Integer.parseInt(toks[1]), toks[2]);
+			res = "" + rm.deleteRooms(id, location);
 		} else if (type.startsWith("queryroomprice")){
-			res = "" + rm.queryRoomsPrice(Integer.parseInt(toks[1]), toks[2]);
+			res = "" + rm.queryRoomsPrice(id, location);
 		} else if (type.startsWith("queryroom")){
-			res = "" + rm.queryRooms(Integer.parseInt(toks[1]), toks[2]);
+			res = "" + rm.queryRooms(id, location);
 		} else if (type.startsWith("getroom")){
-			Hotel room = rm.getRoom(Integer.parseInt(toks[1]), toks[2]);
+			Hotel room = rm.getRoom(id, location);
 			res = room.getLocation() + "," + room.getCount() + "," + room.getPrice();
+		} else if (type.startsWith("updateroom")){
+			Hotel room = rm.getRoom(id, location);  
+			room.setCount(Integer.parseInt(toks[3]));
+			room.setReserved(Integer.parseInt(toks[4]));
+			room.setPrice(Integer.parseInt(toks[5]));
+			try {
+				rm.updateRoom(id, location, room);	
+				res = "true";
+			} catch (Exception e){
+				e.printStackTrace();
+			}
 		}
 		
 		return res;

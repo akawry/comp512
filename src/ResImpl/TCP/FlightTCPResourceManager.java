@@ -23,17 +23,32 @@ public class FlightTCPResourceManager extends AbstractTCPResourceManager {
 		String[] toks = line.split(",");
 		String type = toks[0];
 		String res = "false";
+		
+		int id = Integer.parseInt(toks[1]);
+		int flightNum = Integer.parseInt(toks[2]);
+		
 		if (type.startsWith("new")){
-			res = "" + rm.addFlight(Integer.parseInt(toks[1]), Integer.parseInt(toks[2]), Integer.parseInt(toks[3]), Integer.parseInt(toks[4]));
+			res = "" + rm.addFlight(id, flightNum, Integer.parseInt(toks[3]), Integer.parseInt(toks[4]));
 		} else if (type.startsWith("delete")){
-			res = "" + rm.deleteFlight(Integer.parseInt(toks[1]), Integer.parseInt(toks[2]));
+			res = "" + rm.deleteFlight(id, flightNum);
 		} else if (type.startsWith("queryflightprice")){
-			res = "" + rm.queryFlightPrice(Integer.parseInt(toks[1]), Integer.parseInt(toks[2]));
+			res = "" + rm.queryFlightPrice(id, flightNum);
 		} else if (type.startsWith("queryflight")){
-			res = "" + rm.queryFlight(Integer.parseInt(toks[1]), Integer.parseInt(toks[2]));
+			res = "" + rm.queryFlight(id, flightNum);
 		} else if (type.startsWith("getflight")){
-			Flight flight = rm.getFlight(Integer.parseInt(toks[1]), Integer.parseInt(toks[2]));
+			Flight flight = rm.getFlight(id, flightNum);
 			res = toks[2] + "," + flight.getCount() + "," + flight.getPrice();
+		} else if (type.startsWith("updateflight")){
+			Flight flight = rm.getFlight(id, flightNum);  
+			flight.setCount(Integer.parseInt(toks[3]));
+			flight.setReserved(Integer.parseInt(toks[4]));
+			flight.setPrice(Integer.parseInt(toks[5]));
+			try {
+				rm.updateFlight(id, flightNum, flight);	
+				res = "true";
+			} catch (Exception e){
+				e.printStackTrace();
+			}
 		}
 		
 		return res;

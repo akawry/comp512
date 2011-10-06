@@ -58,14 +58,11 @@ public class TCPMiddleWareServer extends AbstractTCPResourceManager {
 	
 				String[] info;
 				if (type.contains("car")){
-					//Car car = getCar(id, toks[3]);
 					res = "" + rm.reserveCar(id, cid, toks[3]);
 				} else if (type.contains("flight")){
-					Flight flight = getFlight(id, Integer.parseInt(toks[3]));
-					res = "" + rm.reserveFlight(id, cid, flight, Integer.parseInt(toks[3]));
+					res = "" + rm.reserveFlight(id, cid, Integer.parseInt(toks[3]));
 				} else if (type.contains("room")){
-					Hotel room = getRoom(id, toks[3]);
-					res = "" + rm.reserveRoom(id, cid, room, toks[3]);
+					res = "" + rm.reserveRoom(id, cid, toks[3]);
 				}
 			
 			} catch(Exception e){
@@ -106,22 +103,20 @@ public class TCPMiddleWareServer extends AbstractTCPResourceManager {
 			int id = Integer.parseInt(toks[1]);
 			String location = toks[toks.length - 3];
 			
-			Vector<Integer> flightNums = new Vector<Integer>();
+			Vector<String> flightNums = new Vector<String>();
 			for (int i = 3; i < toks.length - 3; i++){
-				flightNums.add(Integer.parseInt(toks[i]));
+				flightNums.add(toks[i]);
 			}
 			
-			Vector<Flight> flights = new Vector<Flight>();
-			for (int i : flightNums){
-				Flight flight = this.getFlight(id, i);
-				flights.add(flight);
+			boolean car = new Boolean(toks[toks.length - 2]);
+			boolean room = new Boolean(toks[toks.length - 1]);
+			try {
+				res = "" + rm.itinerary(Integer.parseInt(toks[1]), Integer.parseInt(toks[2]), flightNums, location, car, room);
+			} catch (Exception e) {
+				e.printStackTrace();
+				res = "false";
 			}
-			
-			Car car = toks[toks.length - 2].equals("true") ? this.getCar(id, location) : null;
-			Hotel room = toks[toks.length - 1].equals("true") ? this.getRoom(id, location) : null;
-			res = "" + rm.itinerary(Integer.parseInt(toks[1]), Integer.parseInt(toks[2]), 
-					flights, flightNums, location, car, room);
-			
+				
 		}
 		
 		return res; 
@@ -131,7 +126,7 @@ public class TCPMiddleWareServer extends AbstractTCPResourceManager {
 		return "";
 	}
 	
-	public void parseArgs(String[] args){
+	private void parseArgs(String[] args){
 		if (args.length != 4 && args.length != 3){
 			System.err.println(usage());
 			System.exit(1);
@@ -167,9 +162,16 @@ public class TCPMiddleWareServer extends AbstractTCPResourceManager {
 		}
 	}
 
+	private void bindCustomerRM(){
+		rm = new CustomerResourceManager(new CarTCPRMProxy(carRMHost, carRMPort),
+				new FlightTCPRMProxy(flightRMHost, flightRMPort),
+				new RoomTCPRMProxy(roomRMHost, roomRMPort));
+	}
+	
 	public static void main(String[] args) {
 		TCPMiddleWareServer mw = new TCPMiddleWareServer();
 		mw.parseArgs(args);
+		mw.bindCustomerRM();
 		mw.listen(mw.port);
 	}
 
