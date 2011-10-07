@@ -1,8 +1,10 @@
 newcustomerid,1,1
-newflight,1,1,222,3434
+newcustomerid,2,2
+newflight,1,1,1,3434
 queryflight,1,1
 reserveflight,1,1,1
 queryflight,1,1
+reserveflight,1,2,1
 deletecustomer,1,1
 queryflight,1,1
 quit
