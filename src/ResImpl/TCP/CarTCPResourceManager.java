@@ -4,7 +4,6 @@ import java.rmi.RemoteException;
 
 import ResImpl.Car;
 import ResImpl.CarResourceManager;
-import ResInterface.ICarResourceManager;
 
 public class CarTCPResourceManager extends AbstractTCPResourceManager {
 

@@ -1,12 +1,8 @@
 package ResInterface;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
-import ResImpl.Hotel;
 
-public interface IRoomResourceManager extends Remote{
-
-	   
+public interface RoomFrontend {
     /* Add rooms to a location.  
      * This should look a lot like addFlight, only keyed on a string location
      * instead of a flight number.
@@ -25,8 +21,4 @@ public interface IRoomResourceManager extends Remote{
 
     /* return the price of a room at a location */
     public int queryRoomsPrice(int id, String location) throws RemoteException;
-    
-    public Hotel getRoom(int id, String location) throws RemoteException;
-    
-    public void updateRoom(int id, String location, Hotel room) throws RemoteException;
 }

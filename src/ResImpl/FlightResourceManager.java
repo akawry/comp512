@@ -7,9 +7,10 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
 import ResImpl.RMI.FlightRMIResourceManager;
-import ResInterface.IFlightResourceManager;
+import ResInterface.FlightBackend;
+import ResInterface.FlightFrontend;
 
-public class FlightResourceManager extends AbstractResourceManager implements IFlightResourceManager {
+public class FlightResourceManager extends AbstractResourceManager implements FlightFrontend,FlightBackend {
 
 	@Override
 	public boolean addFlight(int id, int flightNum, int flightSeats, int flightPrice) {

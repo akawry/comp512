@@ -19,17 +19,16 @@ import ResImpl.RMHashtable;
 import ResImpl.ReservableItem;
 import ResImpl.ReservedItem;
 import ResImpl.Trace;
-import ResInterface.ICarResourceManager;
-import ResInterface.ICustomerResourceManager;
-import ResInterface.IFlightResourceManager;
-import ResInterface.IResourceManager;
-import ResInterface.IRoomResourceManager;
+import ResInterface.CarFrontend;
+import ResInterface.FlightFrontend;
+import ResInterface.ResourceFrontend;
+import ResInterface.RoomFrontend;
 
-public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote, IResourceManager {
+public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote, ResourceFrontend {
 
-	private ICarResourceManager carRM;
-	private IFlightResourceManager flightRM;
-	private IRoomResourceManager roomRM;
+	private CarRMIResourceManager carRM;
+	private FlightRMIResourceManager flightRM;
+	private RoomRMIResourceManager roomRM;
 	private CustomerResourceManager customerRM;
 	
 	// By default, if there is no args for car/room/flight, we try localhost:1099	
@@ -41,27 +40,27 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	private int flightport = 1099 ;
 	private int roomport = 1099 ;
 
-	public ICarResourceManager getCarResourceManager() {
+	public CarFrontend getCarResourceManager() {
 		return carRM;
 	}
 
-	public IFlightResourceManager getFlightResourceManager() {
+	public FlightFrontend getFlightResourceManager() {
 		return flightRM;
 	}
 
-	public IRoomResourceManager getRoomResourceManager() {
+	public RoomFrontend getRoomResourceManager() {
 		return roomRM;
 	}
 
-	public void setCarResourceManager(ICarResourceManager carRM) {
+	public void setCarResourceManager(CarRMIResourceManager carRM) {
 		this.carRM = carRM;
 	}
 
-	public void setFlightResourceManager(IFlightResourceManager flightRM) {
+	public void setFlightResourceManager(FlightRMIResourceManager flightRM) {
 		this.flightRM = flightRM;
 	}
 
-	public void setRoomResourceManager(IRoomResourceManager roomRM) {
+	public void setRoomResourceManager(RoomRMIResourceManager roomRM) {
 		this.roomRM = roomRM;
 	}
 	
@@ -234,9 +233,9 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	protected void launch() {
 
 		try {
-			carRM = (ICarResourceManager)LocateRegistry.getRegistry(carserver,carport).lookup("akawry_MyCarResourceManager");
-			roomRM = (IRoomResourceManager)LocateRegistry.getRegistry(roomserver,roomport).lookup("akawry_MyRoomResourceManager");
-			flightRM = (IFlightResourceManager)LocateRegistry.getRegistry(flightserver,flightport).lookup("akawry_MyFlightResourceManager");
+			carRM = (CarRMIResourceManager) LocateRegistry.getRegistry(carserver,carport).lookup("RMICar");
+			roomRM = (RoomRMIResourceManager)LocateRegistry.getRegistry(roomserver,roomport).lookup("RMIRoom");
+			flightRM = (FlightRMIResourceManager)LocateRegistry.getRegistry(flightserver,flightport).lookup("RMIFlight");
 			customerRM = new CustomerResourceManager(carRM, flightRM, roomRM);
 		} catch (Exception e) {
 		    System.out.println("[ERROR] Middleware cannot get rmi object") ;
@@ -261,7 +260,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	protected void register() throws Exception {
 		registry.bind("RMIMiddleware", UnicastRemoteObject.exportObject(this,0));
 	}
-
+/*
 	@Override
 	public Flight getFlight(int id, int flightNumber) throws RemoteException {
 		return flightRM.getFlight(id, flightNumber);
@@ -276,24 +275,5 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	public Car getCar(int id, String location) throws RemoteException {
 		return carRM.getCar(id, location);
 	}
-
-	@Override
-	public void updateCar(int id, String location, Car car)
-			throws RemoteException {
-		
-		// shouldn't be visible to clients 
-		
-	}
-
-	@Override
-	public void updateFlight(int id, int flightNumber, Flight flight)
-			throws RemoteException {
-		// shouldn't be visible 
-	}
-
-	@Override
-	public void updateRoom(int id, String location, Hotel room)
-			throws RemoteException {
-		// shouldn't be visible
-	}
+	*/
 }

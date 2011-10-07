@@ -3,9 +3,9 @@ package ResImpl.TCP;
 import java.rmi.RemoteException;
 
 import ResImpl.Flight;
-import ResInterface.IFlightResourceManager;
+import ResInterface.FlightBackend;
 
-public class FlightTCPRMProxy extends AbstractTCPResourceManager implements IFlightResourceManager {
+public class FlightTCPRMProxy extends AbstractTCPResourceManager implements FlightBackend {
 
 	private String flightRMHost;
 	private int flightRMPort;
@@ -15,32 +15,6 @@ public class FlightTCPRMProxy extends AbstractTCPResourceManager implements IFli
 		flightRMPort = port;
 	}
 	
-	@Override
-	public boolean addFlight(int id, int flightNum, int flightSeats,
-			int flightPrice) throws RemoteException {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean deleteFlight(int id, int flightNum) throws RemoteException {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public int queryFlight(int id, int flightNumber) throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public int queryFlightPrice(int id, int flightNumber)
-			throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
 	@Override
 	public Flight getFlight(int id, int flightNumber) throws RemoteException {
 		String[] info = send(concat("getflight", id, flightNumber), flightRMHost, flightRMPort).split(",");

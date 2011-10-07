@@ -6,9 +6,10 @@ import java.rmi.server.UnicastRemoteObject;
 
 import ResImpl.Car;
 import ResImpl.CarResourceManager;
-import ResInterface.ICarResourceManager;
+import ResInterface.CarBackend;
+import ResInterface.CarFrontend;
 
-public class CarRMIResourceManager extends AbstractRMIResourceManager implements Remote, ICarResourceManager {
+public class CarRMIResourceManager extends AbstractRMIResourceManager implements Remote, CarFrontend,CarBackend {
 
 	private CarResourceManager rm;
 	
@@ -48,7 +49,7 @@ public class CarRMIResourceManager extends AbstractRMIResourceManager implements
 
 	@Override
 	public void register() throws Exception {
-	    registry.bind("akawry_MyCarResourceManager", UnicastRemoteObject.exportObject(this, 0));
+	    registry.bind("RMICar", UnicastRemoteObject.exportObject(this, 0));
 	}
 	
 	public static void main(String[] args) {

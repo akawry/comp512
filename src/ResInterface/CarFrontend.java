@@ -1,10 +1,8 @@
 package ResInterface;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
-import ResImpl.Car;
 
-public interface ICarResourceManager extends Remote{
+public interface CarFrontend {
 
     
     /* Add cars to a location.  
@@ -28,9 +26,4 @@ public interface ICarResourceManager extends Remote{
 
     /* return the price of a car at a location */
     public int queryCarsPrice(int id, String location) throws RemoteException;
-    
-    public Car getCar(int id, String location) throws RemoteException;
-    
-    public void updateCar(int id, String location, Car car) throws RemoteException;
-	
 }

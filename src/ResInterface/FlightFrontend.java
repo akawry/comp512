@@ -1,11 +1,8 @@
 package ResInterface;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
-import ResImpl.Flight;
 
-public interface IFlightResourceManager extends Remote{
-
+public interface FlightFrontend {
     /* Add seats to a flight.  In general this will be used to create a new
      * flight, but it should be possible to add seats to an existing flight.
      * Adding to an existing flight should overwrite the current price of the
@@ -30,9 +27,4 @@ public interface IFlightResourceManager extends Remote{
      
     /* queryFlightPrice returns the price of a seat on this flight. */
     public int queryFlightPrice(int id, int flightNumber) throws RemoteException; 
-    
-    public Flight getFlight(int id, int flightNumber) throws RemoteException;
-    
-    public void updateFlight(int id, int flightNumber, Flight flight) throws RemoteException;
-	
 }

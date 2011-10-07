@@ -3,9 +3,9 @@ package ResImpl.TCP;
 import java.rmi.RemoteException;
 
 import ResImpl.Hotel;
-import ResInterface.IRoomResourceManager;
+import ResInterface.RoomBackend;
 
-public class RoomTCPRMProxy extends AbstractTCPResourceManager implements IRoomResourceManager {
+public class RoomTCPRMProxy extends AbstractTCPResourceManager implements RoomBackend {
 
 	private String roomRMHost;
 	private int roomRMPort;
@@ -13,31 +13,6 @@ public class RoomTCPRMProxy extends AbstractTCPResourceManager implements IRoomR
 	public RoomTCPRMProxy(String host, int port){
 		roomRMHost = host;
 		roomRMPort = port;
-	}
-	
-	@Override
-	public boolean addRooms(int id, String location, int numRooms, int price)
-			throws RemoteException {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean deleteRooms(int id, String location) throws RemoteException {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public int queryRooms(int id, String location) throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public int queryRoomsPrice(int id, String location) throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
 	}
 
 	@Override

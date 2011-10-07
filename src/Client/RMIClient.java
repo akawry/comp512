@@ -30,7 +30,7 @@ public class RMIClient extends AbstractClient
 		try 
 		{
 			Registry registry = LocateRegistry.getRegistry(serverhost,serverport);
-			rm = (IResourceManager) registry.lookup("RMIMiddleware");
+			rm = (ResourceFrontend) registry.lookup("RMIMiddleware");
 			System.out.println("[OK] Client successfully connected to server at " + serverhost  + " on port " + serverport);
 		} 
 		catch (Exception e) 

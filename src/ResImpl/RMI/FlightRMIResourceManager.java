@@ -6,9 +6,10 @@ import java.rmi.server.UnicastRemoteObject;
 
 import ResImpl.Flight;
 import ResImpl.FlightResourceManager;
-import ResInterface.IFlightResourceManager;
+import ResInterface.FlightBackend;
+import ResInterface.FlightFrontend;
 
-public class FlightRMIResourceManager extends AbstractRMIResourceManager implements Remote, IFlightResourceManager {
+public class FlightRMIResourceManager extends AbstractRMIResourceManager implements Remote, FlightFrontend,FlightBackend {
 
 	private FlightResourceManager rm;
 	
@@ -23,7 +24,7 @@ public class FlightRMIResourceManager extends AbstractRMIResourceManager impleme
 
 	@Override
 	public void register() throws Exception {
-	    registry.bind("akawry_MyFlightResourceManager", UnicastRemoteObject.exportObject(this, 0));
+	    registry.bind("RMiFlight", UnicastRemoteObject.exportObject(this, 0));
 	}
 	
 
