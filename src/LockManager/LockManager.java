@@ -202,7 +202,26 @@ public class LockManager
                     // (1) transaction already had a READ lock
                     // (2) transaction already had a WRITE lock
                     // Seeing the comments at the top of this function might be helpful
-                    // *** ADD CODE HERE *** to take care of both these cases
+                    
+                	// case 1) - already had a read lock
+                	if (dataObj2.getLockType() == DataObj.READ){
+                		
+                		// check if anyone else has a lock on the object
+                		for (Object o : vect){
+                			if (((DataObj)o).getXId() != dataObj.getXId()){
+                				System.out.println("Have a READ, requested a WRITE, but someone else has a lock");
+                				return true;
+                			}
+                		}
+                		
+                		// just convert the lock 
+                		dataObj2.setLockType(DataObj.WRITE);
+                		
+                	// case 2) - already had a write lock 
+                	} else if (dataObj2.getLockType() == DataObj.WRITE){
+                		throw new RedundantLockRequestException(dataObj.getXId(), "Redundant WRITE lock request");
+                	}
+                	
                 }
             } 
             else {
