@@ -62,13 +62,12 @@ public class LockManager
                          
                         if (bConvert.get(0) == true) {
                             // lock conversion 
-                            // *** ADD CODE HERE *** to carry out the lock conversion in the
-                            // lock table
-                        } else {
-                            // a lock request that is not lock conversion
-                            this.lockTable.add(trxnObj);
-                            this.lockTable.add(dataObj);
+                        	dataObj.setLockType(DataObj.WRITE);
+                        	trxnObj.setLockType(TrxnObj.WRITE);	
                         }
+                        
+                        this.lockTable.add(trxnObj);
+                        this.lockTable.add(dataObj);
                     }
                 }
                 if (bConflict) {
@@ -195,6 +194,7 @@ public class LockManager
                     // since transaction already has a lock (may be READ, may be WRITE. we don't
                     // care) on this data item and it is requesting a READ lock, this lock request
                     // is redundant.
+                	System.out.println("Redundant READ request: already have a " + (dataObj2.getLockType() == DataObj.WRITE ? "write" : "read") + " lock...");
                     throw new RedundantLockRequestException(dataObj.getXId(), "Redundant READ lock request");
                 } else if (dataObj.getLockType() == DataObj.WRITE) {
                     // transaction already has a lock and is requesting a WRITE lock
@@ -214,8 +214,8 @@ public class LockManager
                 			}
                 		}
                 		
-                		// just convert the lock 
-                		dataObj2.setLockType(DataObj.WRITE);
+                		// convert the lock 
+                		bitset.set(0, true);
                 		
                 	// case 2) - already had a write lock 
                 	} else if (dataObj2.getLockType() == DataObj.WRITE){
