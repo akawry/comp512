@@ -19,7 +19,7 @@ public class LockManager
         super();
     }
     
-    public boolean Lock(int xid, String strData, int lockType) throws DeadlockException {
+    public boolean Lock(int xid, String strData, int lockType) {
     
         // if any parameter is invalid, then return false
         if (xid < 0) { 
@@ -77,7 +77,7 @@ public class LockManager
             }
         } 
         catch (DeadlockException deadlock) {
-            throw deadlock;
+            return false;
         }
         catch (RedundantLockRequestException redundantlockrequest) {
               // just ignore the redundant lock request

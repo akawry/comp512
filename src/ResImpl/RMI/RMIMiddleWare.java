@@ -27,8 +27,10 @@ import ResInterface.IFlightResourceManager;
 import ResInterface.IRoomResourceManager;
 import ResInterface.ResourceFrontend;
 import ResInterface.RoomFrontend;
+import Transactions.ITransactionManager;
 import Transactions.InvalidTransactionException;
 import Transactions.TransactionAbortedException;
+import Transactions.TransactionManager;
 
 public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote, ResourceFrontend {
 
@@ -36,6 +38,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	private IFlightResourceManager flightRM;
 	private IRoomResourceManager roomRM;
 	private CustomerResourceManager customerRM;
+	private TransactionManager transactionManager;
 	
 	// By default, if there is no args for car/room/flight, we try localhost:1099	
 	// Explicit is better than implicit
@@ -73,6 +76,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	@Override
 	public boolean addFlight(int id, int flightNum, int flightSeats,
 			int flightPrice) throws RemoteException {
+		
 		return flightRM.addFlight(id, flightNum, flightSeats, flightPrice);
 	}
 
