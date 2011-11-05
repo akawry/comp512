@@ -1,29 +1,25 @@
 package ResImpl;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
-import java.rmi.server.UnicastRemoteObject;
 import java.util.Calendar;
 import java.util.Enumeration;
 import java.util.Vector;
 
-import ResInterface.ICarResourceManager;
-import ResInterface.ICustomerResourceManager;
-import ResInterface.IFlightResourceManager;
-import ResInterface.IRoomResourceManager;
+import ResInterface.CarBackend;
+import ResInterface.CustomerFrontend;
+import ResInterface.FlightBackend;
+import ResInterface.ReservationFrontend;
+import ResInterface.RoomBackend;
 
-public class CustomerResourceManager extends AbstractResourceManager implements ICustomerResourceManager {
-
-	private IFlightResourceManager flightRM;
-	private IRoomResourceManager roomRM;
-	private ICarResourceManager carRM;
+public class CustomerResourceManager extends AbstractResourceManager implements CustomerFrontend,ReservationFrontend {
+	private FlightBackend flightRM;
+	private RoomBackend roomRM;
+	private CarBackend carRM;
 	
 	public CustomerResourceManager(){
 	}
 
-	public CustomerResourceManager(ICarResourceManager carRM, IFlightResourceManager flightRM, IRoomResourceManager roomRM){
+	public CustomerResourceManager(CarBackend carRM, FlightBackend flightRM, RoomBackend roomRM){
 		this.carRM = carRM;
 		this.roomRM = roomRM;
 		this.flightRM = flightRM;

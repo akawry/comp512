@@ -1,14 +1,10 @@
 package ResImpl.TCP;
 
-import java.rmi.RemoteException;
 import java.util.Vector;
 
-import ResImpl.Car;
-import ResImpl.Flight;
-import ResImpl.Hotel;
-import ResInterface.IResourceManager;
+import ResInterface.ResourceFrontend;
 
-public class TCPMiddleWareClient extends AbstractTCPResourceManager implements IResourceManager {
+public class TCPMiddleWareClient extends AbstractTCPResourceManager implements ResourceFrontend {
 
 	private String middleWareServerHost = "localhost";
 	private int middleWareServerPort = 1099;
@@ -41,11 +37,6 @@ public class TCPMiddleWareClient extends AbstractTCPResourceManager implements I
 	}
 
 	@Override
-	public Flight getFlight(int id, int flightNumber) {
-		return null;
-	}
-
-	@Override
 	public boolean addRooms(int id, String location, int numRooms, int price) {
 		return new Boolean(send(concat("newroom", id, location, numRooms, price), middleWareServerHost, middleWareServerPort));
 	}
@@ -66,11 +57,6 @@ public class TCPMiddleWareClient extends AbstractTCPResourceManager implements I
 	}
 
 	@Override
-	public Hotel getRoom(int id, String location) {
-		return null;
-	}
-
-	@Override
 	public boolean addCars(int id, String location, int numCars, int price) {
 		return new Boolean(send(concat("newcar", id, location, numCars, price), middleWareServerHost, middleWareServerPort));
 	}
@@ -88,11 +74,6 @@ public class TCPMiddleWareClient extends AbstractTCPResourceManager implements I
 	@Override
 	public int queryCarsPrice(int id, String location) {
 		return new Integer(send(concat("querycarprice", id, location), middleWareServerHost, middleWareServerPort));
-	}
-
-	@Override
-	public Car getCar(int id, String location) {
-		return null;
 	}
 
 	@Override
@@ -148,24 +129,6 @@ public class TCPMiddleWareClient extends AbstractTCPResourceManager implements I
 	@Override
 	public String processInput(String line) {
 		return null;
-	}
-
-	@Override
-	public void updateCar(int id, String location, Car car)
-			throws RemoteException {
-		// shouldn't be visible 
-	}
-
-	@Override
-	public void updateFlight(int id, int flightNumber, Flight flight)
-			throws RemoteException {
-		// shouldn't be visible 
-	}
-
-	@Override
-	public void updateRoom(int id, String location, Hotel room)
-			throws RemoteException {
-		// shouldn't be visible
 	}
 
 }

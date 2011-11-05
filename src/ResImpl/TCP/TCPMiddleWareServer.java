@@ -11,7 +11,6 @@ import ResImpl.FlightResourceManager;
 import ResImpl.Hotel;
 import ResImpl.RoomResourceManager;
 import ResImpl.RMI.RMIMiddleWare;
-import ResInterface.IResourceManager;
 
 public class TCPMiddleWareServer extends AbstractTCPResourceManager {
 

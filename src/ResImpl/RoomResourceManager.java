@@ -6,9 +6,10 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
-import ResInterface.IRoomResourceManager;
+import ResInterface.RoomBackend;
+import ResInterface.RoomFrontend;
 
-public class RoomResourceManager extends AbstractResourceManager implements Remote, IRoomResourceManager {
+public class RoomResourceManager extends AbstractResourceManager implements Remote, RoomFrontend, RoomBackend {
 
 	@Override
 	public boolean addRooms(int id, String location, int count, int price) {

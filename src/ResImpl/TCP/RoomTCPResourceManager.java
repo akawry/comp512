@@ -7,7 +7,6 @@ import ResImpl.CarResourceManager;
 import ResImpl.Flight;
 import ResImpl.Hotel;
 import ResImpl.RoomResourceManager;
-import ResInterface.ICarResourceManager;
 
 public class RoomTCPResourceManager extends AbstractTCPResourceManager {
 

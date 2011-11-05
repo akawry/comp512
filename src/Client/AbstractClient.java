@@ -10,7 +10,7 @@ import java.io.*;
 
 public abstract class AbstractClient {
 	static String message = "blank";
-	static IResourceManager rm = null;
+	static ResourceFrontend rm = null;
 
 	public static void acceptInput() {
 		BufferedReader stdin = new BufferedReader(new InputStreamReader(

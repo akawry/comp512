@@ -3,9 +3,9 @@ package ResImpl.TCP;
 import java.rmi.RemoteException;
 
 import ResImpl.Car;
-import ResInterface.ICarResourceManager;
+import ResInterface.CarBackend;
 
-public class CarTCPRMProxy extends AbstractTCPResourceManager implements ICarResourceManager {
+public class CarTCPRMProxy extends AbstractTCPResourceManager implements CarBackend {
 
 	private String carRMHost;
 	private int carRMPort;
@@ -15,31 +15,6 @@ public class CarTCPRMProxy extends AbstractTCPResourceManager implements ICarRes
 		carRMPort = port;
 	}
 	
-	@Override
-	public boolean addCars(int id, String location, int numCars, int price)
-			throws RemoteException {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean deleteCars(int id, String location) throws RemoteException {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public int queryCars(int id, String location) throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public int queryCarsPrice(int id, String location) throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
 	@Override
 	public Car getCar(int id, String location) throws RemoteException {
 		String[] info = send(concat("getcar", id, location), carRMHost, carRMPort).split(",");
@@ -57,5 +32,6 @@ public class CarTCPRMProxy extends AbstractTCPResourceManager implements ICarRes
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 
 }
