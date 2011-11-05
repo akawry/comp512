@@ -4,6 +4,7 @@ import java.rmi.RemoteException;
 
 public class TransactionManager implements ITransactionManager {
 
+	
 	@Override
 	public int start() throws RemoteException {
 		// TODO Auto-generated method stub
@@ -30,8 +31,7 @@ public class TransactionManager implements ITransactionManager {
 
 	@Override
 	public void enlist(int transactionId) throws InvalidTransactionException {
-		// TODO Auto-generated method stub
-		
+
 	}
 
 }
