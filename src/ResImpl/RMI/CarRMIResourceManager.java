@@ -8,8 +8,9 @@ import ResImpl.Car;
 import ResImpl.CarResourceManager;
 import ResInterface.CarBackend;
 import ResInterface.CarFrontend;
+import ResInterface.ICarResourceManager;
 
-public class CarRMIResourceManager extends AbstractRMIResourceManager implements Remote, CarFrontend,CarBackend {
+public class CarRMIResourceManager extends AbstractRMIResourceManager implements ICarResourceManager {
 
 	private CarResourceManager rm;
 	

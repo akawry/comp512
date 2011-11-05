@@ -6,10 +6,11 @@ import java.rmi.server.UnicastRemoteObject;
 
 import ResImpl.Hotel;
 import ResImpl.RoomResourceManager;
+import ResInterface.IRoomResourceManager;
 import ResInterface.RoomBackend;
 import ResInterface.RoomFrontend;
 
-public class RoomRMIResourceManager extends AbstractRMIResourceManager implements Remote, RoomFrontend, RoomBackend {
+public class RoomRMIResourceManager extends AbstractRMIResourceManager implements IRoomResourceManager {
 
 	private RoomResourceManager rm;
 	

@@ -11,6 +11,7 @@ import java.util.Vector;
 
 import ResImpl.AbstractResourceManager;
 import ResImpl.Car;
+import ResImpl.CarResourceManager;
 import ResImpl.Customer;
 import ResImpl.CustomerResourceManager;
 import ResImpl.Flight;
@@ -21,14 +22,17 @@ import ResImpl.ReservedItem;
 import ResImpl.Trace;
 import ResInterface.CarFrontend;
 import ResInterface.FlightFrontend;
+import ResInterface.ICarResourceManager;
+import ResInterface.IFlightResourceManager;
+import ResInterface.IRoomResourceManager;
 import ResInterface.ResourceFrontend;
 import ResInterface.RoomFrontend;
 
 public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote, ResourceFrontend {
 
-	private CarRMIResourceManager carRM;
-	private FlightRMIResourceManager flightRM;
-	private RoomRMIResourceManager roomRM;
+	private ICarResourceManager carRM;
+	private IFlightResourceManager flightRM;
+	private IRoomResourceManager roomRM;
 	private CustomerResourceManager customerRM;
 	
 	// By default, if there is no args for car/room/flight, we try localhost:1099	
@@ -233,10 +237,10 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	protected void launch() {
 
 		try {
-			carRM = (CarRMIResourceManager) LocateRegistry.getRegistry(carserver,carport).lookup("RMICar");
-			roomRM = (RoomRMIResourceManager)LocateRegistry.getRegistry(roomserver,roomport).lookup("RMIRoom");
-			flightRM = (FlightRMIResourceManager)LocateRegistry.getRegistry(flightserver,flightport).lookup("RMIFlight");
-			customerRM = new CustomerResourceManager(carRM, flightRM, roomRM);
+			carRM = (ICarResourceManager) LocateRegistry.getRegistry(carserver,carport).lookup("RMICar");
+			roomRM = (IRoomResourceManager) LocateRegistry.getRegistry(roomserver,roomport).lookup("RMIRoom");
+			flightRM = (IFlightResourceManager) LocateRegistry.getRegistry(flightserver,flightport).lookup("RMIFlight");
+			customerRM = new CustomerResourceManager(carRM,flightRM,roomRM);
 		} catch (Exception e) {
 		    System.out.println("[ERROR] Middleware cannot get rmi object") ;
 		    e.printStackTrace() ;

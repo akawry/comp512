@@ -8,8 +8,9 @@ import ResImpl.Flight;
 import ResImpl.FlightResourceManager;
 import ResInterface.FlightBackend;
 import ResInterface.FlightFrontend;
+import ResInterface.IFlightResourceManager;
 
-public class FlightRMIResourceManager extends AbstractRMIResourceManager implements Remote, FlightFrontend,FlightBackend {
+public class FlightRMIResourceManager extends AbstractRMIResourceManager implements IFlightResourceManager {
 
 	private FlightResourceManager rm;
 	
@@ -24,7 +25,7 @@ public class FlightRMIResourceManager extends AbstractRMIResourceManager impleme
 
 	@Override
 	public void register() throws Exception {
-	    registry.bind("RMiFlight", UnicastRemoteObject.exportObject(this, 0));
+	    registry.bind("RMIFlight", UnicastRemoteObject.exportObject(this, 0));
 	}
 	
 
