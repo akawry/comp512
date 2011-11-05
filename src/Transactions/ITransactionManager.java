@@ -11,6 +11,4 @@ public interface ITransactionManager {
 	public void abort(int transactionId) throws RemoteException, InvalidTransactionException;
 	
 	public boolean shutdown() throws RemoteException;
-
-	void enlist(int transactionId) throws InvalidTransactionException;
 }

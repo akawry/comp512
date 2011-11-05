@@ -536,6 +536,59 @@ public abstract class AbstractClient {
 					e.printStackTrace();
 				}
 				break;
+				
+			case 23: // start a new transaction
+				if (arguments.size() != 1){
+					wrongNumber();
+					break;
+				}
+				
+				System.out.println("Starting a new transaction.");
+				try {
+					int tID = rm.start();
+					System.out.println("Transaction id is: "+tID);
+				} catch (Exception e){
+					System.out.println("EXCEPTION:");
+					System.out.println(e.getMessage());
+					e.printStackTrace();
+				}
+				break;
+			
+			case 24: // aborts a transaction 
+				if (arguments.size() != 2){
+					wrongNumber();
+					break;
+				}
+				
+				
+				try {
+					int tID = getInt(arguments.elementAt(1));
+					System.out.println("Aborting transaction " + tID);
+					rm.abort(tID);
+				} catch (Exception e) {
+					System.out.println("EXCEPTION:");
+					System.out.println(e.getMessage());
+					e.printStackTrace();
+				}
+				break;
+				
+			case 25: // commit a transaction
+				if (arguments.size() != 2){
+					wrongNumber();
+					break;
+				}
+				
+				try {
+					int tID = getInt(arguments.elementAt(1));
+					System.out.println("Committing transaction " + tID);
+					rm.commit(tID);
+				} catch (Exception e) {
+					System.out.println("EXCEPTION:");
+					System.out.println(e.getMessage());
+					e.printStackTrace();
+				}
+				break;
+				
 
 			default:
 				System.out
@@ -602,6 +655,12 @@ public abstract class AbstractClient {
 			return 21;
 		else if (argument.compareToIgnoreCase("newcustomerid") == 0)
 			return 22;
+		else if (argument.compareToIgnoreCase("start") == 0)
+			return 23;
+		else if (argument.compareToIgnoreCase("abort") == 0)
+			return 24;
+		else if (argument.compareToIgnoreCase("commit") == 0)
+			return 25;
 		else
 			return 666;
 

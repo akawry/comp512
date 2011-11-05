@@ -27,6 +27,8 @@ import ResInterface.IFlightResourceManager;
 import ResInterface.IRoomResourceManager;
 import ResInterface.ResourceFrontend;
 import ResInterface.RoomFrontend;
+import Transactions.InvalidTransactionException;
+import Transactions.TransactionAbortedException;
 
 public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote, ResourceFrontend {
 
@@ -264,20 +266,30 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	protected void register() throws Exception {
 		registry.bind("RMIMiddleware", UnicastRemoteObject.exportObject(this,0));
 	}
-/*
+
 	@Override
-	public Flight getFlight(int id, int flightNumber) throws RemoteException {
-		return flightRM.getFlight(id, flightNumber);
+	public int start() throws RemoteException {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 	@Override
-	public Hotel getRoom(int id, String location) throws RemoteException {
-		return roomRM.getRoom(id, location);
+	public boolean commit(int transactionId) throws RemoteException,
+			TransactionAbortedException, InvalidTransactionException {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 	@Override
-	public Car getCar(int id, String location) throws RemoteException {
-		return carRM.getCar(id, location);
+	public void abort(int transactionId) throws RemoteException,
+			InvalidTransactionException {
+		// TODO Auto-generated method stub
+		
 	}
-	*/
+
+	@Override
+	public boolean shutdown() throws RemoteException {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }
