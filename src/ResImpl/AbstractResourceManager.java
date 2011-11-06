@@ -5,6 +5,16 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.Hashtable;
+import java.util.Stack;
+
+import LockManager.DeadlockException;
+import LockManager.LockManager;
+import LockManager.TrxnObj;
+import Transactions.ITransactionManager;
+import Transactions.InvalidTransactionException;
+import Transactions.Operation;
+import Transactions.TransactionAbortedException;
 
 
 public abstract class AbstractResourceManager {
@@ -12,6 +22,8 @@ public abstract class AbstractResourceManager {
 	protected RMHashtable m_itemHT = new RMHashtable();
 	protected int port;
 	protected Registry registry;
+	protected LockManager lockManager = new LockManager();
+	protected Hashtable<Integer, Stack<Operation>> activeTransactions = new Hashtable<Integer, Stack<Operation>>();
 
 	// Reads a data item
 	protected RMItem readData(int id, String key) {
@@ -85,7 +97,66 @@ public abstract class AbstractResourceManager {
 				+ value);
 		return value;
 	}
+	
+	protected void undoAll(int id){
+		synchronized (m_itemHT){
+			Stack<Operation> ops = activeTransactions.get(id);
+			while (ops.size() > 0){
+				Operation op = ops.pop();
+				switch (op.getType()){
+				case Operation.ADD:
+				case Operation.WRITE:
+					m_itemHT.put(op.getKey(), op.getValue());
+					break;
+				case Operation.DELETE:
+					m_itemHT.remove(op.getKey());
+					break;
+				}
+			}
+		}
+	}
+	
+
+	public int start() throws RemoteException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 
 
+	public boolean commit(int id) throws RemoteException, TransactionAbortedException, InvalidTransactionException {
+		Stack<Operation> ops = activeTransactions.get(id);
+		if (ops == null){
+			throw new InvalidTransactionException("No transaction with id "+id);
+		}
+		activeTransactions.remove(id);
+		return lockManager.UnlockAll(id);
+	}
+
+
+	public void abort(int id) throws RemoteException, InvalidTransactionException {
+		Stack<Operation> ops = activeTransactions.get(id);
+		if (ops == null){
+			throw new InvalidTransactionException("No transaction with id "+id);
+		}
+		activeTransactions.remove(id);
+		undoAll(id);
+		lockManager.UnlockAll(id);
+	}
+
+
+	public boolean shutdown() throws RemoteException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+
+	public boolean enlist(int id) throws RemoteException, InvalidTransactionException {
+		Stack<Operation> ops = activeTransactions.get(id);
+		if (ops != null){
+			throw new InvalidTransactionException("Transaction with id "+id+" already exsist");
+		}
+		activeTransactions.put(id, new Stack<Operation>());
+		return true;
+	}
 
 }

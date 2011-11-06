@@ -73,12 +73,16 @@ public class TCPMiddleWareServer extends AbstractTCPResourceManager {
 			int id = Integer.parseInt(toks[1]),
 				cid = toks.length == 3 ? Integer.parseInt(toks[2]) : 1;
 			
-			if (type.startsWith("new")){
-				res = "" + (toks.length == 2 ? rm.newCustomer(id) : rm.newCustomer(id, cid));
-			} else if (type.startsWith("delete")){
-				res = "" + rm.deleteCustomer(id, cid);
-			} else if (type.startsWith("query")){
-				res = "" + rm.queryCustomerInfo(id, cid);
+			try {
+				if (type.startsWith("new")){
+					res = "" + (toks.length == 2 ? rm.newCustomer(id) : rm.newCustomer(id, cid));
+				} else if (type.startsWith("delete")){
+					res = "" + rm.deleteCustomer(id, cid);
+				} else if (type.startsWith("query")){
+					res = "" + rm.queryCustomerInfo(id, cid);
+				}
+			} catch (Exception e){
+				
 			}
 			
 		// handle locally

@@ -4,11 +4,14 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
+import LockManager.DeadlockException;
 import ResImpl.Hotel;
 import ResImpl.RoomResourceManager;
 import ResInterface.IRoomResourceManager;
 import ResInterface.RoomBackend;
 import ResInterface.RoomFrontend;
+import Transactions.InvalidTransactionException;
+import Transactions.TransactionAbortedException;
 
 public class RoomRMIResourceManager extends AbstractRMIResourceManager implements IRoomResourceManager {
 
@@ -29,27 +32,27 @@ public class RoomRMIResourceManager extends AbstractRMIResourceManager implement
 	}
 
 	@Override
-	public boolean addRooms(int id, String location, int numRooms, int price) throws RemoteException {
+	public boolean addRooms(int id, String location, int numRooms, int price) throws RemoteException, DeadlockException, InvalidTransactionException {
 		return rm.addRooms(id, location, numRooms, price);
 	}
 
 	@Override
-	public boolean deleteRooms(int id, String location) throws RemoteException {
+	public boolean deleteRooms(int id, String location) throws RemoteException, InvalidTransactionException, DeadlockException {
 		return rm.deleteRooms(id, location);
 	}
 
 	@Override
-	public int queryRooms(int id, String location) throws RemoteException {
+	public int queryRooms(int id, String location) throws RemoteException, InvalidTransactionException, DeadlockException {
 		return rm.queryRooms(id, location);
 	}
 
 	@Override
-	public int queryRoomsPrice(int id, String location) throws RemoteException {
+	public int queryRoomsPrice(int id, String location) throws RemoteException, InvalidTransactionException, DeadlockException {
 		return rm.queryRoomsPrice(id, location);
 	}
 
 	@Override
-	public Hotel getRoom(int id, String location) throws RemoteException {
+	public Hotel getRoom(int id, String location) throws RemoteException, DeadlockException, InvalidTransactionException {
 		return rm.getRoom(id, location);
 	}
 
@@ -61,8 +64,41 @@ public class RoomRMIResourceManager extends AbstractRMIResourceManager implement
 
 	@Override
 	public void updateRoom(int id, String location, Hotel room)
-			throws RemoteException {
+			throws RemoteException, DeadlockException, InvalidTransactionException {
 		rm.updateRoom(id, location, room);
+	}
+
+	@Override
+	public int start() throws RemoteException, InvalidTransactionException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public boolean commit(int transactionId) throws RemoteException,
+			TransactionAbortedException, InvalidTransactionException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void abort(int transactionId) throws RemoteException,
+			InvalidTransactionException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean shutdown() throws RemoteException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean enlist(int transactionId) throws RemoteException,
+			InvalidTransactionException {
+		// TODO Auto-generated method stub
+		return rm.enlist(transactionId);
 	}
 
 }

@@ -8,7 +8,9 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import LockManager.DeadlockException;
 import ResImpl.AbstractResourceManager;
+import Transactions.InvalidTransactionException;
 
 public abstract class AbstractTCPResourceManager {
 
@@ -17,8 +19,11 @@ public abstract class AbstractTCPResourceManager {
 	 * This is a command string sent from the client 
 	 * @param line the command 
 	 * @return the response string to send to the client 
+	 * @throws DeadlockException 
+	 * @throws InvalidTransactionException 
+	 * @throws NumberFormatException 
 	 */
-	public abstract String processInput(String line);
+	public abstract String processInput(String line) throws NumberFormatException, InvalidTransactionException, DeadlockException;
 
 	/**
 	 * Start receiving messages on the specified port

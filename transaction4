@@ -1,0 +1,13 @@
+start
+newcustomerid,1,1
+newcustomerid,1,2
+newroom,1,abc,1,3434
+queryroom,1,abc
+reserveroom,1,1,abc
+queryroom,1,abc
+reserveroom,1,2,abc
+deletecustomer,1,1
+reserveroom,1,2,abc
+queryroom,1,abc
+abort,1
+quit

@@ -5,11 +5,13 @@ import java.util.Calendar;
 import java.util.Enumeration;
 import java.util.Vector;
 
+import LockManager.DeadlockException;
 import ResInterface.CarBackend;
 import ResInterface.CustomerFrontend;
 import ResInterface.FlightBackend;
 import ResInterface.ReservationFrontend;
 import ResInterface.RoomBackend;
+import Transactions.InvalidTransactionException;
 
 public class CustomerResourceManager extends AbstractResourceManager implements CustomerFrontend,ReservationFrontend {
 	private FlightBackend flightRM;
@@ -26,7 +28,7 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 	}
 	
 	@Override
-	public int newCustomer(int id) {
+	public int newCustomer(int id) throws DeadlockException {
 		Trace.info("INFO: RM::newCustomer(" + id + ") called" );
 		// Generate a globally unique ID for the new customer
 		int cid = Integer.parseInt( String.valueOf(id) +
@@ -39,7 +41,7 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 	}
 
 	@Override
-	public boolean newCustomer(int id, int customerID ) {
+	public boolean newCustomer(int id, int customerID ) throws DeadlockException {
 		Trace.info("INFO: RM::newCustomer(" + id + ", " + customerID + ") called" );
 		Customer cust = (Customer) readData( id, Customer.getKey(customerID) );
 		if( cust == null ) {
@@ -54,7 +56,7 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 	}
 
 	@Override
-	public boolean deleteCustomer(int id, int customerID) {
+	public boolean deleteCustomer(int id, int customerID) throws DeadlockException {
 		Trace.info("RM::deleteCustomer(" + id + ", " + customerID + ") called" );
 		Customer cust = (Customer) readData( id, Customer.getKey(customerID) );
 		if( cust == null ) {
@@ -106,7 +108,7 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 	}
 
 	@Override
-	public String queryCustomerInfo(int id, int customerID) {
+	public String queryCustomerInfo(int id, int customerID) throws DeadlockException {
 		Trace.info("RM::queryCustomerInfo(" + id + ", " + customerID + ") called" );
 		Customer cust = (Customer) readData( id, Customer.getKey(customerID) );
 		if( cust == null ) {
@@ -121,7 +123,7 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 	}
 
 	@Override
-	public boolean reserveCar(int id, int customer, String location) throws RemoteException {
+	public boolean reserveCar(int id, int customer, String location) throws RemoteException, InvalidTransactionException, DeadlockException {
 		Car car = carRM.getCar(id, location);
 		boolean success = this.reserveItem(id, customer, car, location);
 		if (success){
@@ -133,7 +135,7 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 
 	@Override
 	public boolean reserveFlight(int id, int customer, int flightNumber)
-			throws RemoteException {
+			throws RemoteException, DeadlockException, InvalidTransactionException {
 		Flight flight = flightRM.getFlight(id, flightNumber);
 		boolean success = reserveItem(id, customer, flight, String.valueOf(flightNumber));
 		if (success)
@@ -143,7 +145,7 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 
 	@Override
 	public boolean reserveRoom(int id, int customer, String location)
-			throws RemoteException {
+			throws RemoteException, DeadlockException, InvalidTransactionException {
 		Hotel room = roomRM.getRoom(id, location);
 		boolean success = reserveItem(id, customer, room, location);
 		if (success)
@@ -152,7 +154,7 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 	}
 
 	@Override
-	public boolean itinerary(int id, int customer, Vector<String> flightNumbers, String location, boolean Car, boolean Room) throws RemoteException {
+	public boolean itinerary(int id, int customer, Vector<String> flightNumbers, String location, boolean Car, boolean Room) throws RemoteException, NumberFormatException, DeadlockException, InvalidTransactionException {
 		boolean success = true;
 		
 		// reserve flights 
@@ -173,7 +175,7 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 	
 	// reserve an item
 	protected boolean reserveItem(int id, int customerID, String key,
-			String location) {
+			String location) throws DeadlockException {
 		Trace.info("RM::reserveItem( " + id + ", customer=" + customerID + ", "
 				+ key + ", " + location + " ) called");
 		// Read customer object if it exists (and read lock it)
@@ -211,7 +213,7 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 
 	// reserve an item
 	protected boolean reserveItem(int id, int customerID, ReservableItem item,
-			String location) {
+			String location) throws DeadlockException {
 
 		// check if the item is available
 		if (item == null) {

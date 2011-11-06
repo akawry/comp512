@@ -41,28 +41,12 @@ public class TransactionManager implements ITransactionManager {
 		// TODO Auto-generated method stub
 		return false;
 	}
-	
-	/**
-	 * Returns true if the shared lock has been granted for the given resource, false otherwise  
-	 * @param transactionId
-	 * @param type
-	 * @param itemId
-	 * @return
-	 */
-	public boolean read(int transactionId, String type, int itemId){
-		return lockManager.Lock(transactionId, type + itemId, TrxnObj.READ);
-	}
-	
-	/**
-	 * Returns true if the exclusive lock has been granted for the given resource, false otherwise 
-	 * @param transactionId
-	 * @param type
-	 * @param itemId
-	 * @return
-	 */
-	public boolean write(int transactionId, String type, int itemId){
-		// TODO: Keep the corresponding 'undo' commands 
-		return lockManager.Lock(transactionId, type + itemId, TrxnObj.WRITE);
+
+	@Override
+	public boolean enlist(int transactionId) throws RemoteException,
+			InvalidTransactionException {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 

@@ -160,4 +160,11 @@ public class TCPMiddleWareClient extends AbstractTCPResourceManager implements R
 		return false;
 	}
 
+	@Override
+	public boolean enlist(int transactionId) throws RemoteException,
+			InvalidTransactionException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

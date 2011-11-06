@@ -9,6 +9,7 @@ import java.util.Calendar;
 import java.util.Enumeration;
 import java.util.Vector;
 
+import LockManager.DeadlockException;
 import ResImpl.AbstractResourceManager;
 import ResImpl.Car;
 import ResImpl.CarResourceManager;
@@ -39,6 +40,8 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	private IRoomResourceManager roomRM;
 	private CustomerResourceManager customerRM;
 	private TransactionManager transactionManager;
+	
+	private int txnId = 1;
 	
 	// By default, if there is no args for car/room/flight, we try localhost:1099	
 	// Explicit is better than implicit
@@ -77,105 +80,276 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	public boolean addFlight(int id, int flightNum, int flightSeats,
 			int flightPrice) throws RemoteException {
 		
-		return flightRM.addFlight(id, flightNum, flightSeats, flightPrice);
+		try {
+			return flightRM.addFlight(id, flightNum, flightSeats, flightPrice);
+		} catch (DeadlockException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidTransactionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
 	}
 
 	@Override
 	public boolean deleteFlight(int id, int flightNum) throws RemoteException {
-		return flightRM.deleteFlight(id, flightNum);
+		try {
+			return flightRM.deleteFlight(id, flightNum);
+		} catch (InvalidTransactionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (DeadlockException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
 	}
 
 	@Override
 	public int queryFlight(int id, int flightNumber) throws RemoteException {
-		return flightRM.queryFlight(id, flightNumber);
+		try {
+			return flightRM.queryFlight(id, flightNumber);
+		} catch (InvalidTransactionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (DeadlockException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return flightNumber;
 	}
 
 	@Override
 	public int queryFlightPrice(int id, int flightNumber) throws RemoteException {
-		return flightRM.queryFlightPrice(id, flightNumber);
+		try {
+			return flightRM.queryFlightPrice(id, flightNumber);
+		} catch (InvalidTransactionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (DeadlockException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return flightNumber;
 	}
 
 	@Override
 	public boolean reserveFlight(int id, int customer, int flightNumber) throws RemoteException {
-		return customerRM.reserveFlight(id, customer, flightNumber);
+		try {
+			return customerRM.reserveFlight(id, customer, flightNumber);
+		} catch (DeadlockException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidTransactionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
 	}
 
 	@Override
 	public boolean addRooms(int id, String location, int numRooms, int price) throws RemoteException {
-		return roomRM.addRooms(id, location, numRooms, price);
+		try {
+			return roomRM.addRooms(id, location, numRooms, price);
+		} catch (DeadlockException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidTransactionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
 	}
 
 	@Override
 	public boolean deleteRooms(int id, String location) throws RemoteException {
-		return roomRM.deleteRooms(id, location);
+		try {
+			return roomRM.deleteRooms(id, location);
+		} catch (InvalidTransactionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (DeadlockException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
 	}
 
 	@Override
 	public int queryRooms(int id, String location) throws RemoteException {
-		return roomRM.queryRooms(id, location);
+		try {
+			return roomRM.queryRooms(id, location);
+		} catch (InvalidTransactionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (DeadlockException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return id;
 	}
 
 	@Override
 	public int queryRoomsPrice(int id, String location) throws RemoteException {
-		return roomRM.queryRoomsPrice(id, location);
+		try {
+			return roomRM.queryRoomsPrice(id, location);
+		} catch (InvalidTransactionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (DeadlockException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return id;
 	}
 
 	@Override
 	public boolean reserveRoom(int id, int customer, String location) throws RemoteException {
-		return customerRM.reserveRoom(id, customer, location);
+		try {
+			return customerRM.reserveRoom(id, customer, location);
+		} catch (DeadlockException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidTransactionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
 	}
 
 	@Override
 	public boolean addCars(int id, String location, int numCars, int price) throws RemoteException {
-		return carRM.addCars(id, location, numCars, price);
+		try {
+			return carRM.addCars(id, location, numCars, price);
+		} catch (InvalidTransactionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (DeadlockException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
 	}
 
 	@Override
 	public boolean deleteCars(int id, String location) throws RemoteException {
 		// ask customer if this car is reserved
 		
-		return carRM.deleteCars(id, location);
+		try {
+			return carRM.deleteCars(id, location);
+		} catch (InvalidTransactionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (DeadlockException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
 	}
 
 	@Override
 	public int queryCars(int id, String location) throws RemoteException {
-		return carRM.queryCars(id, location);
+		try {
+			return carRM.queryCars(id, location);
+		} catch (InvalidTransactionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (DeadlockException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return id;
 	}
 
 	@Override
 	public int queryCarsPrice(int id, String location) throws RemoteException {
-		return carRM.queryCarsPrice(id, location);
+		try {
+			return carRM.queryCarsPrice(id, location);
+		} catch (InvalidTransactionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (DeadlockException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return id;
 	}
 
 	@Override
 	public boolean reserveCar(int id, int customer, String location) throws RemoteException {
-		return customerRM.reserveCar(id, customer, location);
+		try {
+			return customerRM.reserveCar(id, customer, location);
+		} catch (InvalidTransactionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (DeadlockException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
 	}
 
 	@Override
 	public int newCustomer(int id) throws RemoteException {
-		return customerRM.newCustomer(id);
+		try {
+			return customerRM.newCustomer(id);
+		} catch (DeadlockException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return id;
 	}
 
 	@Override
 	public boolean newCustomer(int id, int customerID ) throws RemoteException {
-		return customerRM.newCustomer(id, customerID);
+		try {
+			return customerRM.newCustomer(id, customerID);
+		} catch (DeadlockException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
 	}
 
 	@Override
 	public boolean deleteCustomer(int id, int customerID) {
-		return customerRM.deleteCustomer(id, customerID);
+		try {
+			return customerRM.deleteCustomer(id, customerID);
+		} catch (DeadlockException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
 	}
 
 	@Override
 	public String queryCustomerInfo(int id, int customerID) {
-		return customerRM.queryCustomerInfo(id, customerID);
+		try {
+			return customerRM.queryCustomerInfo(id, customerID);
+		} catch (DeadlockException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return carserver;
 	}
 
 	@Override
 	public boolean itinerary(int id, int customer, Vector<String> flightNumbers,
 			String location, boolean Car, boolean Room) throws RemoteException {
-		return customerRM.itinerary(id, customer, flightNumbers, location, Car, Room);
+		try {
+			return customerRM.itinerary(id, customer, flightNumbers, location, Car, Room);
+		} catch (NumberFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidTransactionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (DeadlockException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return Room;
 	}
 
 	public String usage(){
@@ -272,28 +446,44 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	}
 
 	@Override
-	public int start() throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
+	public int start() throws RemoteException, InvalidTransactionException {
+		int id = txnId;
+		txnId++;
+		enlist(id);
+		return id;
 	}
 
 	@Override
-	public boolean commit(int transactionId) throws RemoteException,
-			TransactionAbortedException, InvalidTransactionException {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean commit(int transactionId) throws RemoteException, TransactionAbortedException, InvalidTransactionException {
+		boolean success = true;
+		success &= carRM.commit(transactionId);
+		success &= flightRM.commit(transactionId);
+		success &= roomRM.commit(transactionId);
+		return success;
 	}
 
 	@Override
-	public void abort(int transactionId) throws RemoteException,
-			InvalidTransactionException {
-		// TODO Auto-generated method stub
-		
+	public void abort(int transactionId) throws RemoteException, InvalidTransactionException {
+		carRM.abort(transactionId);
+		flightRM.abort(transactionId);
+		roomRM.abort(transactionId);
 	}
 
 	@Override
 	public boolean shutdown() throws RemoteException {
-		// TODO Auto-generated method stub
-		return false;
+		boolean success = true;
+		success &= carRM.shutdown();
+		success &= flightRM.shutdown();
+		success &= roomRM.shutdown();
+		return success;
+	}
+
+	@Override
+	public boolean enlist(int transactionId) throws RemoteException, InvalidTransactionException {
+		boolean success = true;
+		success &= carRM.enlist(transactionId);
+		success &= flightRM.enlist(transactionId);
+		success &= roomRM.enlist(transactionId);
+		return success;
 	}
 }

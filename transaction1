@@ -1,0 +1,6 @@
+start
+newcustomer,1,1
+newcar,1,montreal,1,100
+querycar,1,montreal
+commit,1
+quit

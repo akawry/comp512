@@ -34,6 +34,9 @@ package ResImpl.TCP;
 import java.net.*;
 import java.io.*;
 
+import LockManager.DeadlockException;
+import Transactions.InvalidTransactionException;
+
 public class MultiServerThread extends Thread {
     private Socket socket = null;
     private AbstractTCPResourceManager rm;
@@ -65,7 +68,7 @@ public class MultiServerThread extends Thread {
 		    in.close();
 		    socket.close();
 		    
-		} catch (IOException e) {
+		} catch (Exception e) {
 		    e.printStackTrace();
 		}
     }

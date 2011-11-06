@@ -2,8 +2,10 @@ package ResImpl.TCP;
 
 import java.rmi.RemoteException;
 
+import LockManager.DeadlockException;
 import ResImpl.Car;
 import ResImpl.CarResourceManager;
+import Transactions.InvalidTransactionException;
 
 public class CarTCPResourceManager extends AbstractTCPResourceManager {
 
@@ -14,7 +16,7 @@ public class CarTCPResourceManager extends AbstractTCPResourceManager {
 	}
 	
 	@Override
-	public String processInput(String line) {
+	public String processInput(String line) throws NumberFormatException, InvalidTransactionException, DeadlockException {
 		
 		String[] toks = line.split(",");
 		String type = toks[0];
