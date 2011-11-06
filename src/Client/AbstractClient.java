@@ -12,7 +12,14 @@ public abstract class AbstractClient {
 	static String message = "blank";
 	static ResourceFrontend rm = null;
 
-	public static void acceptInput() {
+	public static void automaticInput(int loopnb, int trsec, int x) {
+
+	    for (int i = 0 ; i < loopnb ; i++) {
+	    }
+
+	}
+
+	public static void manualInput() {
 		BufferedReader stdin = new BufferedReader(new InputStreamReader(
 				System.in));
 		String command = "";

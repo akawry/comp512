@@ -8,6 +8,9 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.Calendar;
 import java.util.Enumeration;
 import java.util.Vector;
+import java.util.Timer;
+import java.util.HashMap ;
+import java.util.Map ;
 
 import LockManager.DeadlockException;
 import ResImpl.AbstractResourceManager;
@@ -21,6 +24,7 @@ import ResImpl.RMHashtable;
 import ResImpl.ReservableItem;
 import ResImpl.ReservedItem;
 import ResImpl.Trace;
+import ResImpl.AliveTransactionTask;
 import ResInterface.CarFrontend;
 import ResInterface.FlightFrontend;
 import ResInterface.ICarResourceManager;
@@ -42,6 +46,9 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	private TransactionManager transactionManager;
 	
 	private int txnId = 1;
+  private AliveTransactionTask aliveTransactionTask ;
+  private Timer alive ;
+  private Map<Integer,Long>  transactions = new HashMap<Integer,Long>() ;
 	
 	// By default, if there is no args for car/room/flight, we try localhost:1099	
 	// Explicit is better than implicit
@@ -51,6 +58,13 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	private int carport = 1099 ;
 	private int flightport = 1099 ;
 	private int roomport = 1099 ;
+
+  public RMIMiddleWare () {
+    super() ;
+    aliveTransactionTask = new AliveTransactionTask (transactions) ;
+    alive = new Timer() ;
+    alive.schedule ( aliveTransactionTask , 10000, 10000) ;
+  }
 
 	public CarFrontend getCarResourceManager() {
 		return carRM;
@@ -449,6 +463,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	public int start() throws RemoteException, InvalidTransactionException {
 		int id = txnId;
 		txnId++;
+		transactions.put(id,Calendar.getInstance().getTime().getTime()) ;
 		enlist(id);
 		return id;
 	}

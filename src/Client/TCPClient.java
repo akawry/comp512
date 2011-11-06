@@ -1,8 +1,5 @@
 package Client;
 
-// Client.java
-
-
 import java.rmi.*;
 
 import ResImpl.TCP.TCPMiddleWareClient;
@@ -29,8 +26,7 @@ public class TCPClient extends AbstractClient
 			serverhost = args[0].split(":")[0]; 
 			serverport = Integer.parseInt( args[0].split(":")[1] ); 
 			rm = new TCPMiddleWareClient(serverhost, serverport);
-			// begin input loop 
-			acceptInput();
+			manualInput();
 			
 		}
 
