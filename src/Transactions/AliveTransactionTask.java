@@ -1,15 +1,18 @@
 package Transactions;
 
+import java.rmi.RemoteException;
 import java.util.* ;
 
 public class AliveTransactionTask extends TimerTask {
 
     private final Map<Integer,Long> transactions ;
     private static final int TRANSACTION_TIMEOUT_SECONDS = 10 ;
-
-    public AliveTransactionTask(Map<Integer,Long> t) {
+    private final ITransactionManager transactionManager;
+    
+    public AliveTransactionTask(Map<Integer,Long> t, ITransactionManager tm) {
       super() ;
       transactions = t ;
+      transactionManager = tm;
     }
 
     public void run() {
@@ -29,6 +32,15 @@ public class AliveTransactionTask extends TimerTask {
 		// We delete them
 		for (int key : timeouted) {
 		    transactions.remove(key) ;
+		    try {
+				transactionManager.abort(key);
+			} catch (RemoteException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (InvalidTransactionException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 		}
 
     }

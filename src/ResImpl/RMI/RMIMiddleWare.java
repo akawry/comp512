@@ -63,7 +63,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 
 	public RMIMiddleWare() {
 		super();
-		aliveTransactionTask = new AliveTransactionTask(transactions);
+		aliveTransactionTask = new AliveTransactionTask(transactions, this);
 		alive = new Timer();
 		alive.schedule(aliveTransactionTask, 10000, 10000);
 	}
