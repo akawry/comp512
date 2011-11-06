@@ -34,13 +34,15 @@ public abstract class AbstractClient {
 			System.out.print("\n>");
 			try {
 				// read the next command
-				command = stdin.readLine();
+				while(command == "") {
+				    command = stdin.readLine();
+				    command = command.trim();
+				}
 			} catch (IOException io) {
 				System.out.println("Unable to read from standard in");
 				System.exit(1);
 			}
 			// remove heading and trailing white space
-			command = command.trim();
 			arguments = parse(command);
 
 			// decide which of the commands this was
