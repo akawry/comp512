@@ -8,6 +8,7 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.Hashtable;
 import java.util.Stack;
 
+import ResImpl.Customer;
 import LockManager.DeadlockException;
 import LockManager.LockManager;
 import LockManager.TrxnObj;
@@ -113,7 +114,18 @@ public abstract class AbstractResourceManager {
 				break;
 			case Operation.DELETE:
 				Trace.info(this+":: Undoing ADD command. Removing " + op.getKey());
-				deleteItem(id, (String) op.getKey());
+				try {
+					// deleting a resource 
+					deleteItem(id, (String) op.getKey());
+				} catch (ClassCastException e){
+					// deleting a customer 
+					removeData(id, (String) op.getKey());
+				}
+				break;
+			case Operation.UNRESERVE:
+				Trace.info(this+":: Undoing RESERVE command. Removing " + op.getValue()+" from " + op.getKey());
+				Customer cust = (Customer) readData(id, op.getKey());
+				cust.unreserve((String)op.getValue());
 				break;
 			}
 		}

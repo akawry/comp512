@@ -44,8 +44,8 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 								String.valueOf(Calendar.getInstance().get(Calendar.MILLISECOND)) +
 								String.valueOf( Math.round( Math.random() * 100 + 1 )));
 		Customer cust = new Customer( cid );
-		
 		lockManager.Lock(id, cust.getKey(), TrxnObj.WRITE);
+		ops.push(new Operation(Operation.DELETE, cust.getKey(), null));
 		writeData( id, cust.getKey(), cust );
 		Trace.info("RM::newCustomer(" + cid + ") returns ID=" + cid );
 		return cid;
@@ -63,6 +63,7 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 		if( cust == null ) {
 			if (lockManager.Lock(id, Customer.getKey(customerID), TrxnObj.WRITE)){
 				cust = new Customer(customerID);
+				ops.push(new Operation(Operation.DELETE, cust.getKey(), null));
 				writeData( id, cust.getKey(), cust );
 				Trace.info("INFO: RM::newCustomer(" + id + ", " + customerID + ") created a new customer" );
 				return true;
@@ -125,6 +126,7 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 			}
 			
 			if (lockManager.Lock(id, cust.getKey(), TrxnObj.WRITE)){
+				ops.push(new Operation(Operation.ADD, cust.getKey(), cust));
 				// remove the customer from the storage
 				removeData(id, cust.getKey());
 				
@@ -173,6 +175,7 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 		
 		boolean success = false;
 		if (lockManager.Lock(id, Customer.getKey(customer), TrxnObj.WRITE)){
+			ops.push(new Operation(Operation.UNRESERVE, Customer.getKey(customer), Car.getKey(location)));
 			success = this.reserveItem(id, customer, car, location);
 		} 
 		
@@ -194,6 +197,7 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 		Flight flight = flightRM.getFlight(id, flightNumber);
 		boolean success = false;
 		if (lockManager.Lock(id, Customer.getKey(customer), TrxnObj.WRITE)){
+			ops.push(new Operation(Operation.UNRESERVE, Customer.getKey(customer), Flight.getKey(flightNumber)));
 			success = reserveItem(id, customer, flight, String.valueOf(flightNumber));
 		}
 		
@@ -203,11 +207,16 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 	}
 
 	@Override
-	public boolean reserveRoom(int id, int customer, String location)
-			throws RemoteException, DeadlockException, InvalidTransactionException {
+	public boolean reserveRoom(int id, int customer, String location) throws RemoteException, DeadlockException, InvalidTransactionException {
+		Stack<Operation> ops = activeTransactions.get(id);
+		if (ops == null){
+			throw new InvalidTransactionException("No transaction with id "+id);
+		}
+		
 		Hotel room = roomRM.getRoom(id, location);
 		boolean success = false;
 		if (lockManager.Lock(id, Customer.getKey(customer), TrxnObj.WRITE)){
+			ops.push(new Operation(Operation.UNRESERVE, Customer.getKey(customer), Hotel.getKey(location)));
 			success = reserveItem(id, customer, room, location);
 		}
 		if (success)

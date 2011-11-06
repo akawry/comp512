@@ -96,6 +96,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 	public boolean addFlight(int id, int flightNum, int flightSeats, int flightPrice) throws RemoteException {
 
 		try {
+			transactions.put(id, Calendar.getInstance().getTime().getTime());
 			return flightRM.addFlight(id, flightNum, flightSeats, flightPrice);
 		} catch (DeadlockException e) {
 			abort(id);
@@ -108,6 +109,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 	@Override
 	public boolean deleteFlight(int id, int flightNum) throws RemoteException {
 		try {
+			transactions.put(id, Calendar.getInstance().getTime().getTime());
 			return flightRM.deleteFlight(id, flightNum);
 		} catch (InvalidTransactionException e) {
 			Trace.error("[ERROR] "+e.getMessage());
@@ -120,31 +122,33 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 	@Override
 	public int queryFlight(int id, int flightNumber) throws RemoteException {
 		try {
+			transactions.put(id, Calendar.getInstance().getTime().getTime());
 			return flightRM.queryFlight(id, flightNumber);
 		} catch (InvalidTransactionException e) {
 			Trace.error("[ERROR] "+e.getMessage());
 		} catch (DeadlockException e) {
 			abort(id);
 		}
-		return flightNumber;
+		return -1;
 	}
 
 	@Override
 	public int queryFlightPrice(int id, int flightNumber) throws RemoteException {
 		try {
+			transactions.put(id, Calendar.getInstance().getTime().getTime());
 			return flightRM.queryFlightPrice(id, flightNumber);
 		} catch (InvalidTransactionException e) {
 			Trace.error("[ERROR] "+e.getMessage());
 		} catch (DeadlockException e) {
 			abort(id);
 		}
-		return flightNumber;
+		return -1;
 	}
 
 	@Override
-	public boolean reserveFlight(int id, int customer, int flightNumber)
-			throws RemoteException {
+	public boolean reserveFlight(int id, int customer, int flightNumber) throws RemoteException {
 		try {
+			transactions.put(id, Calendar.getInstance().getTime().getTime());
 			return customerRM.reserveFlight(id, customer, flightNumber);
 		} catch (DeadlockException e) {
 			abort(id);
@@ -155,9 +159,9 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 	}
 
 	@Override
-	public boolean addRooms(int id, String location, int numRooms, int price)
-			throws RemoteException {
+	public boolean addRooms(int id, String location, int numRooms, int price) throws RemoteException {
 		try {
+			transactions.put(id, Calendar.getInstance().getTime().getTime());
 			return roomRM.addRooms(id, location, numRooms, price);
 		} catch (DeadlockException e) {
 			abort(id);
@@ -170,6 +174,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 	@Override
 	public boolean deleteRooms(int id, String location) throws RemoteException {
 		try {
+			transactions.put(id, Calendar.getInstance().getTime().getTime());
 			return roomRM.deleteRooms(id, location);
 		} catch (InvalidTransactionException e) {
 			Trace.error("[ERROR] "+e.getMessage());
@@ -182,31 +187,33 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 	@Override
 	public int queryRooms(int id, String location) throws RemoteException {
 		try {
+			transactions.put(id, Calendar.getInstance().getTime().getTime());
 			return roomRM.queryRooms(id, location);
 		} catch (InvalidTransactionException e) {
 			Trace.error("[ERROR] "+e.getMessage());
 		} catch (DeadlockException e) {
 			abort(id);
 		}
-		return id;
+		return -1;
 	}
 
 	@Override
 	public int queryRoomsPrice(int id, String location) throws RemoteException {
 		try {
+			transactions.put(id, Calendar.getInstance().getTime().getTime());
 			return roomRM.queryRoomsPrice(id, location);
 		} catch (InvalidTransactionException e) {
 			Trace.error("[ERROR] "+e.getMessage());
 		} catch (DeadlockException e) {
 			abort(id);
 		}
-		return id;
+		return -1;
 	}
 
 	@Override
-	public boolean reserveRoom(int id, int customer, String location)
-			throws RemoteException {
+	public boolean reserveRoom(int id, int customer, String location) throws RemoteException {
 		try {
+			transactions.put(id, Calendar.getInstance().getTime().getTime());
 			return customerRM.reserveRoom(id, customer, location);
 		} catch (DeadlockException e) {
 			abort(id);
@@ -220,6 +227,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 	public boolean addCars(int id, String location, int numCars, int price)
 			throws RemoteException {
 		try {
+			transactions.put(id, Calendar.getInstance().getTime().getTime());
 			return carRM.addCars(id, location, numCars, price);
 		} catch (InvalidTransactionException e) {
 			Trace.error("[ERROR] "+e.getMessage());
@@ -231,9 +239,8 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 
 	@Override
 	public boolean deleteCars(int id, String location) throws RemoteException {
-		// ask customer if this car is reserved
-
 		try {
+			transactions.put(id, Calendar.getInstance().getTime().getTime());
 			return carRM.deleteCars(id, location);
 		} catch (InvalidTransactionException e) {
 			Trace.error("[ERROR] "+e.getMessage());
@@ -246,31 +253,34 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 	@Override
 	public int queryCars(int id, String location) throws RemoteException {
 		try {
+			transactions.put(id, Calendar.getInstance().getTime().getTime());
 			return carRM.queryCars(id, location);
 		} catch (InvalidTransactionException e) {
 			Trace.error("[ERROR] "+e.getMessage());
 		} catch (DeadlockException e) {
 			abort(id);
 		}
-		return id;
+		return -1;
 	}
 
 	@Override
 	public int queryCarsPrice(int id, String location) throws RemoteException {
 		try {
+			transactions.put(id, Calendar.getInstance().getTime().getTime());
 			return carRM.queryCarsPrice(id, location);
 		} catch (InvalidTransactionException e) {
 			Trace.error("[ERROR] "+e.getMessage());
 		} catch (DeadlockException e) {
 			abort(id);
 		}
-		return id;
+		return -1;
 	}
 
 	@Override
 	public boolean reserveCar(int id, int customer, String location)
 			throws RemoteException {
 		try {
+			transactions.put(id, Calendar.getInstance().getTime().getTime());
 			return customerRM.reserveCar(id, customer, location);
 		} catch (InvalidTransactionException e) {
 			Trace.error("[ERROR] "+e.getMessage());
@@ -283,18 +293,20 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 	@Override
 	public int newCustomer(int id) throws RemoteException {
 		try {
+			transactions.put(id, Calendar.getInstance().getTime().getTime());
 			return customerRM.newCustomer(id);
 		} catch (DeadlockException e) {
 			abort(id);
 		} catch (InvalidTransactionException e) {
 			Trace.error("[ERROR] "+e.getMessage());
 		}
-		return id;
+		return -1;
 	}
 
 	@Override
 	public boolean newCustomer(int id, int customerID) throws RemoteException {
 		try {
+			transactions.put(id, Calendar.getInstance().getTime().getTime());
 			return customerRM.newCustomer(id, customerID);
 		} catch (DeadlockException e) {
 			abort(id);
@@ -307,6 +319,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 	@Override
 	public boolean deleteCustomer(int id, int customerID) {
 		try {
+			transactions.put(id, Calendar.getInstance().getTime().getTime());
 			return customerRM.deleteCustomer(id, customerID);
 		} catch (DeadlockException e) {
 			abort(id);
@@ -319,13 +332,14 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 	@Override
 	public String queryCustomerInfo(int id, int customerID) {
 		try {
+			transactions.put(id, Calendar.getInstance().getTime().getTime());
 			return customerRM.queryCustomerInfo(id, customerID);
 		} catch (DeadlockException e) {
 			abort(id);
 		} catch (InvalidTransactionException e) {
 			Trace.error("[ERROR] "+e.getMessage());
 		}
-		return carserver;
+		return "";
 	}
 
 	@Override
@@ -333,8 +347,8 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 			Vector<String> flightNumbers, String location, boolean Car,
 			boolean Room) throws RemoteException {
 		try {
-			return customerRM.itinerary(id, customer, flightNumbers, location,
-					Car, Room);
+			transactions.put(id, Calendar.getInstance().getTime().getTime());
+			return customerRM.itinerary(id, customer, flightNumbers, location, Car, Room);
 		} catch (NumberFormatException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -343,7 +357,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 		} catch (DeadlockException e) {
 			abort(id);
 		}
-		return Room;
+		return false;
 	}
 
 	public String usage() {
@@ -409,12 +423,9 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 	protected void launch() {
 
 		try {
-			carRM = (ICarResourceManager) LocateRegistry.getRegistry(carserver,
-					carport).lookup("RMICar");
-			roomRM = (IRoomResourceManager) LocateRegistry.getRegistry(
-					roomserver, roomport).lookup("RMIRoom");
-			flightRM = (IFlightResourceManager) LocateRegistry.getRegistry(
-					flightserver, flightport).lookup("RMIFlight");
+			carRM = (ICarResourceManager) LocateRegistry.getRegistry(carserver,carport).lookup("RMICar");
+			roomRM = (IRoomResourceManager) LocateRegistry.getRegistry(roomserver, roomport).lookup("RMIRoom");
+			flightRM = (IFlightResourceManager) LocateRegistry.getRegistry(flightserver, flightport).lookup("RMIFlight");
 			customerRM = new CustomerResourceManager(carRM, flightRM, roomRM);
 		} catch (Exception e) {
 			System.out.println("[ERROR] Middleware cannot get rmi object");
@@ -476,7 +487,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 			customerRM.abort(transactionId);
 			transactions.remove(transactionId);
 		} catch (InvalidTransactionException e){
-			
+			Trace.error("[ERROR] "+e.getMessage());
 		} catch (RemoteException e) {
 
 		}
@@ -490,6 +501,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 			success &= flightRM.shutdown();
 			success &= roomRM.shutdown();
 			success &= customerRM.shutdown();
+			transactions.clear();
 		} catch (Exception e){
 			success = false;
 		}

@@ -11,6 +11,7 @@ public class Operation {
 	public static final int WRITE = 1;
 	public static final int ADD = 2;
 	public static final int DELETE = 3;
+	public static final int UNRESERVE = 4;
 	
 	public Operation(int type, String key, Object value){
 		this.type = type;
