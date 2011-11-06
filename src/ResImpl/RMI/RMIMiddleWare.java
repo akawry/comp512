@@ -27,6 +27,10 @@ import ResInterface.IFlightResourceManager;
 import ResInterface.IRoomResourceManager;
 import ResInterface.ResourceFrontend;
 import ResInterface.RoomFrontend;
+import Transactions.ITransactionManager;
+import Transactions.InvalidTransactionException;
+import Transactions.TransactionAbortedException;
+import Transactions.TransactionManager;
 
 public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote, ResourceFrontend {
 
@@ -34,6 +38,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	private IFlightResourceManager flightRM;
 	private IRoomResourceManager roomRM;
 	private CustomerResourceManager customerRM;
+	private TransactionManager transactionManager;
 	
 	// By default, if there is no args for car/room/flight, we try localhost:1099	
 	// Explicit is better than implicit
@@ -71,6 +76,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	@Override
 	public boolean addFlight(int id, int flightNum, int flightSeats,
 			int flightPrice) throws RemoteException {
+		
 		return flightRM.addFlight(id, flightNum, flightSeats, flightPrice);
 	}
 
@@ -264,20 +270,30 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	protected void register() throws Exception {
 		registry.bind("RMIMiddleware", UnicastRemoteObject.exportObject(this,0));
 	}
-/*
+
 	@Override
-	public Flight getFlight(int id, int flightNumber) throws RemoteException {
-		return flightRM.getFlight(id, flightNumber);
+	public int start() throws RemoteException {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 	@Override
-	public Hotel getRoom(int id, String location) throws RemoteException {
-		return roomRM.getRoom(id, location);
+	public boolean commit(int transactionId) throws RemoteException,
+			TransactionAbortedException, InvalidTransactionException {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 	@Override
-	public Car getCar(int id, String location) throws RemoteException {
-		return carRM.getCar(id, location);
+	public void abort(int transactionId) throws RemoteException,
+			InvalidTransactionException {
+		// TODO Auto-generated method stub
+		
 	}
-	*/
+
+	@Override
+	public boolean shutdown() throws RemoteException {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }

@@ -1,6 +1,8 @@
 package ResInterface;
-	import java.rmi.Remote;	
+import java.rmi.Remote;	
 
-	public interface ResourceFrontend extends Remote, CarFrontend, RoomFrontend,FlightFrontend, CustomerFrontend, ReservationFrontend{
-	    			
-	}
+import Transactions.ITransactionManager;
+
+public interface ResourceFrontend extends Remote, CarFrontend, RoomFrontend,FlightFrontend, CustomerFrontend, ReservationFrontend, ITransactionManager {
+
+}
