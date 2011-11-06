@@ -29,7 +29,7 @@ public class RoomResourceManager extends AbstractResourceManager implements Remo
 		if (lockManager.Lock(id, location, TrxnObj.WRITE)){
 			Hotel curObj = (Hotel) readData( id, Hotel.getKey(location) );
 			if( curObj == null ) {
-				ops.push(new Operation(Operation.DELETE, location, null));
+				ops.push(new Operation(Operation.DELETE, Hotel.getKey(location), null));
 
 				
 				// doesn't exist...add it
@@ -60,7 +60,7 @@ public class RoomResourceManager extends AbstractResourceManager implements Remo
 			throw new InvalidTransactionException("No transaction with id "+id);
 		}
 		lockManager.Lock(id, location, TrxnObj.WRITE);
-		ops.push(new Operation(Operation.ADD, location, queryNum(id, Hotel.getKey(location))));
+		ops.push(new Operation(Operation.ADD, Hotel.getKey(location), readData(id, Hotel.getKey(location))));
 		return deleteItem(id, Hotel.getKey(location));	
 	}
 

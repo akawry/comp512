@@ -32,7 +32,7 @@ public class FlightResourceManager extends AbstractResourceManager implements IF
 		if (lockManager.Lock(id, ""+flightNum, TrxnObj.WRITE)){
 			Flight curObj = (Flight) readData( id, Flight.getKey(flightNum) );
 			if( curObj == null ) {
-				ops.push(new Operation(Operation.DELETE, flightNum, null));
+				ops.push(new Operation(Operation.DELETE, Flight.getKey(flightNum), null));
 				
 				// doesn't exist...add it
 				Flight newObj = new Flight( flightNum, flightSeats, flightPrice );
@@ -63,7 +63,7 @@ public class FlightResourceManager extends AbstractResourceManager implements IF
 			throw new InvalidTransactionException("No transaction with id "+id);
 		}
 		lockManager.Lock(id, ""+flightNum, TrxnObj.WRITE);
-		ops.push(new Operation(Operation.ADD, flightNum, queryNum(id, Flight.getKey(flightNum))));
+		ops.push(new Operation(Operation.ADD, Flight.getKey(flightNum), readData(id, Flight.getKey(flightNum))));
 		return deleteItem(id, Flight.getKey(flightNum));
 	}
 

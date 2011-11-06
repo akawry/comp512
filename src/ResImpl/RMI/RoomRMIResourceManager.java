@@ -75,29 +75,22 @@ public class RoomRMIResourceManager extends AbstractRMIResourceManager implement
 	}
 
 	@Override
-	public boolean commit(int transactionId) throws RemoteException,
-			TransactionAbortedException, InvalidTransactionException {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean commit(int transactionId) throws RemoteException, TransactionAbortedException, InvalidTransactionException {
+		return rm.commit(transactionId);
 	}
 
 	@Override
-	public void abort(int transactionId) throws RemoteException,
-			InvalidTransactionException {
-		// TODO Auto-generated method stub
-		
+	public void abort(int transactionId) throws RemoteException, InvalidTransactionException {
+		rm.abort(transactionId);
 	}
 
 	@Override
 	public boolean shutdown() throws RemoteException {
-		// TODO Auto-generated method stub
-		return false;
+		return rm.shutdown();
 	}
 
 	@Override
-	public boolean enlist(int transactionId) throws RemoteException,
-			InvalidTransactionException {
-		// TODO Auto-generated method stub
+	public boolean enlist(int transactionId) throws RemoteException, InvalidTransactionException {
 		return rm.enlist(transactionId);
 	}
 

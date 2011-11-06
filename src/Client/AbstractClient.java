@@ -34,10 +34,10 @@ public abstract class AbstractClient {
 			System.out.print("\n>");
 			try {
 				// read the next command
-				while(command == "") {
+				//while(command.equals("")) {
 				    command = stdin.readLine();
 				    command = command.trim();
-				}
+				//}
 			} catch (IOException io) {
 				System.out.println("Unable to read from standard in");
 				System.exit(1);
