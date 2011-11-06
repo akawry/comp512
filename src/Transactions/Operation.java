@@ -1,8 +1,10 @@
 package Transactions;
 
+import ResImpl.RMItem;
+
 public class Operation {
 
-	private Object key;
+	private String key;
 	private Object value;
 	private int type;
 	
@@ -10,13 +12,13 @@ public class Operation {
 	public static final int ADD = 2;
 	public static final int DELETE = 3;
 	
-	public Operation(int type, Object key, Object value){
+	public Operation(int type, String key, Object value){
 		this.type = type;
 		this.key = key;
 		this.value = value;
 	}
 
-	public Object getKey() {
+	public String getKey() {
 		return key;
 	}
 

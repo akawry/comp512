@@ -99,19 +99,22 @@ public abstract class AbstractResourceManager {
 	}
 	
 	protected void undoAll(int id){
-		synchronized (m_itemHT){
-			Stack<Operation> ops = activeTransactions.get(id);
-			while (ops.size() > 0){
-				Operation op = ops.pop();
-				switch (op.getType()){
-				case Operation.ADD:
-				case Operation.WRITE:
-					m_itemHT.put(op.getKey(), op.getValue());
-					break;
-				case Operation.DELETE:
-					m_itemHT.remove(op.getKey());
-					break;
-				}
+		Stack<Operation> ops = activeTransactions.get(id);
+		while (ops.size() > 0){
+			Operation op = ops.pop();
+			switch (op.getType()){
+			case Operation.ADD:
+				System.out.println("Undoing DELETE command ...");
+				writeData(id, (String)op.getKey(), (RMItem) op.getValue());
+				break;
+			case Operation.WRITE:
+				System.out.println("Undoing WRITE command ...");
+				writeData(id, (String)op.getKey(), (RMItem) op.getValue());
+				break;
+			case Operation.DELETE:
+				System.out.println("Undoing ADD command. Removing " + op.getKey());
+				deleteItem(id, (String) op.getKey());
+				break;
 			}
 		}
 	}
@@ -138,8 +141,8 @@ public abstract class AbstractResourceManager {
 		if (ops == null){
 			throw new InvalidTransactionException("No transaction with id "+id);
 		}
-		activeTransactions.remove(id);
 		undoAll(id);
+		activeTransactions.remove(id);
 		lockManager.UnlockAll(id);
 	}
 

@@ -37,7 +37,7 @@ public class CarResourceManager extends AbstractResourceManager implements ICarR
 			
 			Car curObj = (Car) readData( id, Car.getKey(location) );
 			if( curObj == null ) {
-				ops.push(new Operation(Operation.DELETE, location, null));
+				ops.push(new Operation(Operation.DELETE, Car.getKey(location), null));
 				
 				// car location doesn't exist...add it
 				Car newObj = new Car( location, count, price );
@@ -66,7 +66,7 @@ public class CarResourceManager extends AbstractResourceManager implements ICarR
 			throw new InvalidTransactionException("No transaction with id "+id);
 		}
 		lockManager.Lock(id, location, TrxnObj.WRITE);
-		ops.push(new Operation(Operation.ADD, location, queryNum(id, Car.getKey(location))));
+		ops.push(new Operation(Operation.ADD, Car.getKey(location), readData(id, Car.getKey(location))));
 		return deleteItem(id, Car.getKey(location));
 	}
 
@@ -107,7 +107,7 @@ public class CarResourceManager extends AbstractResourceManager implements ICarR
 			throw new InvalidTransactionException("No transaction with id "+id);
 		}
 		lockManager.Lock(id, location, TrxnObj.WRITE);
-		ops.push(new Operation(Operation.WRITE, location, readData(id, Car.getKey(location))));
+		ops.push(new Operation(Operation.WRITE, Car.getKey(location), readData(id, Car.getKey(location))));
 		writeData(id, Car.getKey(location), car);
 		
 	}
