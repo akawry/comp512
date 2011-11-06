@@ -65,7 +65,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 		super();
 		aliveTransactionTask = new AliveTransactionTask(transactions, this);
 		alive = new Timer();
-		alive.schedule(aliveTransactionTask, 10000, 10000);
+		alive.schedule(aliveTransactionTask, AliveTransactionTask.TRANSACTION_TIMEOUT_SECONDS, AliveTransactionTask.TRANSACTION_TIMEOUT_SECONDS);
 	}
 
 	public CarFrontend getCarResourceManager() {
@@ -98,11 +98,9 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 		try {
 			return flightRM.addFlight(id, flightNum, flightSeats, flightPrice);
 		} catch (DeadlockException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			abort(id);
 		} catch (InvalidTransactionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Trace.error("[ERROR] "+e.getMessage());
 		}
 		return false;
 	}
@@ -112,11 +110,9 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 		try {
 			return flightRM.deleteFlight(id, flightNum);
 		} catch (InvalidTransactionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Trace.error("[ERROR] "+e.getMessage());
 		} catch (DeadlockException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			abort(id);
 		}
 		return false;
 	}
@@ -126,26 +122,21 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 		try {
 			return flightRM.queryFlight(id, flightNumber);
 		} catch (InvalidTransactionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Trace.error("[ERROR] "+e.getMessage());
 		} catch (DeadlockException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			abort(id);
 		}
 		return flightNumber;
 	}
 
 	@Override
-	public int queryFlightPrice(int id, int flightNumber)
-			throws RemoteException {
+	public int queryFlightPrice(int id, int flightNumber) throws RemoteException {
 		try {
 			return flightRM.queryFlightPrice(id, flightNumber);
 		} catch (InvalidTransactionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Trace.error("[ERROR] "+e.getMessage());
 		} catch (DeadlockException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			abort(id);
 		}
 		return flightNumber;
 	}
@@ -156,11 +147,9 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 		try {
 			return customerRM.reserveFlight(id, customer, flightNumber);
 		} catch (DeadlockException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			abort(id);
 		} catch (InvalidTransactionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Trace.error("[ERROR] "+e.getMessage());
 		}
 		return false;
 	}
@@ -171,11 +160,9 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 		try {
 			return roomRM.addRooms(id, location, numRooms, price);
 		} catch (DeadlockException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			abort(id);
 		} catch (InvalidTransactionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Trace.error("[ERROR] "+e.getMessage());
 		}
 		return false;
 	}
@@ -185,11 +172,9 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 		try {
 			return roomRM.deleteRooms(id, location);
 		} catch (InvalidTransactionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Trace.error("[ERROR] "+e.getMessage());
 		} catch (DeadlockException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			abort(id);
 		}
 		return false;
 	}
@@ -199,11 +184,9 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 		try {
 			return roomRM.queryRooms(id, location);
 		} catch (InvalidTransactionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Trace.error("[ERROR] "+e.getMessage());
 		} catch (DeadlockException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			abort(id);
 		}
 		return id;
 	}
@@ -213,11 +196,9 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 		try {
 			return roomRM.queryRoomsPrice(id, location);
 		} catch (InvalidTransactionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Trace.error("[ERROR] "+e.getMessage());
 		} catch (DeadlockException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			abort(id);
 		}
 		return id;
 	}
@@ -228,11 +209,9 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 		try {
 			return customerRM.reserveRoom(id, customer, location);
 		} catch (DeadlockException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			abort(id);
 		} catch (InvalidTransactionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Trace.error("[ERROR] "+e.getMessage());
 		}
 		return false;
 	}
@@ -243,11 +222,9 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 		try {
 			return carRM.addCars(id, location, numCars, price);
 		} catch (InvalidTransactionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Trace.error("[ERROR] "+e.getMessage());
 		} catch (DeadlockException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			abort(id);
 		}
 		return false;
 	}
@@ -259,11 +236,9 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 		try {
 			return carRM.deleteCars(id, location);
 		} catch (InvalidTransactionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Trace.error("[ERROR] "+e.getMessage());
 		} catch (DeadlockException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			abort(id);
 		}
 		return false;
 	}
@@ -273,11 +248,9 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 		try {
 			return carRM.queryCars(id, location);
 		} catch (InvalidTransactionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Trace.error("[ERROR] "+e.getMessage());
 		} catch (DeadlockException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			abort(id);
 		}
 		return id;
 	}
@@ -287,11 +260,9 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 		try {
 			return carRM.queryCarsPrice(id, location);
 		} catch (InvalidTransactionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Trace.error("[ERROR] "+e.getMessage());
 		} catch (DeadlockException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			abort(id);
 		}
 		return id;
 	}
@@ -302,11 +273,9 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 		try {
 			return customerRM.reserveCar(id, customer, location);
 		} catch (InvalidTransactionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Trace.error("[ERROR] "+e.getMessage());
 		} catch (DeadlockException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			abort(id);
 		}
 		return false;
 	}
@@ -316,11 +285,9 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 		try {
 			return customerRM.newCustomer(id);
 		} catch (DeadlockException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			abort(id);
 		} catch (InvalidTransactionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Trace.error("[ERROR] "+e.getMessage());
 		}
 		return id;
 	}
@@ -330,11 +297,9 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 		try {
 			return customerRM.newCustomer(id, customerID);
 		} catch (DeadlockException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			abort(id);
 		} catch (InvalidTransactionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Trace.error("[ERROR] "+e.getMessage());
 		}
 		return false;
 	}
@@ -344,11 +309,9 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 		try {
 			return customerRM.deleteCustomer(id, customerID);
 		} catch (DeadlockException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			abort(id);
 		} catch (InvalidTransactionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Trace.error("[ERROR] "+e.getMessage());
 		}
 		return false;
 	}
@@ -358,11 +321,9 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 		try {
 			return customerRM.queryCustomerInfo(id, customerID);
 		} catch (DeadlockException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			abort(id);
 		} catch (InvalidTransactionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Trace.error("[ERROR] "+e.getMessage());
 		}
 		return carserver;
 	}
@@ -378,11 +339,9 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InvalidTransactionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Trace.error("[ERROR] "+e.getMessage());
 		} catch (DeadlockException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			abort(id);
 		}
 		return Room;
 	}
@@ -491,43 +450,65 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 	}
 
 	@Override
-	public boolean commit(int transactionId) throws RemoteException,
-			TransactionAbortedException, InvalidTransactionException {
+	public boolean commit(int transactionId) {
 		boolean success = true;
-		success &= carRM.commit(transactionId);
-		success &= flightRM.commit(transactionId);
-		success &= roomRM.commit(transactionId);
-		success &= customerRM.commit(transactionId);
+		try {
+			success &= carRM.commit(transactionId);
+			success &= flightRM.commit(transactionId);
+			success &= roomRM.commit(transactionId);
+			success &= customerRM.commit(transactionId);
+		} catch (Exception e){
+			success = false;
+		}
+		
+		if (success)
+			transactions.remove(transactionId);
+		
 		return success;
 	}
 
 	@Override
-	public void abort(int transactionId) throws RemoteException,
-			InvalidTransactionException {
-		carRM.abort(transactionId);
-		flightRM.abort(transactionId);
-		roomRM.abort(transactionId);
-		customerRM.abort(transactionId);
+	public void abort(int transactionId){
+		try {
+			carRM.abort(transactionId);
+			flightRM.abort(transactionId);
+			roomRM.abort(transactionId);
+			customerRM.abort(transactionId);
+			transactions.remove(transactionId);
+		} catch (InvalidTransactionException e){
+			
+		} catch (RemoteException e) {
+
+		}
 	}
 
 	@Override
-	public boolean shutdown() throws RemoteException {
+	public boolean shutdown(){
 		boolean success = true;
-		success &= carRM.shutdown();
-		success &= flightRM.shutdown();
-		success &= roomRM.shutdown();
-		success &= customerRM.shutdown();
+		try {
+			success &= carRM.shutdown();
+			success &= flightRM.shutdown();
+			success &= roomRM.shutdown();
+			success &= customerRM.shutdown();
+		} catch (Exception e){
+			success = false;
+		}
 		return success;
 	}
 
 	@Override
-	public boolean enlist(int transactionId) throws RemoteException,
-			InvalidTransactionException {
+	public boolean enlist(int transactionId) {
+		
 		boolean success = true;
-		success &= carRM.enlist(transactionId);
-		success &= flightRM.enlist(transactionId);
-		success &= roomRM.enlist(transactionId);
-		success &= customerRM.enlist(transactionId);
+		try {
+			success &= carRM.enlist(transactionId);
+			success &= flightRM.enlist(transactionId);
+			success &= roomRM.enlist(transactionId);
+			success &= customerRM.enlist(transactionId);
+		} catch (Exception e){
+			success = false;
+		}
+		
 		return success;
 	}
 }

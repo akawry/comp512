@@ -3,6 +3,8 @@ package LockManager;
 import java.util.BitSet;
 import java.util.Vector;
 
+import ResImpl.Trace;
+
 public class LockManager
 {
     public static final int READ = 0;
@@ -194,7 +196,7 @@ public class LockManager
                     // since transaction already has a lock (may be READ, may be WRITE. we don't
                     // care) on this data item and it is requesting a READ lock, this lock request
                     // is redundant.
-                	System.out.println("Redundant READ request: already have a " + (dataObj2.getLockType() == DataObj.WRITE ? "write" : "read") + " lock...");
+                	Trace.warn("LockManager:: Redundant READ request: transaction " + dataObj.getXId()+" already has a " + (dataObj2.getLockType() == DataObj.WRITE ? "WRITE" : "READ"));
                     throw new RedundantLockRequestException(dataObj.getXId(), "Redundant READ lock request");
                 } else if (dataObj.getLockType() == DataObj.WRITE) {
                     // transaction already has a lock and is requesting a WRITE lock
@@ -209,7 +211,7 @@ public class LockManager
                 		// check if anyone else has a lock on the object
                 		for (Object o : vect){
                 			if (((DataObj)o).getXId() != dataObj.getXId()){
-                				System.out.println("Have a READ, requested a WRITE, but someone else has a lock");
+                				Trace.warn("LockManager:: Transaction " +dataObj.getXId()+" has a READ, requested a WRITE, but " + ((DataObj)o).getXId()+" has "+(dataObj2.getLockType() == DataObj.WRITE ? "WRITE" : "READ"));
                 				return true;
                 			}
                 		}
@@ -229,7 +231,7 @@ public class LockManager
                     if (dataObj2.getLockType() == DataObj.WRITE) {
                         // transaction is requesting a READ lock and some other transaction
                         // already has a WRITE lock on it ==> conflict
-                        System.out.println("Want READ, someone has WRITE");
+                        Trace.warn("LockManager:: Transaction "+dataObj.getXId()+" wants READ, "+dataObj2.getXId()+(dataObj2.getLockType() == DataObj.WRITE ? "WRITE" : "READ"));
                         return true;
                     }
                     else {
@@ -238,7 +240,7 @@ public class LockManager
                 } else if (dataObj.getLockType() == DataObj.WRITE) {
                     // transaction is requesting a WRITE lock and some other transaction has either
                     // a READ or a WRITE lock on it ==> conflict
-                    System.out.println("Want WRITE, someone has READ or WRITE");
+                	Trace.warn("LockManager:: Transaction "+dataObj.getXId()+" wants WRITE, "+dataObj2.getXId()+(dataObj2.getLockType() == DataObj.WRITE ? "WRITE" : "READ"));
                     return true;
                 }
             }

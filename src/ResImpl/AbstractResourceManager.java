@@ -104,15 +104,15 @@ public abstract class AbstractResourceManager {
 			Operation op = ops.pop();
 			switch (op.getType()){
 			case Operation.ADD:
-				System.out.println("Undoing DELETE command ...");
+				Trace.info(this+":: Undoing DELETE command");
 				writeData(id, (String)op.getKey(), (RMItem) op.getValue());
 				break;
 			case Operation.WRITE:
-				System.out.println("Undoing WRITE command ...");
+				Trace.info(this+":: Undoing WRITE command");
 				writeData(id, (String)op.getKey(), (RMItem) op.getValue());
 				break;
 			case Operation.DELETE:
-				System.out.println("Undoing ADD command. Removing " + op.getKey());
+				Trace.info(this+":: Undoing ADD command. Removing " + op.getKey());
 				deleteItem(id, (String) op.getKey());
 				break;
 			}
