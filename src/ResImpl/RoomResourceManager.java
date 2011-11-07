@@ -31,13 +31,12 @@ public class RoomResourceManager extends AbstractResourceManager implements Remo
 			if( curObj == null ) {
 				ops.push(new Operation(Operation.DELETE, Hotel.getKey(location), null));
 
-				
 				// doesn't exist...add it
 				Hotel newObj = new Hotel( location, count, price );
 				writeData( id, newObj.getKey(), newObj );
 				Trace.info("RM::addRooms(" + id + ") created new room location " + location + ", count=" + count + ", price=$" + price );
 			} else {
-				ops.push(new Operation(Operation.WRITE, curObj.getKey(), curObj));
+				ops.push(new Operation(Operation.WRITE, curObj.getKey(), new Hotel(curObj.getLocation(), curObj.getCount(), curObj.getPrice())));
 				
 				// add count to existing object and update price...
 				curObj.setCount( curObj.getCount() + count );

@@ -43,7 +43,7 @@ public class CarResourceManager extends AbstractResourceManager implements ICarR
 				Car newObj = new Car( location, count, price );
 				writeData( id, newObj.getKey(), newObj ); Trace.info("RM::addCars(" + id + ") created new location " + location + ", count=" + count + ", price=$" + price );
 			} else {
-				ops.push(new Operation(Operation.WRITE, curObj.getKey(), curObj));
+				ops.push(new Operation(Operation.WRITE, curObj.getKey(), new Car(curObj.getLocation(), curObj.getCount(), curObj.getPrice())));
 				
 				// add count to existing car location and update price...
 				curObj.setCount( curObj.getCount() + count );

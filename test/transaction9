@@ -1,0 +1,12 @@
+start
+newcustomerid,1,1
+newflight,1,1,1,300
+commit,1
+start
+newflight,2,1,2,100
+abort,2
+start
+queryflight,3,1
+queryflightprice,3,1
+commit,3
+quit

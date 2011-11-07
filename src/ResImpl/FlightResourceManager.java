@@ -40,7 +40,7 @@ public class FlightResourceManager extends AbstractResourceManager implements IF
 				Trace.info("RM::addFlight(" + id + ") created new flight " + flightNum + ", seats=" +
 						flightSeats + ", price=$" + flightPrice );
 			} else {
-				ops.push(new Operation(Operation.WRITE, curObj.getKey(), curObj));
+				ops.push(new Operation(Operation.WRITE, curObj.getKey(), new Flight(flightNum, curObj.getCount(), curObj.getPrice())));
 				
 				// add seats to existing flight and update the price...
 				curObj.setCount( curObj.getCount() + flightSeats );

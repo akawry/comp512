@@ -39,7 +39,7 @@ public class CarRMIResourceManager extends AbstractRMIResourceManager implements
 
 	@Override
 	public int queryCarsPrice(int id, String location) throws RemoteException, InvalidTransactionException, DeadlockException {
-		return rm.queryCars(id, location);
+		return rm.queryCarsPrice(id, location);
 	}
 
 	@Override

@@ -1,0 +1,12 @@
+start
+newcustomerid,1,1
+newcar,1,montreal,1,300
+commit,1
+start
+newcar,2,montreal,2,100
+abort,2
+start
+querycar,3,montreal
+querycarprice,3,montreal
+commit,3
+quit
