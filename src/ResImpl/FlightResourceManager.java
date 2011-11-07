@@ -104,6 +104,7 @@ public class FlightResourceManager extends AbstractResourceManager implements IF
 			throw new InvalidTransactionException("No transaction with id "+id);
 		}
 		lockManager.Lock(id, ""+flightNumber, TrxnObj.WRITE);
+		ops.push(new Operation(Operation.WRITE, Flight.getKey(flightNumber), readData(id, Flight.getKey(flightNumber))));
 		writeData(id, Flight.getKey(flightNumber), flight);
 	}
 

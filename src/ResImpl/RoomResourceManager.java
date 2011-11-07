@@ -102,7 +102,7 @@ public class RoomResourceManager extends AbstractResourceManager implements Remo
 			throw new InvalidTransactionException("No transaction with id "+id);
 		}
 		lockManager.Lock(id, location, TrxnObj.WRITE);
-		ops.push(new Operation(Operation.WRITE, location, readData(id, Hotel.getKey(location))));
+		ops.push(new Operation(Operation.WRITE, Hotel.getKey(location), readData(id, Hotel.getKey(location))));
 		writeData(id, Hotel.getKey(location), room);
 	}
 

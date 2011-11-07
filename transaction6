@@ -1,0 +1,17 @@
+start
+newcustomerid,1,1
+newflight,1,1,1,100
+commit,1
+start
+reserveflight,2,1,1
+queryflight,2,1
+abort,2
+start
+querycustomer,3,1
+queryflight,3,1
+commit,3
+start
+reserveflight,4,1,1
+queryflight,4,1
+commit,4
+quit

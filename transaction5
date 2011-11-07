@@ -1,0 +1,17 @@
+start
+newcustomerid,1,1
+newroom,1,montreal,1,300
+commit,1
+start
+reserveroom,2,1,montreal
+queryroom,2,montreal
+abort,2
+start
+querycustomer,3,1
+queryroom,3,montreal
+commit,3
+start
+reserveroom,4,1,montreal
+queryroom,4,montreal
+commit,4
+quit

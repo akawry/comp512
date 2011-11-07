@@ -217,10 +217,13 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 		boolean success = false;
 		if (lockManager.Lock(id, Customer.getKey(customer), TrxnObj.WRITE)){
 			ops.push(new Operation(Operation.UNRESERVE, Customer.getKey(customer), Hotel.getKey(location)));
-			success = reserveItem(id, customer, room, location);
-		}
-		if (success)
+			success = this.reserveItem(id, customer, room, location);
+		} 
+		
+		if (success){
+			// send back
 			roomRM.updateRoom(id, location, room);
+		}
 		return success;
 	}
 
