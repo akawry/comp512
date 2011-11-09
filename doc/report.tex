@@ -116,6 +116,49 @@ Finaly, login to server3 and use the client redirecting stdin from the input1 fi
 
 \section{Project Part 2: Transactions and Concurrency Control}
 \subsection{Design}
+\subsubsection{General}
+
+Recall that for each resource manager, a hierarchy such shown in figure \ref{carrm} exists. To maximize code reusibility, both the \texttt{RMICarRM} and \texttt{TCPCarRM} pose as resource managers but delegate to a local instance of 
+\texttt{CarRM} which implements concrete logic describing how cars should be managed. 
+\begin{figure}[h!]
+  \centering
+	\includegraphics[scale=0.6]{carrm.png}
+  \caption{ResourceManager hierarchy}
+  \label{carrm}
+\end{figure}
+We noticed that we could support transaction support for \it both \rm TCP and RMI, \bf for free\rm, if transaction management was implemented at the \texttt{CarRM} level. Accordingly, we defined a new interface \texttt{ITransactionManager} which 
+exposes the set of methods prescribed in the assignment and had both \texttt{RMICarRM} and \texttt{TCPCarRM} implement this interface. Again, we maximized code reuse by delegating to the concrete \texttt{CarRM} for handling transactions
+rather than redoing it for both TCP and RMI. Likewise, we noticed that the set of methods exposed by the \texttt{ITransactionManager} was exactly the same for all of the resource managers. That is, a \texttt{commit} always:
+\begin{enumerate}
+ \item[1.] Removes the transaction from the list of active transactions 
+ \item[2.] Unlocks all resources held by that transaction
+\end{enumerate}
+Similarly, an \texttt{enlist} adds the transaction to the list of active transactions, while an \texttt{abort} always: does a rollback, remove from active transaction list, unlock resources. The datatstructures involved are the same
+regardless of resource manager type. Consequently, these methods were all implemented \texttt{AbstractRM} and inherited by the concrete RMs. Adding transaction support, then, simply involved adding a few lines to each method of each RM:
+\begin{enumerate}
+ \item[1.] Check if the given \texttt{TxID} is in the list of active transactions, and throw an \texttt{InvalidTransactionException} if not
+ \item[2.] For a write, load the appropriate UNDO op (see section \ref{rollbacks})
+ \item[3.] Lock the resource, uniquely identified by the Key (for example, this key is the \texttt{location} parameter for the car RM).
+\end{enumerate}
+In this way, the middleware only needed to be modified slightly: upon receiving, for example, a query for a car's price, we call the remote car RM's method and only need to worry about catching the appropriate exceptions. For example, if a 
+\texttt{DeadLockException} is thrown, we tell all RM's to abort. In this way, each resource manager worries only about locking their own kind of resource, rather than a centralized transaction manager worrying about all the resources.
+Likewise, each resource manager has its own \texttt{LockManager} instance for locking, rather than a centralized lock manager. A glimpse of the updated design is provided in figure \ref{txncarrm}
+\begin{figure}[h!]
+  \centering
+	\includegraphics[scale=0.6]{txncarrm.png}
+  \caption{Updated ResourceManager hierarchy}
+  \label{txncarrm}
+\end{figure}
+\subsubsection{Rollbacks}
+\label{rollbacks}
+
+A rollback consists of sequential execution of inverse operations. For example, the inverse of an \texttt{ADD} is a \texttt{DELETE} (and vice-versa), and the inverse of a \texttt{WRITE} is a \texttt{WRITE} containing the old values. 
+We defined a generic \texttt{Operation} class which encapsulates this concept. Each instance of \texttt{Operation} contains a type (one of \texttt{ADD}, \texttt{DELETE}, \texttt{WRITE}, \texttt{UNRESERVE}) as well as a key-value pair
+which describes the operation. For example, an \texttt{ADD} consists of the key of the object (location in the case of cars), and a value consisting of the object to write itself. 
+
+Each RM maintains, for each active transaction, a \texttt{Stack<Operation>} onto which he pushes inverse operations prior to any writes. The \texttt{AbstractRM}'s \texttt{undoAll(txID)} method then keeps poppping off the appropriate stack
+and `performing' the inverse operations until none are left. 
+
 \subsection{Testing}
 \subsection{Performance evaluation}
 
