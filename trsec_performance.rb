@@ -1,7 +1,5 @@
 #!/usr/bin/env ruby
 
-require 'gruff'
-
 # Print help
 def print_usage()
   puts "Usage : ./performance.rb host port nbloop "
