@@ -12,44 +12,6 @@ public abstract class AbstractClient {
   static String message = "blank";
   static ResourceFrontend rm = null;
 
-  private static long smallTransactionMultipleRM() {
-    try {
-      long startTime = System.nanoTime() ;
-      int tid = rm.start() ;
-      String room = "ROOM" + Integer.toString(tid) ;
-      String car = "CAR" + Integer.toString(tid) ;
-      rm.addRooms(tid, room, tid, tid) ;
-      rm.addCars(tid, car, tid,  tid) ;
-      rm.addFlight(tid, tid, tid, tid) ;
-      rm.commit(tid) ;
-      long executionTime = System.nanoTime() - startTime;
-      return executionTime/1000 ; //return value in microseconds
-    } catch ( Exception e) {
-      System.err.println("Error during variousTransation execution" + e ) ; 
-      e.printStackTrace() ;
-      return 0 ;
-    }
-  }
-
-  private static long mediumTransactionMultipleRM() {
-    try {
-      long startTime = System.nanoTime() ;
-      int tid = rm.start() ;
-      String room = "ROOM" + Integer.toString(tid) ;
-      String car = "CAR" + Integer.toString(tid) ;
-      rm.addRooms(tid, room, tid, tid) ;
-      rm.addCars(tid, car, tid,  tid) ;
-      rm.addFlight(tid, tid, tid, tid) ;
-      rm.commit(tid) ;
-      long executionTime = System.nanoTime() - startTime;
-      return executionTime/1000 ; //return value in microseconds
-    } catch ( Exception e) {
-      System.err.println("Error during variousTransation execution" + e ) ; 
-      e.printStackTrace() ;
-      return 0 ;
-    }
-  }
-
   private static long bigTransactionMultipleRM() {
     try {
       long startTime = System.nanoTime() ;
@@ -76,23 +38,6 @@ public abstract class AbstractClient {
     }
   }
 
-  private static long smallTransactionOneRM() {
-    try {
-      long startTime = System.nanoTime() ;
-      int tid = rm.start() ;
-      String loc1 = "ROOM" + Integer.toString(tid + 1) ;
-      rm.addRooms(tid,loc1 , tid, tid) ;
-      rm.queryRooms(tid, loc1);
-      rm.deleteRooms(tid, loc1) ;
-      rm.commit(tid) ;
-      long executionTime = System.nanoTime() - startTime;
-      return executionTime/1000 ; //return value in microseconds
-    } catch ( Exception e) {
-      System.err.println("Error during variousTransation execution" + e ) ; 
-      e.printStackTrace() ;
-      return 0 ;
-    }
-  }
 
   private static long bigTransactionOneRM() {
     try {
@@ -121,27 +66,19 @@ public abstract class AbstractClient {
   }
 
   public static void automaticInput(int loopnb, int trsec, int type) {
-    int intermediate_result = 0 ;
-    if (loopnb > 100 ) {
-      intermediate_result = loopnb / 10 ;
-    }
     long wavelength = 0 ;
     if (trsec > 0) {
       // if trsec = 0 , no sleep
       wavelength = 1000000 / (long)trsec ; 
     }
     long total = 0 ;
-    System.out.println("We are gonna loop " + loopnb + " times with a average transaction time of " + wavelength + " microseconds") ;
+    
     for (int i = 0 ; i < loopnb ; i++) {
       long res = 0 ;
       if (type == 1) {
-        res = smallTransactionOneRM() / 3;
+        res = bigTransactionOneRM() ;
       } else if (type == 2) {
-        res = smallTransactionMultipleRM() / 3 ;
-      } else if (type == 3) {
-        res = bigTransactionOneRM() / 9;
-      } else if (type == 4) {
-        res = bigTransactionMultipleRM() / 9 ;
+        res = bigTransactionMultipleRM() ;
       } else {
         //default
         res = 0 ;
@@ -160,21 +97,14 @@ public abstract class AbstractClient {
           int x = generator.nextInt(2 * sleeptime_milli) ;
           x = x - sleeptime_milli ;
           int variation = sleeptime_milli + x ;
-
           //System.out.println("Sleeping for " + variation + " microseconds") ;
           Thread.sleep(variation) ;
           //res += variation ;
         } catch (Exception e) {}
       }
       total += res ;
-      if (intermediate_result > 0 && i > 0 && i % intermediate_result == 0 ) {
-        System.out.println("[Intermediate result] Looped " + i + " times : took " + total + " microseconds") ;
-        System.out.println("Average time by transaction : " + total/i  + " microseconds") ;
-      }
     }
-    //  System.out.println("Looped " + loopnb + " times : took " + total + " microseconds") ;
-    //  System.out.println("Average time by transaction : " + total/loopnb  + " microseconds") ;
-    System.out.println(total) ;
+    System.out.println(total/loopnb) ;
   }
 
   public static void manualInput() {

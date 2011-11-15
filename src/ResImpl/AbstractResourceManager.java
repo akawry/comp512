@@ -133,10 +133,12 @@ public abstract class AbstractResourceManager {
 	
 
 	public int start() {
+		Trace.info(this+":: Starting up...");
 	    return 0 ;
 	}
 
 	public boolean commit(int id) throws RemoteException, TransactionAbortedException, InvalidTransactionException {
+		Trace.info(this+":: Commiting transaction "+id+"...");
 		Stack<Operation> ops = activeTransactions.get(id);
 		if (ops == null){
 			throw new InvalidTransactionException("No transaction with id "+id);
@@ -147,6 +149,7 @@ public abstract class AbstractResourceManager {
 
 
 	public void abort(int id) throws RemoteException, InvalidTransactionException {
+		Trace.info(this+":: Aborting transaction "+id+"...");
 		Stack<Operation> ops = activeTransactions.get(id);
 		if (ops == null){
 			throw new InvalidTransactionException("No transaction with id "+id);
@@ -158,6 +161,7 @@ public abstract class AbstractResourceManager {
 
 
 	public boolean shutdown() throws RemoteException {
+		Trace.info(this+":: Shutting down...");
 		if (activeTransactions.size() > 0 ) {
 		    return false;
 		} else {
@@ -170,6 +174,7 @@ public abstract class AbstractResourceManager {
 
 
 	public boolean enlist(int id) throws RemoteException, InvalidTransactionException {
+		Trace.info(this+":: Enlisting transaction "+id+"...");
 		Stack<Operation> ops = activeTransactions.get(id);
 		if (ops != null){
 			throw new InvalidTransactionException("Transaction with id "+id+" already exsist");
