@@ -167,13 +167,15 @@ In this section, we will submit our system to different kinds of benchmarks to s
 From a client point of view, we measure the time between the start and the commit(or the abort) of a transaction on different tests bench.
 On each bench, we try several transaction types :
 \begin{itemize}
-\item Small transaction not distributed (3 operations on the same RM)
-\item Small transaction distributed (3 operations on 3 different RMs)
-\item Big transaction not distributed (9 operations on the same RM)
-\item Big transaction distributed (9 operations on 3 different RMs)
+\item Small transaction not distributed (9 operations in 3 transactions on the same RM)
+\item Small transaction distributed (9 operations in 3 transactions on 3 different RMs)
+\item Big transaction not distributed (9 operations in the same transaction on the same RM)
+\item Big transaction distributed (9 operations in the same transaction on 3 different RMs)
 \end{itemize}
-
+We submit request in a loop to provide smoother result (the response time is the arithmetic average of the response time a each iteration).
 In the first benchmark, we try only one client (no concurrency) and one server hosting all RMs with various throughput.
+
+\subsubsection{One client, one server}
 \begin{figure}[h!]
   \centering
 	\includegraphics[scale=0.6]{one_client.png}
@@ -181,7 +183,14 @@ In the first benchmark, we try only one client (no concurrency) and one server h
   \label{oneclient}
 \end{figure}
 
-As we see, the response time for each transaction types are pretty much constant, whatever the throughput is. It is easily explained by the fact that  
+As we see, the response time for each transaction types are pretty much constant, whatever the throughput is. It is easily explained by the fact that  the is only one server running, so the response time is always the "``best'' possible from one computer.
+
+Another interesting obvious result is that having distributed transaction or not doesn't impact the response time, again logic when all the RMs are on the same computer.
+
+We also see that big transactions tend to respond slightly faster than smaller one (when total operations count is equal).
+
+\subsubsection{One client, distributed servers}
+
 %\bibliographystyle{plain}
 %\bibliography{bib}
 \end{document}
