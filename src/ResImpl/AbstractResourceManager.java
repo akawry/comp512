@@ -132,11 +132,9 @@ public abstract class AbstractResourceManager {
 	}
 	
 
-	public int start() throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
+	public int start() {
+	    return 0 ;
 	}
-
 
 	public boolean commit(int id) throws RemoteException, TransactionAbortedException, InvalidTransactionException {
 		Stack<Operation> ops = activeTransactions.get(id);
@@ -160,8 +158,14 @@ public abstract class AbstractResourceManager {
 
 
 	public boolean shutdown() throws RemoteException {
-		// TODO Auto-generated method stub
-		return false;
+		if (activeTransactions.size() > 0 ) {
+		    return false;
+		} else {
+		    m_itemHT = new RMHashtable();
+		    lockManager = new LockManager();
+		    activeTransactions = new Hashtable<Integer, Stack<Operation>>();
+		    return true ;
+		}
 	}
 
 

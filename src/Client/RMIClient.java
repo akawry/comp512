@@ -30,7 +30,7 @@ public class RMIClient extends AbstractClient
 			x = Integer.parseInt( args[1].split(":")[3]) ;
 
 		} else if (args.length > 2) {
-			System.out.println ("Usage: java RMIClient [rmihost] [automatic(true/false):loopnb:tr_per_second:x]"); 
+			System.out.println ("Usage: java RMIClient [rmihost] [true/false:loopnb:tr_per_second(0 = no sleep):type]"); 
 			System.exit(1); 
 		}
 

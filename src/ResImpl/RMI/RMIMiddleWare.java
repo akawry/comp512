@@ -44,7 +44,6 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 	private IFlightResourceManager flightRM;
 	private IRoomResourceManager roomRM;
 	private CustomerResourceManager customerRM;
-	private TransactionManager transactionManager;
 
 	private int txnId = 1;
 	private AliveTransactionTask aliveTransactionTask;
@@ -487,7 +486,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 			customerRM.abort(transactionId);
 			transactions.remove(transactionId);
 		} catch (InvalidTransactionException e){
-			Trace.error("[ERROR] "+e.getMessage());
+			Trace.error("[ERROR] " + this + e.getMessage());
 		} catch (RemoteException e) {
 
 		}
@@ -502,6 +501,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 			success &= roomRM.shutdown();
 			success &= customerRM.shutdown();
 			transactions.clear();
+
 		} catch (Exception e){
 			success = false;
 		}
