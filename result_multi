@@ -1,0 +1,95 @@
+Starting performance test for throughput 5 tr/sec
+30825
+28349
+64160
+65181
+Starting performance test for throughput 10 tr/sec
+37367
+38029
+54693
+60976
+Starting performance test for throughput 15 tr/sec
+27606
+23722
+31317
+37252
+Starting performance test for throughput 20 tr/sec
+20934
+22723
+34411
+40434
+Starting performance test for throughput 30 tr/sec
+21598
+23276
+32326
+36918
+Starting performance test for throughput 40 tr/sec
+20876
+21746
+30958
+39751
+Starting performance test for throughput 50 tr/sec
+19949
+20886
+30236
+31745
+Starting performance test for throughput 75 tr/sec
+17320
+18183
+30852
+37856
+Starting performance test for throughput 100 tr/sec
+19366
+20702
+31012
+37350
+Starting performance test for throughput 150 tr/sec
+20294
+21375
+30673
+38735
+Starting performance test for throughput 200 tr/sec
+19486
+21398
+31222
+39417
+Starting performance test for throughput 350 tr/sec
+19778
+21132
+31783
+39140
+Starting performance test for throughput 500 tr/sec
+18958
+20864
+30236
+37281
+Starting performance test for throughput 750 tr/sec
+18392
+21339
+30508
+38968
+Starting performance test for throughput 1000 tr/sec
+19143
+17165
+31806
+38429
+Starting performance test for throughput 5000 tr/sec
+19890
+21425
+32379
+38959
+Starting performance test for throughput 10000 tr/sec
+19354
+21063
+31008
+36002
+Starting performance test for throughput 50000 tr/sec
+18834
+20613
+30685
+39916
+Starting performance test for throughput 0 tr/sec
+18545
+20747
+31337
+38730
