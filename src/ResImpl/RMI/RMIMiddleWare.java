@@ -455,6 +455,10 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 		int id = txnId;
 		txnId++;
 		transactions.put(id, Calendar.getInstance().getTime().getTime());
+		carRM.start();
+		flightRM.start();
+		roomRM.start();
+		customerRM.start();
 		enlist(id);
 		return id;
 	}

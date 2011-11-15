@@ -73,8 +73,7 @@ public class FlightRMIResourceManager extends AbstractRMIResourceManager impleme
 
 	@Override
 	public int start() throws RemoteException, InvalidTransactionException {
-		// TODO Auto-generated method stub
-		return 0;
+		return rm.start();
 	}
 
 	@Override

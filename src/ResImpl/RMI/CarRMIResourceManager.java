@@ -72,8 +72,7 @@ public class CarRMIResourceManager extends AbstractRMIResourceManager implements
 
 	@Override
 	public int start() throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
+		return rm.start();
 	}
 
 	@Override

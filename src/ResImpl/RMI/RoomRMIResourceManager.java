@@ -70,8 +70,7 @@ public class RoomRMIResourceManager extends AbstractRMIResourceManager implement
 
 	@Override
 	public int start() throws RemoteException, InvalidTransactionException {
-		// TODO Auto-generated method stub
-		return 0;
+		return rm.start();
 	}
 
 	@Override
