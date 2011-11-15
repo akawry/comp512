@@ -135,13 +135,13 @@ public abstract class AbstractClient {
     for (int i = 0 ; i < loopnb ; i++) {
       long res = 0 ;
       if (type == 1) {
-        res = smallTransactionOneRM() ;
+        res = smallTransactionOneRM() / 3;
       } else if (type == 2) {
-        res = smallTransactionMultipleRM() ;
+        res = smallTransactionMultipleRM() / 3 ;
       } else if (type == 3) {
-        res = bigTransactionOneRM() ;
+        res = bigTransactionOneRM() / 9;
       } else if (type == 4) {
-        res = bigTransactionMultipleRM() ;
+        res = bigTransactionMultipleRM() / 9 ;
       } else {
         //default
         res = 0 ;
@@ -153,8 +153,17 @@ public abstract class AbstractClient {
         //	return ;
       } else {
         try {
-          //System.out.println("Sleeping for " + sleeptime + " microseconds") ;
-          Thread.sleep(sleeptime/1000) ;
+          //Put some variation in sleep +/- x
+          int sleeptime_milli = (int)sleeptime ;
+          sleeptime_milli = sleeptime_milli / 1000 ;
+          Random  generator = new Random() ;
+          int x = generator.nextInt(2 * sleeptime_milli) ;
+          x = x - sleeptime_milli ;
+          int variation = sleeptime_milli + x ;
+
+          //System.out.println("Sleeping for " + variation + " microseconds") ;
+          Thread.sleep(variation) ;
+          //res += variation ;
         } catch (Exception e) {}
       }
       total += res ;

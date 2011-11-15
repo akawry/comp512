@@ -18,17 +18,20 @@ port = ARGV.shift.to_i
 trsec = ARGV.shift.to_i
 filename = ARGV.shift
 nbloop = []
-nbloop << 5 << 15 << 30 << 40 <<  50 << 60 << 100
+nbloop <<0 << 30 << 30 << 40 << 22 << 11 <<  100 << 200 
 smallOneRM = [0]
 smallMultipleRM = [0]
 bigOneRM = [0]
 bigMultipleRM = [0]
 
 nbloop.each do  |i|
+  if i == 0 
+    next
+  end
 # Launch client
 # Collect data (time+transaction) from stdin
 # Calculate mean ..etc..
-puts "Starting performance test for loop of size #{i}"
+puts i
   
 exec = IO.popen("./launch_client_automatic.sh rmi #{host}:#{port} #{i*3}:#{trsec*3}:1")
 smallOneRM <<  ( exec.readlines.last.to_i / i)

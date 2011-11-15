@@ -156,12 +156,32 @@ A rollback consists of sequential execution of inverse operations. For example, 
 We defined a generic \texttt{Operation} class which encapsulates this concept. Each instance of \texttt{Operation} contains a type (one of \texttt{ADD}, \texttt{DELETE}, \texttt{WRITE}, \texttt{UNRESERVE}) as well as a key-value pair
 which describes the operation. For example, an \texttt{ADD} consists of the key of the object (location in the case of cars), and a value consisting of the object to write itself. 
 
-Each RM maintains, for each active transaction, a \texttt{Stack<Operation>} onto which he pushes inverse operations prior to any writes. The \texttt{AbstractRM}'s \texttt{undoAll(txID)} method then keeps poppping off the appropriate stack
+Each RM maintains, for each active transaction, a \texttt{Stack<Operation>} onto which he pushes inverse operations prior to any writes. The \texttt{AbstractRM}'s \texttt{undoAll(txID)} method then keeps popping off the appropriate stack
 and `performing' the inverse operations until none are left. 
 
-\subsection{Testing}
 \subsection{Performance evaluation}
+The goals of having a distributed system instead of a more traditional monolithic one is mainly to achieve fault-tolerance and scalability.
 
+In this section, we will submit our system to different kinds of benchmarks to see how scalable it is.
+
+From a client point of view, we measure the time between the start and the commit(or the abort) of a transaction on different tests bench.
+On each bench, we try several transaction types :
+\begin{itemize}
+\item Small transaction not distributed (3 operations on the same RM)
+\item Small transaction distributed (3 operations on 3 different RMs)
+\item Big transaction not distributed (9 operations on the same RM)
+\item Big transaction distributed (9 operations on 3 different RMs)
+\end{itemize}
+
+In the first benchmark, we try only one client (no concurrency) and one server hosting all RMs with various throughput.
+\begin{figure}[h!]
+  \centering
+	\includegraphics[scale=0.6]{one_client.png}
+  \caption{One client performance evaluation (response time in microseconds function of throughput)}
+  \label{oneclient}
+\end{figure}
+
+As we see, the response time for each transaction types are pretty much constant, whatever the throughput is. It is easily explained by the fact that  
 %\bibliographystyle{plain}
 %\bibliography{bib}
 \end{document}
