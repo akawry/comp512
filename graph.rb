@@ -16,22 +16,16 @@ end
 filename = ARGV.shift
 x = []
 
-smallOneRM = []
-smallMultipleRM = []
 bigOneRM = []
 bigMultipleRM = []
 
 i = 0
 STDIN.readlines.each do |l|
-  if i % 5 == 0 
+  if i % 3 == 0 
     x << l
-  elsif i %  5 == 1
-    smallOneRM << l.to_i
-  elsif i % 5 == 2
-    smallMultipleRM  << l.to_i 
-  elsif i % 5 == 3
+  elsif i % 3 == 1
     bigOneRM <<  l.to_i
-  elsif i % 5 == 4
+  elsif i % 3 == 2
     bigMultipleRM << l.to_i
   end
   i = i + 1
@@ -48,8 +42,6 @@ x.each do |l|
   i = i + 1
 end
 
-g.data("Small One", smallOneRM)
-g.data("Small Multiple", smallMultipleRM)
 g.data("Big One", bigOneRM)
 g.data("Big Multiple", bigMultipleRM)
 g.write(filename)

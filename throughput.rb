@@ -13,17 +13,16 @@ end
 
 host = ARGV.shift
 port = ARGV.shift.to_i
-nbloop = 100
+nbloop = 1
 trsec=  0
 
 nbclient = []
-nbclient <<  1 << 3 << 8 << 20
-
+nbclient =  (1..2)
 nbclient.each do  |i|
   puts i
 
-  (1..2).each do |type|
-    eachClient = []
+  (1..1).each do |type|
+    average = 0
     # Run it 
     threads = []
     i.times do |c|
@@ -34,13 +33,8 @@ nbclient.each do  |i|
     # Wait for the thread results
     threads.each do |t|
       t.join
-      eachClient <<  t[:responsetime]
-    end
-
-    # Calculate the average
-    average = 0
-    eachClient.each do |c|
-      average += c
+      # Calculate the average
+      average += t[:responsetime]
     end
     average /= i
     puts average
