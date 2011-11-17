@@ -4,6 +4,7 @@ import java.rmi.*;
 import ResInterface.*;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.concurrent.*;
 
 import java.util.*;
 import java.io.*;
@@ -12,99 +13,47 @@ public abstract class AbstractClient {
   static String message = "blank";
   static ResourceFrontend rm = null;
 
-  private static long bigTransactionMultipleRM() {
-    try {
-      long startTime = System.nanoTime() ;
-      int tid = rm.start() ;
-      String room = "ROOM" + Integer.toString(tid) ;
-      String car = "CAR" + Integer.toString(tid) ;
-      //String flight = "FLIGHT" + Integer.toString(tid) ;
-      rm.addRooms(tid, room, tid, tid) ;
-      rm.addCars(tid, car, tid,  tid) ;
-      rm.addFlight(tid, tid, tid, tid) ;
-      rm.queryRooms(tid,room);
-      rm.queryCars(tid, car);
-      rm.queryFlight(tid, tid);
-      rm.deleteRooms(tid,room) ;
-      rm.deleteCars(tid, car) ;
-      rm.deleteFlight(tid, tid) ;
-      rm.commit(tid) ;
-      long executionTime = System.nanoTime() - startTime;
-      return executionTime/1000 ; //return value in microseconds
-    } catch ( Exception e) {
-      System.err.println("Error during variousTransation execution" + e ) ; 
-      e.printStackTrace() ;
-      return 0 ;
-    }
-  }
 
+  public static void automaticInput(int clientnb, int loopnb, int trsec, int type) {
+    int total = 0 ;
+    int average = 0 ;
+    /*
+    List<Thread> threads = new ArrayList<Thread>() ;
+    Map<Integer,Integer> results = new ConcurrentHashMap<Integer,Integer>() ;
 
-  private static long bigTransactionOneRM() {
-    try {
-      long startTime = System.nanoTime() ;
-      int tid = rm.start() ;
-      String loc1 = "ROOM" + Integer.toString(tid + 1) ;
-      String loc2 = "ROOM" + Integer.toString(tid + 2) ;
-      String loc3 = "ROOM" + Integer.toString(tid + 3) ;
-      rm.addRooms(tid,loc1 , tid, tid) ;
-      rm.addRooms(tid, loc2 , tid, tid) ;
-      rm.addRooms(tid, loc3 , tid, tid) ;
-      rm.queryRooms(tid, loc1);
-      rm.queryRooms(tid, loc2);
-      rm.queryRooms(tid, loc3);
-      rm.deleteRooms(tid, loc1) ;
-      rm.deleteRooms(tid, loc2) ;
-      rm.deleteRooms(tid, loc3) ;
-      rm.commit(tid) ;
-      long executionTime = System.nanoTime() - startTime;
-      return executionTime/1000 ; //return value in microseconds
-    } catch ( Exception e) {
-      System.err.println("Error during variousTransation execution" + e ) ; 
-      e.printStackTrace() ;
-      return 0 ;
+    // Launching n threads = n clients
+    for (int tnb = 0 ; tnb < clientnb ; tnb++) {
+      LoopClient lc = new LoopClient(rm,loopnb,trsec,type) ;
+      threads.add(lc) ;
     }
-  }
 
-  public static void automaticInput(int loopnb, int trsec, int type) {
-    long wavelength = 0 ;
-    if (trsec > 0) {
-      // if trsec = 0 , no sleep
-      wavelength = 1000000 / (long)trsec ; 
+    // Wait for all the thread to finish
+    for (Thread t : threads) {
+      t.join() ;
+    } 
+
+    // Calculate the total and the average
+    for (Map.Entry<Integer,Integer> e :  results.entrySet() ) {
+      total += e.getValue() ;
     }
-    long total = 0 ;
-    
-    for (int i = 0 ; i < loopnb ; i++) {
-      long res = 0 ;
-      if (type == 1) {
-        res = bigTransactionOneRM() ;
-      } else if (type == 2) {
-        res = bigTransactionMultipleRM() ;
-      } else {
-        //default
-        res = 0 ;
+    */
+    ExecutorService pool = Executors.newFixedThreadPool(clientnb);
+    Set<Future<Integer>> set = new HashSet<Future<Integer>>();
+    for (int i = 0 ; i < clientnb ; i++) {
+      Callable<Integer> callable = new LoopClient(rm,loopnb,trsec,type);
+      Future<Integer> future = pool.submit(callable);
+      set.add(future);
+    }
+    for (Future<Integer> future : set) {
+      try {
+      total += future.get();
+      } catch (Exception e) {
+        e.printStackTrace() ;
       }
-
-      long sleeptime = wavelength - res ;
-      if (sleeptime < 0 ) {
-        //	System.out.println("Frequency too high by " + (-sleeptime) + " microseconds") ;
-        //	return ;
-      } else {
-        try {
-          //Put some variation in sleep +/- x
-          int sleeptime_milli = (int)sleeptime ;
-          sleeptime_milli = sleeptime_milli / 1000 ;
-          Random  generator = new Random() ;
-          int x = generator.nextInt(2 * sleeptime_milli) ;
-          x = x - sleeptime_milli ;
-          int variation = sleeptime_milli + x ;
-          //System.out.println("Sleeping for " + variation + " microseconds") ;
-          Thread.sleep(variation) ;
-          //res += variation ;
-        } catch (Exception e) {}
-      }
-      total += res ;
     }
-    System.out.println(total/loopnb) ;
+    average = total / clientnb ;
+    System.out.println(average) ;
+    System.exit(average) ;
   }
 
   public static void manualInput() {

@@ -17,17 +17,19 @@ public class RMIClient extends AbstractClient
 		String serverhost = "localhost";
 		int serverport = 1099; 
 		boolean automatic = false ;
+    int clientnb = 0 ;
 		int loopnb = 0 ;
 		int trsec = 0 ;
-		int x = 0 ;
+		int type = 0 ;
 
 		if (args.length == 2) { 
 			serverhost = args[0].split(":")[0]; 
 			serverport = Integer.parseInt( args[0].split(":")[1] ); 
 			automatic = Boolean.valueOf(args[1].split(":")[0]) ;
-			loopnb = Integer.parseInt( args[1].split(":")[1]) ;
-			trsec = Integer.parseInt( args[1].split(":")[2]) ;
-			x = Integer.parseInt( args[1].split(":")[3]) ;
+			clientnb = Integer.parseInt( args[1].split(":")[1]) ;
+			loopnb = Integer.parseInt( args[1].split(":")[2]) ;
+			trsec = Integer.parseInt( args[1].split(":")[3]) ;
+			type = Integer.parseInt( args[1].split(":")[4]) ;
 
 		} else if (args.length > 2) {
 			System.out.println ("Usage: java RMIClient [rmihost] [true/false:loopnb:tr_per_second(0 = no sleep):type]"); 
@@ -38,7 +40,7 @@ public class RMIClient extends AbstractClient
 		{
 			Registry registry = LocateRegistry.getRegistry(serverhost,serverport);
 			rm = (ResourceFrontend) registry.lookup("RMIMiddleware");
-			System.out.println("[OK] Client successfully connected to server at " + serverhost  + " on port " + serverport);
+			//System.out.println("[OK] Client successfully connected to server at " + serverhost  + " on port " + serverport);
 		} 
 		catch (Exception e) 
 		{	
@@ -48,7 +50,7 @@ public class RMIClient extends AbstractClient
 		}
 
 		if (automatic) {
-		    automaticInput(loopnb,trsec,x) ;
+		    automaticInput(clientnb,loopnb,trsec,type) ;
 		} else {
 		    manualInput();
 		}

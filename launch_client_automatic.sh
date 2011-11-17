@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function print_usage() {
-	echo "Usage: $0 rmi/tcp host:port loop:transac_sec:x"
+	echo "Usage: $0 rmi/tcp host:port nbclient:nbloop:transac_sec:x"
 	exit 1
 }
 
