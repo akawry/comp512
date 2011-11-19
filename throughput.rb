@@ -13,11 +13,11 @@ end
 
 host = ARGV.shift
 port = ARGV.shift.to_i
-nbloop = 5
+nbloop = 10
 trsec =  0
 
 nbclient = []
-nbclient  << 1 << 2 << 5 << 10 << 50 << 100 << 200
+nbclient  << 1 << 2 <<  3 << 4 << 5 <<6 <<7<<8<<9 
 nbclient.each do  |i|
   puts i
   (1..2).each do |type|

@@ -118,23 +118,31 @@ Finaly, login to server3 and use the client redirecting stdin from the input1 fi
 \subsection{Design}
 \subsubsection{General}
 
-Recall that for each resource manager, a hierarchy such shown in figure \ref{carrm} exists. To maximize code reusibility, both the \texttt{RMICarRM} and \texttt{TCPCarRM} pose as resource managers but delegate to a local instance of 
-\texttt{CarRM} which implements concrete logic describing how cars should be managed. 
+Recall that for each resource manager, a hierarchy such shown in Fig.\ref{carrm} exists. To maximize code reusability, both the \texttt{RMICarRM} and \texttt{TCPCarRM} pose as resource managers but delegate to a local instance of 
+\texttt{CarRM} which implements concrete logic describing how cars should be managed.
+ 
 \begin{figure}[h!]
   \centering
 	\includegraphics[scale=0.6]{carrm.png}
   \caption{ResourceManager hierarchy}
   \label{carrm}
 \end{figure}
-We noticed that we could support transaction support for \it both \rm TCP and RMI, \bf for free\rm, if transaction management was implemented at the \texttt{CarRM} level. Accordingly, we defined a new interface \texttt{ITransactionManager} which 
+
+We noticed that we could support transaction support for \it both \rm TCP and RMI, \emph{for free}, if transaction management was implemented at the \texttt{CarRM} level. Accordingly, we defined a new interface \texttt{ITransactionManager} which 
 exposes the set of methods prescribed in the assignment and had both \texttt{RMICarRM} and \texttt{TCPCarRM} implement this interface. Again, we maximized code reuse by delegating to the concrete \texttt{CarRM} for handling transactions
 rather than redoing it for both TCP and RMI. Likewise, we noticed that the set of methods exposed by the \texttt{ITransactionManager} was exactly the same for all of the resource managers. That is, a \texttt{commit} always:
 \begin{enumerate}
  \item[1.] Removes the transaction from the list of active transactions 
  \item[2.] Unlocks all resources held by that transaction
 \end{enumerate}
-Similarly, an \texttt{enlist} adds the transaction to the list of active transactions, while an \texttt{abort} always: does a rollback, remove from active transaction list, unlock resources. The datatstructures involved are the same
-regardless of resource manager type. Consequently, these methods were all implemented \texttt{AbstractRM} and inherited by the concrete RMs. Adding transaction support, then, simply involved adding a few lines to each method of each RM:
+Similarly, an \texttt{enlist} adds the transaction to the list of active transactions, while an \texttt{abort} always:
+\begin{enumerate}
+\item Does a rollback
+\item Remove from active transaction list
+\item Unlock resources.
+\end{enumerate}
+
+The data structures involved are the same regardless of resource manager type. Consequently, these methods were all implemented in \texttt{AbstractRM} and inherited by the concrete RMs. Adding transaction support then simply involved adding a few lines to each method of each RM:
 \begin{enumerate}
  \item[1.] Check if the given \texttt{TxID} is in the list of active transactions, and throw an \texttt{InvalidTransactionException} if not
  \item[2.] For a write, load the appropriate UNDO op (see section \ref{rollbacks})
@@ -142,13 +150,14 @@ regardless of resource manager type. Consequently, these methods were all implem
 \end{enumerate}
 In this way, the middleware only needed to be modified slightly: upon receiving, for example, a query for a car's price, we call the remote car RM's method and only need to worry about catching the appropriate exceptions. For example, if a 
 \texttt{DeadLockException} is thrown, we tell all RM's to abort. In this way, each resource manager worries only about locking their own kind of resource, rather than a centralized transaction manager worrying about all the resources.
-Likewise, each resource manager has its own \texttt{LockManager} instance for locking, rather than a centralized lock manager. A glimpse of the updated design is provided in figure \ref{txncarrm}
+Likewise, each resource manager has its own \texttt{LockManager} instance for locking, rather than a centralized lock manager. A glimpse of the updated design is provided in Fig.\ref{txncarrm}
 \begin{figure}[h!]
   \centering
 	\includegraphics[scale=0.6]{txncarrm.png}
   \caption{Updated ResourceManager hierarchy}
   \label{txncarrm}
 \end{figure}
+
 \subsubsection{Rollbacks}
 \label{rollbacks}
 
@@ -159,37 +168,80 @@ which describes the operation. For example, an \texttt{ADD} consists of the key 
 Each RM maintains, for each active transaction, a \texttt{Stack<Operation>} onto which he pushes inverse operations prior to any writes. The \texttt{AbstractRM}'s \texttt{undoAll(txID)} method then keeps popping off the appropriate stack
 and `performing' the inverse operations until none are left. 
 
+\subsubsection{Client}
+
+In order to support performance evaluation (\ref{perf}), we extended the AbstractClient (which is the base client class, extended by RMIClient and TCPClient) to support looped and multithreaded requests.
+
+The abstract client creates \texttt{nb-client} (specified by command line argument) Java threads and run them concurrently, waits them to finish and calculates the average response time for one client.
+
+Each thread submits \texttt{nb-loop} (specified with command line argument) transactions (of type specified with command line argument too), and calculates the average response time in microseconds (if an expected throughput is specified, then it sleeps the correct amount of time to respect it).
+
+This allow us to test concurrent requests on the system.
+\subsection{Testing}
+
+To facilitate the test of our system, we provide several new scripts :
+\begin{itemize}
+\item
+{\tt launch-client-automatic.sh}
+Launch the new automatic (threaded and looped client). Takes number of concurrent clients , number of loop iteration, expected transaction rate, and transaction type.
+
+\item
+
+{\tt throughput.rb}
+Ruby script which use the previous script and execute it for several concurrent clients number. Generate a text file with the average response time of the transactions.
+
+\item
+{\tt graph.rb}
+Ruby script which takes a specific text file format as input, and generated the appropriate PNG graph.
+\end{itemize}
+
+
 \subsection{Performance evaluation}
+\label{perf}
 The goals of having a distributed system instead of a more traditional monolithic one is mainly to achieve fault-tolerance and scalability.
 
 In this section, we will submit our system to different kinds of benchmarks to see how scalable it is.
 
-From a client point of view, we measure the time between the start and the commit(or the abort) of a transaction on different tests bench.
-On each bench, we try several transaction types :
-\begin{itemize}
-\item Small transaction not distributed (9 operations in 3 transactions on the same RM)
-\item Small transaction distributed (9 operations in 3 transactions on 3 different RMs)
-\item Big transaction not distributed (9 operations in the same transaction on the same RM)
-\item Big transaction distributed (9 operations in the same transaction on 3 different RMs)
-\end{itemize}
-We submit request in a loop to provide smoother result (the response time is the arithmetic average of the response time a each iteration).
-In the first benchmark, we try only one client (no concurrency) and one server hosting all RMs with various throughput.
+From a client point of view, we measure the time between the start and the commit (or the abort) of a transaction on different tests bench.
 
-\subsubsection{One client, one server}
+On each bench, we try two transaction types :
+\begin{itemize}
+\item Transaction not distributed (9 operations on the same RM)
+\item Transaction distributed (9 operations on 3 different RMs)
+\end{itemize}
+
+We submit request in a loop (500) to provide smoother and more accurate result (the response time is the arithmetic average of the response time of each iteration).
+
+\subsubsection{Non distributed server}
+
+As seen of Fig.\ref{oneserver}, a non distributed system doesn't scale well, and the average response time increases linearly with the throughput.
+
+We can notice that having a distributed transaction doesn't change the result, as it's actually using 3 separate RMs, but all on the same physical server.
+
 \begin{figure}[h!]
   \centering
-	\includegraphics[scale=0.6]{one_client.png}
-  \caption{One client performance evaluation (response time in microseconds function of throughput)}
+	\includegraphics[scale=0.6]{oc_linear.png}
+  \caption{Transaction time in microseconds function of the number of clients}
+  \label{oneserver}
+\end{figure}
+
+
+\subsubsection{Distributed servers}
+
+Within a distributed scenario, we try to compare the advantage of having separate RMs running on different server to see the scalability.
+
+\begin{figure}[h!]
+  \centering
+	\includegraphics[scale=0.6]{distributed.png}
+  \caption{Transaction time in microseconds function of the number of client in a distributed environment}
   \label{oneclient}
 \end{figure}
 
-As we see, the response time for each transaction types are pretty much constant, whatever the throughput is. It is easily explained by the fact that  the is only one server running, so the response time is always the "``best'' possible from one computer.
+Here we see that when we increase the throughput (that is, the number of concurrent clients), a distributed transaction (a transaction involving multiple RMs) has a contained response time even in high throughput ( 26ms when there is two clients, 88ms when there is fifty), but a non distributed transaction response time increases a lot faster. This is due to the fact to the load is handle by 3 RMs in the distributed case, but only by one in the non distributed case.
 
-Another interesting obvious result is that having distributed transaction or not doesn't impact the response time, again logic when all the RMs are on the same computer.
+An interesting point compared to the non distributed server is that from 1 to 10 concurrent clients, the response time of a distributed transaction is almost constant, contrary to the non distributed server case. This is our "``gain'' in distributing our system.
 
-We also see that big transactions tend to respond slightly faster than smaller one (when total operations count is equal).
-
-\subsubsection{One client, distributed servers}
+However, the difference in performance is not so great, maybe due to the fact that our architecture is not that scalable and independent (the requests \texttt{start}, \texttt{enlist}, \texttt{commit}, \texttt{abort} ..etc.. are executed on each RMs, whatever the transaction is).
 
 %\bibliographystyle{plain}
 %\bibliography{bib}

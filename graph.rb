@@ -42,6 +42,6 @@ x.each do |l|
   i = i + 1
 end
 
-g.data("Big One", bigOneRM)
-g.data("Big Multiple", bigMultipleRM)
+g.data("One RM transaction", bigOneRM)
+g.data("Multiple RM transaction", bigMultipleRM)
 g.write(filename)
