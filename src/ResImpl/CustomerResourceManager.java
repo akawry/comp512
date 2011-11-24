@@ -6,6 +6,7 @@ import java.util.Enumeration;
 import java.util.Stack;
 import java.util.Vector;
 
+import FaultTolerance.CrashException;
 import LockManager.DeadlockException;
 import LockManager.TrxnObj;
 import ResInterface.CarBackend;
@@ -164,7 +165,7 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 	}
 
 	@Override
-	public boolean reserveCar(int id, int customer, String location) throws RemoteException, InvalidTransactionException, DeadlockException {
+	public boolean reserveCar(int id, int customer, String location) throws RemoteException, InvalidTransactionException, DeadlockException, CrashException {
 		Stack<Operation> ops = activeTransactions.get(id);
 		if (ops == null){
 			throw new InvalidTransactionException("No transaction with id "+id);
@@ -188,7 +189,7 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 
 	@Override
 	public boolean reserveFlight(int id, int customer, int flightNumber)
-			throws RemoteException, DeadlockException, InvalidTransactionException {
+			throws RemoteException, DeadlockException, InvalidTransactionException, CrashException {
 		Stack<Operation> ops = activeTransactions.get(id);
 		if (ops == null){
 			throw new InvalidTransactionException("No transaction with id "+id);
@@ -207,7 +208,7 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 	}
 
 	@Override
-	public boolean reserveRoom(int id, int customer, String location) throws RemoteException, DeadlockException, InvalidTransactionException {
+	public boolean reserveRoom(int id, int customer, String location) throws RemoteException, DeadlockException, InvalidTransactionException, CrashException {
 		Stack<Operation> ops = activeTransactions.get(id);
 		if (ops == null){
 			throw new InvalidTransactionException("No transaction with id "+id);
@@ -228,7 +229,7 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 	}
 
 	@Override
-	public boolean itinerary(int id, int customer, Vector<String> flightNumbers, String location, boolean Car, boolean Room) throws RemoteException, NumberFormatException, DeadlockException, InvalidTransactionException {
+	public boolean itinerary(int id, int customer, Vector<String> flightNumbers, String location, boolean Car, boolean Room) throws RemoteException, NumberFormatException, DeadlockException, InvalidTransactionException, CrashException {
 		boolean success = true;
 		
 		// reserve flights 

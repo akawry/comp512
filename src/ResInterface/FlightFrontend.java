@@ -3,6 +3,7 @@ package ResInterface;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
+import FaultTolerance.CrashException;
 import LockManager.DeadlockException;
 import Transactions.InvalidTransactionException;
 
@@ -14,7 +15,7 @@ public interface FlightFrontend {
      *
      * @return success.
      */
-    public boolean addFlight(int id, int flightNum, int flightSeats, int flightPrice) throws RemoteException, DeadlockException, InvalidTransactionException; 
+    public boolean addFlight(int id, int flightNum, int flightSeats, int flightPrice) throws RemoteException, DeadlockException, InvalidTransactionException, CrashException; 
     
     /**
      *   Delete the entire flight.
@@ -25,12 +26,13 @@ public interface FlightFrontend {
      * @return success.
      * @throws DeadlockException 
      * @throws InvalidTransactionException 
+     * @throws CrashException 
      */   
-    public boolean deleteFlight(int id, int flightNum) throws RemoteException, InvalidTransactionException, DeadlockException; 
+    public boolean deleteFlight(int id, int flightNum) throws RemoteException, InvalidTransactionException, DeadlockException, CrashException; 
 
     /* queryFlight returns the number of empty seats. */
-    public int queryFlight(int id, int flightNumber) throws RemoteException, InvalidTransactionException, DeadlockException;
+    public int queryFlight(int id, int flightNumber) throws RemoteException, InvalidTransactionException, DeadlockException, CrashException;
      
     /* queryFlightPrice returns the price of a seat on this flight. */
-    public int queryFlightPrice(int id, int flightNumber) throws RemoteException, InvalidTransactionException, DeadlockException; 
+    public int queryFlightPrice(int id, int flightNumber) throws RemoteException, InvalidTransactionException, DeadlockException, CrashException; 
 }
