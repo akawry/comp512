@@ -4,9 +4,6 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
-import FaultTolerance.CrashException;
-import FaultTolerance.CrashedRM;
-import FaultTolerance.ICrashable;
 import LockManager.DeadlockException;
 import ResImpl.Car;
 import ResImpl.CarResourceManager;
@@ -17,36 +14,36 @@ import Transactions.ITransactionManager;
 import Transactions.InvalidTransactionException;
 import Transactions.TransactionAbortedException;
 
-public class CarRMIResourceManager extends AbstractRMIResourceManager implements ITransactionManager, ICarResourceManager, ICrashable {
+public class CarRMIResourceManager extends AbstractRMIResourceManager implements ITransactionManager, ICarResourceManager {
 
-	private ICarResourceManager rm;
+	private CarResourceManager rm;
 	
-	public CarRMIResourceManager(ICarResourceManager rm){
+	public CarRMIResourceManager(CarResourceManager rm){
 		this.rm = rm;
 	}
 
 	@Override
-	public boolean addCars(int id, String location, int numCars, int price) throws RemoteException, InvalidTransactionException, DeadlockException, CrashException {
+	public boolean addCars(int id, String location, int numCars, int price) throws RemoteException, InvalidTransactionException, DeadlockException {
 		return rm.addCars(id, location, numCars, price);
 	}
 
 	@Override
-	public boolean deleteCars(int id, String location) throws RemoteException, InvalidTransactionException, DeadlockException, CrashException {
+	public boolean deleteCars(int id, String location) throws RemoteException, InvalidTransactionException, DeadlockException {
 		return rm.deleteCars(id, location);
 	}
 
 	@Override
-	public int queryCars(int id, String location) throws RemoteException, InvalidTransactionException, DeadlockException, CrashException {
+	public int queryCars(int id, String location) throws RemoteException, InvalidTransactionException, DeadlockException {
 		return rm.queryCars(id, location);
 	}
 
 	@Override
-	public int queryCarsPrice(int id, String location) throws RemoteException, InvalidTransactionException, DeadlockException, CrashException {
+	public int queryCarsPrice(int id, String location) throws RemoteException, InvalidTransactionException, DeadlockException {
 		return rm.queryCarsPrice(id, location);
 	}
 
 	@Override
-	public Car getCar(int id, String location) throws RemoteException, InvalidTransactionException, DeadlockException, CrashException {
+	public Car getCar(int id, String location) throws RemoteException, InvalidTransactionException, DeadlockException {
 		return rm.getCar(id, location);
 	}
 
@@ -68,41 +65,36 @@ public class CarRMIResourceManager extends AbstractRMIResourceManager implements
 
 	@Override
 	public void updateCar(int id, String location, Car car)
-			throws RemoteException, InvalidTransactionException, DeadlockException, CrashException {
+			throws RemoteException, InvalidTransactionException, DeadlockException {
 		rm.updateCar(id, location, car);
 		
 	}
 
 	@Override
-	public int start() throws RemoteException, InvalidTransactionException, CrashException {
+	public int start() throws RemoteException {
 		return rm.start();
 	}
 
 	@Override
-	public boolean commit(int transactionId) throws RemoteException, TransactionAbortedException, InvalidTransactionException, CrashException {
+	public boolean commit(int transactionId) throws RemoteException, TransactionAbortedException, InvalidTransactionException {
 		return rm.commit(transactionId);
 	}
 
 	@Override
-	public void abort(int transactionId) throws RemoteException, InvalidTransactionException, CrashException {
+	public void abort(int transactionId) throws RemoteException, InvalidTransactionException {
 		rm.abort(transactionId);
 		
 	}
 
 	@Override
-	public boolean shutdown() throws RemoteException, CrashException {
+	public boolean shutdown() throws RemoteException {
 		return rm.shutdown();
 	}
 
 	@Override
 	public boolean enlist(int transactionId) throws RemoteException,
-			InvalidTransactionException, CrashException {
+			InvalidTransactionException {
 		return rm.enlist(transactionId);
-	}
-
-	@Override
-	public void crash() throws RemoteException {
-		this.rm = new CrashedRM();
 	}
 	
 }

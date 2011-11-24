@@ -14,7 +14,7 @@ case "$1" in
 	"tcp" )
 		java Client.TCPClient $2 $3 ;;
 	"rmi" )
-		java -Djava.security.policy=client.policy Client.RMIClient $2 false:0:0:0:1 ;;
+		java -Djava.security.policy=client.policy Client.RMIClient $2 false:0:0:0 ;;
 	*)
 		print_usage
 esac

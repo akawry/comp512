@@ -3,8 +3,6 @@ package Transactions;
 import java.rmi.RemoteException;
 import java.util.* ;
 
-import FaultTolerance.CrashException;
-
 public class AliveTransactionTask extends TimerTask {
 
     private final Map<Integer,Long> transactions ;
@@ -42,9 +40,6 @@ public class AliveTransactionTask extends TimerTask {
 			} catch (InvalidTransactionException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
-			} catch (CrashException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
 		}
 

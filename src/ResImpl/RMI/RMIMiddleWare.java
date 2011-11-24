@@ -12,7 +12,6 @@ import java.util.Timer;
 import java.util.HashMap;
 import java.util.Map;
 
-import FaultTolerance.CrashException;
 import LockManager.DeadlockException;
 import ResImpl.AbstractResourceManager;
 import ResImpl.Car;
@@ -102,9 +101,6 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 			abort(id);
 		} catch (InvalidTransactionException e) {
 			Trace.error("[ERROR] "+e.getMessage());
-		} catch (CrashException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		return false;
 	}
@@ -118,9 +114,6 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 			Trace.error("[ERROR] "+e.getMessage());
 		} catch (DeadlockException e) {
 			abort(id);
-		} catch (CrashException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		return false;
 	}
@@ -134,9 +127,6 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 			Trace.error("[ERROR] "+e.getMessage());
 		} catch (DeadlockException e) {
 			abort(id);
-		} catch (CrashException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		return -1;
 	}
@@ -150,9 +140,6 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 			Trace.error("[ERROR] "+e.getMessage());
 		} catch (DeadlockException e) {
 			abort(id);
-		} catch (CrashException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		return -1;
 	}
@@ -166,9 +153,6 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 			abort(id);
 		} catch (InvalidTransactionException e) {
 			Trace.error("[ERROR] "+e.getMessage());
-		} catch (CrashException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		return false;
 	}
@@ -182,9 +166,6 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 			abort(id);
 		} catch (InvalidTransactionException e) {
 			Trace.error("[ERROR] "+e.getMessage());
-		} catch (CrashException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		return false;
 	}
@@ -198,9 +179,6 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 			Trace.error("[ERROR] "+e.getMessage());
 		} catch (DeadlockException e) {
 			abort(id);
-		} catch (CrashException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		return false;
 	}
@@ -214,9 +192,6 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 			Trace.error("[ERROR] "+e.getMessage());
 		} catch (DeadlockException e) {
 			abort(id);
-		} catch (CrashException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		return -1;
 	}
@@ -230,9 +205,6 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 			Trace.error("[ERROR] "+e.getMessage());
 		} catch (DeadlockException e) {
 			abort(id);
-		} catch (CrashException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		return -1;
 	}
@@ -246,9 +218,6 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 			abort(id);
 		} catch (InvalidTransactionException e) {
 			Trace.error("[ERROR] "+e.getMessage());
-		} catch (CrashException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		return false;
 	}
@@ -263,9 +232,6 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 			Trace.error("[ERROR] "+e.getMessage());
 		} catch (DeadlockException e) {
 			abort(id);
-		} catch (CrashException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		return false;
 	}
@@ -279,9 +245,6 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 			Trace.error("[ERROR] "+e.getMessage());
 		} catch (DeadlockException e) {
 			abort(id);
-		} catch (CrashException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		return false;
 	}
@@ -295,9 +258,6 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 			Trace.error("[ERROR] "+e.getMessage());
 		} catch (DeadlockException e) {
 			abort(id);
-		} catch (CrashException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		return -1;
 	}
@@ -311,9 +271,6 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 			Trace.error("[ERROR] "+e.getMessage());
 		} catch (DeadlockException e) {
 			abort(id);
-		} catch (CrashException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		return -1;
 	}
@@ -328,9 +285,6 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 			Trace.error("[ERROR] "+e.getMessage());
 		} catch (DeadlockException e) {
 			abort(id);
-		} catch (CrashException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		return false;
 	}
@@ -401,9 +355,6 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 			Trace.error("[ERROR] "+e.getMessage());
 		} catch (DeadlockException e) {
 			abort(id);
-		} catch (CrashException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		return false;
 	}
@@ -504,14 +455,10 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 		int id = txnId;
 		txnId++;
 		transactions.put(id, Calendar.getInstance().getTime().getTime());
-		try {
-			carRM.start();
-			flightRM.start();
-			roomRM.start();
-			customerRM.start();
-		} catch (CrashException e){
-			
-		}
+		carRM.start();
+		flightRM.start();
+		roomRM.start();
+		customerRM.start();
 		enlist(id);
 		return id;
 	}
@@ -546,9 +493,6 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 			Trace.error("[ERROR] " + this + e.getMessage());
 		} catch (RemoteException e) {
 
-		} catch (CrashException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 	}
 

@@ -4,24 +4,20 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
-import FaultTolerance.CrashException;
-import FaultTolerance.CrashedRM;
-import FaultTolerance.ICrashable;
 import LockManager.DeadlockException;
 import ResImpl.Hotel;
 import ResImpl.RoomResourceManager;
 import ResInterface.IRoomResourceManager;
 import ResInterface.RoomBackend;
 import ResInterface.RoomFrontend;
-import Transactions.ITransactionManager;
 import Transactions.InvalidTransactionException;
 import Transactions.TransactionAbortedException;
 
-public class RoomRMIResourceManager extends AbstractRMIResourceManager implements ITransactionManager, IRoomResourceManager, ICrashable {
+public class RoomRMIResourceManager extends AbstractRMIResourceManager implements IRoomResourceManager {
 
-	private IRoomResourceManager rm;
+	private RoomResourceManager rm;
 	
-	public RoomRMIResourceManager(IRoomResourceManager rm) {
+	public RoomRMIResourceManager(RoomResourceManager rm) {
 		this.rm = rm;
 	}
 	
@@ -36,27 +32,27 @@ public class RoomRMIResourceManager extends AbstractRMIResourceManager implement
 	}
 
 	@Override
-	public boolean addRooms(int id, String location, int numRooms, int price) throws RemoteException, DeadlockException, InvalidTransactionException, CrashException {
+	public boolean addRooms(int id, String location, int numRooms, int price) throws RemoteException, DeadlockException, InvalidTransactionException {
 		return rm.addRooms(id, location, numRooms, price);
 	}
 
 	@Override
-	public boolean deleteRooms(int id, String location) throws RemoteException, InvalidTransactionException, DeadlockException, CrashException {
+	public boolean deleteRooms(int id, String location) throws RemoteException, InvalidTransactionException, DeadlockException {
 		return rm.deleteRooms(id, location);
 	}
 
 	@Override
-	public int queryRooms(int id, String location) throws RemoteException, InvalidTransactionException, DeadlockException, CrashException {
+	public int queryRooms(int id, String location) throws RemoteException, InvalidTransactionException, DeadlockException {
 		return rm.queryRooms(id, location);
 	}
 
 	@Override
-	public int queryRoomsPrice(int id, String location) throws RemoteException, InvalidTransactionException, DeadlockException, CrashException {
+	public int queryRoomsPrice(int id, String location) throws RemoteException, InvalidTransactionException, DeadlockException {
 		return rm.queryRoomsPrice(id, location);
 	}
 
 	@Override
-	public Hotel getRoom(int id, String location) throws RemoteException, DeadlockException, InvalidTransactionException, CrashException {
+	public Hotel getRoom(int id, String location) throws RemoteException, DeadlockException, InvalidTransactionException {
 		return rm.getRoom(id, location);
 	}
 
@@ -68,38 +64,33 @@ public class RoomRMIResourceManager extends AbstractRMIResourceManager implement
 
 	@Override
 	public void updateRoom(int id, String location, Hotel room)
-			throws RemoteException, DeadlockException, InvalidTransactionException, CrashException {
+			throws RemoteException, DeadlockException, InvalidTransactionException {
 		rm.updateRoom(id, location, room);
 	}
 
 	@Override
-	public int start() throws RemoteException, InvalidTransactionException, CrashException {
+	public int start() throws RemoteException, InvalidTransactionException {
 		return rm.start();
 	}
 
 	@Override
-	public boolean commit(int transactionId) throws RemoteException, TransactionAbortedException, InvalidTransactionException, CrashException {
+	public boolean commit(int transactionId) throws RemoteException, TransactionAbortedException, InvalidTransactionException {
 		return rm.commit(transactionId);
 	}
 
 	@Override
-	public void abort(int transactionId) throws RemoteException, InvalidTransactionException, CrashException {
+	public void abort(int transactionId) throws RemoteException, InvalidTransactionException {
 		rm.abort(transactionId);
 	}
 
 	@Override
-	public boolean shutdown() throws RemoteException, CrashException {
+	public boolean shutdown() throws RemoteException {
 		return rm.shutdown();
 	}
 
 	@Override
-	public boolean enlist(int transactionId) throws RemoteException, InvalidTransactionException, CrashException {
+	public boolean enlist(int transactionId) throws RemoteException, InvalidTransactionException {
 		return rm.enlist(transactionId);
-	}
-
-	@Override
-	public void crash() throws RemoteException {
-		rm = new CrashedRM();
 	}
 
 }
