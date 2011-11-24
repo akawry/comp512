@@ -27,7 +27,7 @@ public class RMIClient extends AbstractClient
 			serverhosts = new String[set.length];
 			serverports = new int[set.length];
 			for (int i = 0; i < set.length; i++){
-				serverhosts[i] = set[i].split(",")[0];
+				serverhosts[i] = set[i].split(":")[0];
 				serverports[i] = Integer.parseInt(set[i].split(":")[1]);
 			}
 			

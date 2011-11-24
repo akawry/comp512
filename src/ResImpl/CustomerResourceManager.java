@@ -3,6 +3,7 @@ package ResImpl;
 import java.rmi.RemoteException;
 import java.util.Calendar;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Stack;
 import java.util.Vector;
 
@@ -11,13 +12,20 @@ import LockManager.TrxnObj;
 import ResInterface.CarBackend;
 import ResInterface.CustomerFrontend;
 import ResInterface.FlightBackend;
+import ResInterface.ICarResourceManager;
+import ResInterface.IFlightResourceManager;
+import ResInterface.IRoomResourceManager;
 import ResInterface.ReservationFrontend;
 import ResInterface.RoomBackend;
 import Transactions.ITransactionManager;
 import Transactions.InvalidTransactionException;
 import Transactions.Operation;
+import Transactions.TransactionException;
 
 public class CustomerResourceManager extends AbstractResourceManager implements ITransactionManager, CustomerFrontend,ReservationFrontend {
+	private List<IFlightResourceManager> flightRMs;
+	private List<IRoomResourceManager> roomRMs;
+	private List<ICarResourceManager> carRMs;
 	private FlightBackend flightRM;
 	private RoomBackend roomRM;
 	private CarBackend carRM;
@@ -29,6 +37,12 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 		this.carRM = carRM;
 		this.roomRM = roomRM;
 		this.flightRM = flightRM;
+	}
+	
+	public CustomerResourceManager(List<ICarResourceManager> carRMs, List<IFlightResourceManager> flightRMs, List<IRoomResourceManager> roomRMs){
+		this.carRMs = carRMs;
+		this.roomRMs = roomRMs;
+		this.flightRMs = flightRMs;
 	}
 	
 	@Override
@@ -180,8 +194,14 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 		} 
 		
 		if (success){
-			// send back
-			carRM.updateCar(id, location, car);
+			for (CarBackend carRM : carRMs){
+				try {
+					carRM.updateCar(id, location, car);
+				} catch (TransactionException e){
+					// TODO: handle this !!!
+					return false;
+				} 
+			}
 		}
 		return success;
 	}
@@ -201,8 +221,16 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 			success = reserveItem(id, customer, flight, String.valueOf(flightNumber));
 		}
 		
-		if (success)
-			flightRM.updateFlight(id, flightNumber, flight);
+		if (success){
+			for (FlightBackend flightRM : flightRMs){
+				try {
+					flightRM.updateFlight(id, flightNumber, flight);
+				} catch (TransactionException e){
+					// TODO: handle this !!!
+					return false;
+				}
+			}
+		}
 		return success;
 	}
 
@@ -221,8 +249,14 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 		} 
 		
 		if (success){
-			// send back
-			roomRM.updateRoom(id, location, room);
+			for (RoomBackend roomRM : roomRMs){
+				try {
+					roomRM.updateRoom(id, location, room);
+				} catch (TransactionException e){
+					// TODO: handle this !!!
+					return false;
+				}
+			}
 		}
 		return success;
 	}
@@ -329,5 +363,17 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 
 		}
 
+	}
+	
+	public void setCarRM(CarBackend carRM){
+		this.carRM = carRM;
+	}
+	
+	public void setFlightRM(FlightBackend flightRM){
+		this.flightRM = flightRM;
+	}
+	
+	public void setRoomRM(RoomBackend roomRM){
+		this.roomRM = roomRM;
 	}
 }
