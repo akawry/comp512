@@ -4,6 +4,8 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
+import FaultTolerance.ICrashable;
+import FaultTolerance.IPingable;
 import LockManager.DeadlockException;
 import ResImpl.Car;
 import ResImpl.CarResourceManager;
@@ -14,7 +16,7 @@ import Transactions.ITransactionManager;
 import Transactions.InvalidTransactionException;
 import Transactions.TransactionAbortedException;
 
-public class CarRMIResourceManager extends AbstractRMIResourceManager implements ITransactionManager, ICarResourceManager {
+public class CarRMIResourceManager extends AbstractRMIResourceManager implements ITransactionManager, ICarResourceManager, ICrashable, IPingable {
 
 	private CarResourceManager rm;
 	
@@ -96,5 +98,6 @@ public class CarRMIResourceManager extends AbstractRMIResourceManager implements
 			InvalidTransactionException {
 		return rm.enlist(transactionId);
 	}
+
 	
 }

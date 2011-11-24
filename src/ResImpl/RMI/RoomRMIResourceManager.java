@@ -4,16 +4,19 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
+import FaultTolerance.ICrashable;
+import FaultTolerance.IPingable;
 import LockManager.DeadlockException;
 import ResImpl.Hotel;
 import ResImpl.RoomResourceManager;
 import ResInterface.IRoomResourceManager;
 import ResInterface.RoomBackend;
 import ResInterface.RoomFrontend;
+import Transactions.ITransactionManager;
 import Transactions.InvalidTransactionException;
 import Transactions.TransactionAbortedException;
 
-public class RoomRMIResourceManager extends AbstractRMIResourceManager implements IRoomResourceManager {
+public class RoomRMIResourceManager extends AbstractRMIResourceManager implements ITransactionManager, IRoomResourceManager, ICrashable, IPingable {
 
 	private RoomResourceManager rm;
 	
@@ -28,7 +31,7 @@ public class RoomRMIResourceManager extends AbstractRMIResourceManager implement
 	
 	@Override
 	public void register() throws Exception {
-	    registry.bind("RMIRoom", UnicastRemoteObject.exportObject(this,0));
+	    registry.bind("RMIRoom", UnicastRemoteObject.exportObject(this, 0));
 	}
 
 	@Override

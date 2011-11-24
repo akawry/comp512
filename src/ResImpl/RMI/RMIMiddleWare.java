@@ -1,17 +1,21 @@
 package ResImpl.RMI;
 
+import java.rmi.ConnectException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Vector;
 import java.util.Timer;
 import java.util.HashMap;
 import java.util.Map;
 
+import FaultTolerance.ICrashable;
 import LockManager.DeadlockException;
 import ResImpl.AbstractResourceManager;
 import ResImpl.Car;
@@ -37,14 +41,16 @@ import Transactions.InvalidTransactionException;
 import Transactions.TransactionAbortedException;
 import Transactions.TransactionManager;
 
-public class RMIMiddleWare extends AbstractRMIResourceManager implements
-		Remote, ResourceFrontend {
+public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote, ResourceFrontend, ICrashable {
 
 	private ICarResourceManager carRM;
 	private IFlightResourceManager flightRM;
 	private IRoomResourceManager roomRM;
 	private CustomerResourceManager customerRM;
-
+	private List<ICarResourceManager> carRMs;
+	private List<IFlightResourceManager> flightRMs;
+	private List<IRoomResourceManager> roomRMs;
+	
 	private int txnId = 1;
 	private AliveTransactionTask aliveTransactionTask;
 	private Timer alive;
@@ -53,18 +59,22 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 	// By default, if there is no args for car/room/flight, we try
 	// localhost:1099
 	// Explicit is better than implicit
-	private String carserver = new String("localhost");
-	private String flightserver = new String("localhost");
-	private String roomserver = new String("localhost");
-	private int carport = 1099;
-	private int flightport = 1099;
-	private int roomport = 1099;
+	private String[] carservers;
+	private String[] flightservers;
+	private String[] roomservers;
+	private int[] carports;
+	private int[] flightports;
+	private int[] roomports;
 
 	public RMIMiddleWare() {
 		super();
 		aliveTransactionTask = new AliveTransactionTask(transactions, this);
 		alive = new Timer();
 		alive.schedule(aliveTransactionTask, AliveTransactionTask.TRANSACTION_TIMEOUT_SECONDS, AliveTransactionTask.TRANSACTION_TIMEOUT_SECONDS);
+		
+		carRMs = new ArrayList<ICarResourceManager>();
+		flightRMs = new ArrayList<IFlightResourceManager>();
+		roomRMs = new ArrayList<IRoomResourceManager>();
 	}
 
 	public CarFrontend getCarResourceManager() {
@@ -101,6 +111,8 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 			abort(id);
 		} catch (InvalidTransactionException e) {
 			Trace.error("[ERROR] "+e.getMessage());
+		} catch (ConnectException e){
+			
 		}
 		return false;
 	}
@@ -399,19 +411,35 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 				if (flag.equals(arg.substring(0, flag.length()))
 						&& arg.length() > flag.length()) {
 					String argval = arg.split("=")[1];
+					String[] set;
 					// if : setting the port where this middleware runs
 					// else : we need to parse the server name and server port
 					if (s.equals("port")) {
 						this.port = Integer.parseInt(argval);
 					} else if (s.equals("car")) {
-						carserver = argval.split(":")[0];
-						carport = Integer.parseInt(argval.split(":")[1]);
+						set = argval.split(",");
+						carservers = new String[set.length];
+						carports = new int[set.length];
+						for (int i = 0; i < set.length; i++){
+							carservers[i] = set[i].split(":")[0];
+							carports[i] = Integer.parseInt(set[i].split(":")[1]);
+						}
 					} else if (s.equals("room")) {
-						roomserver = argval.split(":")[0];
-						roomport = Integer.parseInt(argval.split(":")[1]);
+						set = argval.split(",");
+						roomservers = new String[set.length];
+						roomports = new int[set.length];
+						for (int i = 0; i < set.length; i++){
+							roomservers[i] = set[i].split(":")[0];
+							roomports[i] = Integer.parseInt(set[i].split(":")[1]);
+						}
 					} else if (s.equals("flight")) {
-						flightserver = argval.split(":")[0];
-						flightport = Integer.parseInt(argval.split(":")[1]);
+						set = argval.split(",");
+						flightservers = new String[set.length];
+						flightports = new int[set.length];
+						for (int i = 0; i < set.length; i++){
+							flightservers[i] = set[i].split(":")[0];
+							flightports[i] = Integer.parseInt(set[i].split(":")[1]);
+						}
 					}
 				}
 			}
@@ -422,9 +450,21 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 	protected void launch() {
 
 		try {
-			carRM = (ICarResourceManager) LocateRegistry.getRegistry(carserver,carport).lookup("RMICar");
-			roomRM = (IRoomResourceManager) LocateRegistry.getRegistry(roomserver, roomport).lookup("RMIRoom");
-			flightRM = (IFlightResourceManager) LocateRegistry.getRegistry(flightserver, flightport).lookup("RMIFlight");
+			for (int i = 0; i < carservers.length; i++){
+				carRMs.add((ICarResourceManager) LocateRegistry.getRegistry(carservers[i],carports[i]).lookup("RMICar"));
+			}
+			carRM = carRMs.get(0);
+			
+			for (int i = 0; i < roomservers.length; i++){
+				roomRMs.add((IRoomResourceManager) LocateRegistry.getRegistry(roomservers[i], roomports[i]).lookup("RMIRoom"));
+			}
+			roomRM = roomRMs.get(0);
+			
+			for (int i = 0; i < flightservers.length; i++){
+				flightRMs.add((IFlightResourceManager) LocateRegistry.getRegistry(flightservers[i], flightports[i]).lookup("RMIFlight"));
+			}
+			flightRM = flightRMs.get(0);
+			
 			customerRM = new CustomerResourceManager(carRM, flightRM, roomRM);
 		} catch (Exception e) {
 			System.out.println("[ERROR] Middleware cannot get rmi object");
@@ -455,9 +495,24 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 		int id = txnId;
 		txnId++;
 		transactions.put(id, Calendar.getInstance().getTime().getTime());
-		carRM.start();
-		flightRM.start();
-		roomRM.start();
+		try {
+			carRM.start();
+		} catch (ConnectException e){
+			Trace.info("[ERROR] " + e.getMessage());
+		}
+		
+		try {
+			flightRM.start();
+		} catch (ConnectException e){
+			Trace.info("[ERROR] " + e.getMessage());
+		}
+		
+		try {
+			roomRM.start();
+		} catch (ConnectException e){
+			Trace.info("[ERROR] " + e.getMessage());
+		}
+		
 		customerRM.start();
 		enlist(id);
 		return id;
@@ -526,5 +581,10 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements
 		}
 		
 		return success;
+	}
+
+	@Override
+	public void crash() throws RemoteException {
+		System.exit(1);
 	}
 }

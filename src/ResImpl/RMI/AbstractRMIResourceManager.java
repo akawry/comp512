@@ -1,5 +1,6 @@
 package ResImpl.RMI;
 
+import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
@@ -7,7 +8,8 @@ public abstract class AbstractRMIResourceManager {
 
 	protected int port;
 	protected Registry registry;
-
+	protected int state;
+	
 	protected abstract String usage();
 
 	protected abstract void register() throws Exception;
@@ -34,6 +36,14 @@ public abstract class AbstractRMIResourceManager {
 			System.exit(1);
 		}
 
+	}
+	
+	public void crash() throws RemoteException {
+		System.exit(1);
+	}
+
+	public int ping() throws RemoteException {
+		return state;
 	}
 
 }

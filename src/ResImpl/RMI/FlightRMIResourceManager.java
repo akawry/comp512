@@ -4,16 +4,19 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
+import FaultTolerance.ICrashable;
+import FaultTolerance.IPingable;
 import LockManager.DeadlockException;
 import ResImpl.Flight;
 import ResImpl.FlightResourceManager;
 import ResInterface.FlightBackend;
 import ResInterface.FlightFrontend;
 import ResInterface.IFlightResourceManager;
+import Transactions.ITransactionManager;
 import Transactions.InvalidTransactionException;
 import Transactions.TransactionAbortedException;
 
-public class FlightRMIResourceManager extends AbstractRMIResourceManager implements IFlightResourceManager {
+public class FlightRMIResourceManager extends AbstractRMIResourceManager implements ITransactionManager, IFlightResourceManager, ICrashable, IPingable {
 
 	private FlightResourceManager rm;
 	
@@ -95,5 +98,4 @@ public class FlightRMIResourceManager extends AbstractRMIResourceManager impleme
 	public boolean enlist(int transactionId) throws RemoteException, InvalidTransactionException {
 		return rm.enlist(transactionId);
 	}
-
 }
