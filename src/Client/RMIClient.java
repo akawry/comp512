@@ -17,7 +17,7 @@ public class RMIClient extends AbstractClient
 		String[] serverhosts;
 		int[] serverports; 
 		boolean automatic = false ;
-    int clientnb = 0 ;
+		int clientnb = 0 ;
 		int loopnb = 0 ;
 		int trsec = 0 ;
 		int type = 0 ;

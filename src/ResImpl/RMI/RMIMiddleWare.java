@@ -15,6 +15,7 @@ import java.util.Timer;
 import java.util.HashMap;
 import java.util.Map;
 
+import FaultTolerance.CrashException;
 import FaultTolerance.ICrashable;
 import LockManager.DeadlockException;
 import ResImpl.AbstractResourceManager;
@@ -117,11 +118,11 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 
 		boolean success = true;
 		transactions.put(id, Calendar.getInstance().getTime().getTime());
-		for (IFlightResourceManager flightRM : flightRMs){
+		for (int i = flightRMs.size() - 1; i >= 0; i--){
 			try {
-				success &= flightRM.addFlight(id, flightNum, flightSeats, flightPrice);
+				success &= flightRMs.get(i).addFlight(id, flightNum, flightSeats, flightPrice);
 			} catch (ConnectException e){
-				handleFlightRMCrash(flightRM);
+				handleFlightRMCrash(flightRMs.get(i));
 			} catch (DeadlockException e) {
 				abort(id);
 			} catch (InvalidTransactionException e) {
@@ -143,11 +144,11 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 
 		boolean success = true;
 		transactions.put(id, Calendar.getInstance().getTime().getTime());
-		for (IFlightResourceManager flightRM : flightRMs){
+		for (int i = flightRMs.size() - 1; i >= 0; i--){
 			try {
-				success &= flightRM.deleteFlight(id, flightNum);
+				success &= flightRMs.get(i).deleteFlight(id, flightNum);
 			} catch (ConnectException e){
-				handleFlightRMCrash(flightRM);
+				handleFlightRMCrash(flightRMs.get(i));
 			} catch (InvalidTransactionException e) {
 				Trace.error("[ERROR] "+e.getMessage());
 			} catch (DeadlockException e) {
@@ -215,9 +216,12 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 		} catch (DeadlockException e) {
 			abort(id);
 		} catch (TransactionException e) {
-			Trace.error("[ERROR] "+e.getMessage());
-		} catch (ConnectException e){
-			// TODO: handle this 
+			Trace.error("[ERROR] "+e.getMessage());	
+		} catch (CrashException e){
+			handleFlightRMCrash((IFlightResourceManager) e.getOffendingRM());
+			if (e.shouldRetry()){
+				return reserveFlight(id, customer, flightNumber);
+			}
 		} 
 		return false;
 	}
@@ -227,17 +231,15 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 		
 		boolean success = true;
 		transactions.put(id, Calendar.getInstance().getTime().getTime());
-		for (IRoomResourceManager roomRM : roomRMs){
+		for (int i = roomRMs.size() - 1; i >= 0; i--){
 			try {
-				success &= roomRM.addRooms(id, location, numRooms, price);
+				success &= roomRMs.get(i).addRooms(id, location, numRooms, price);
 			} catch (ConnectException e){
-				handleRoomRMCrash(roomRM);
+				handleRoomRMCrash(roomRMs.get(i));
 			} catch (DeadlockException e) {
 				abort(id);
-				success = false;
 			} catch (InvalidTransactionException e) {
 				Trace.error("[ERROR] "+e.getMessage());
-				success = false;
 			} 
 		}
 		
@@ -255,11 +257,11 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 
 		boolean success = true;
 		transactions.put(id, Calendar.getInstance().getTime().getTime());
-		for (IRoomResourceManager roomRM : roomRMs){
+		for (int i = roomRMs.size() - 1; i >= 0; i--){
 			try {
-				success &= roomRM.deleteRooms(id, location);
+				success &= roomRMs.get(i).deleteRooms(id, location);
 			} catch (ConnectException e){
-				handleRoomRMCrash(roomRM);
+				handleRoomRMCrash(roomRMs.get(i));
 			} catch (InvalidTransactionException e) {
 				Trace.error("[ERROR] "+e.getMessage());
 			} catch (DeadlockException e) {
@@ -329,8 +331,10 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 			abort(id);
 		} catch (InvalidTransactionException e) {
 			Trace.error("[ERROR] "+e.getMessage());
-		} catch (ConnectException e){
-			// TODO: handle this 
+		} catch (CrashException e){
+			handleRoomRMCrash((IRoomResourceManager) e.getOffendingRM());
+			if (e.shouldRetry())
+				return reserveRoom(id, customer, location);
 		}
 		
 		return false;
@@ -342,11 +346,11 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 		boolean success = true;
 		transactions.put(id, Calendar.getInstance().getTime().getTime());
 		
-		for (ICarResourceManager carRM : carRMs){
+		for (int i = carRMs.size() - 1; i >= 0; i--){
 			try {
-				success &= carRM.addCars(id, location, numCars, price);
+				success &= carRMs.get(i).addCars(id, location, numCars, price);
 			} catch (ConnectException e){
-				handleCarRMCrash(carRM);
+				handleCarRMCrash(carRMs.get(i));
 			} catch (InvalidTransactionException e) {
 				Trace.error("[ERROR] "+e.getMessage());
 			} catch (DeadlockException e) {
@@ -368,11 +372,11 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 
 		boolean success = true;
 		transactions.put(id, Calendar.getInstance().getTime().getTime());
-		for (ICarResourceManager carRM : carRMs){
+		for (int i = carRMs.size() - 1; i >= 0; i--){
 			try {
-				success &= carRM.deleteCars(id, location);
+				success &= carRMs.get(i).deleteCars(id, location);
 			} catch (ConnectException e){
-				handleCarRMCrash(carRM);
+				handleCarRMCrash(carRMs.get(i));
 			} catch (InvalidTransactionException e) {
 				Trace.error("[ERROR] "+e.getMessage());
 			} catch (DeadlockException e) {
@@ -442,8 +446,10 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 			Trace.error("[ERROR] "+e.getMessage());
 		} catch (DeadlockException e) {
 			abort(id);
-		} catch (ConnectException e){
-			// TODO: handle this 
+		} catch (CrashException e){
+			handleCarRMCrash((ICarResourceManager) e.getOffendingRM());
+			if (e.shouldRetry())
+				return reserveCar(id, customer, location);
 		}
 		return false;
 	}
@@ -514,8 +520,14 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 			Trace.error("[ERROR] "+e.getMessage());
 		} catch (DeadlockException e) {
 			abort(id);
-		} catch (ConnectException e){
-			//TODO: handle this !!!
+		} catch (CrashException e){
+			if (e.getOffendingRM() instanceof ICarResourceManager){
+				handleCarRMCrash((ICarResourceManager) e.getOffendingRM());
+			} else if (e.getOffendingRM() instanceof IFlightResourceManager){
+				handleFlightRMCrash((IFlightResourceManager) e.getOffendingRM());
+			} else if (e.getOffendingRM() instanceof IRoomResourceManager){
+				handleRoomRMCrash((IRoomResourceManager) e.getOffendingRM());
+			}
 		}
 		return false;
 	}
@@ -615,6 +627,9 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 			flightRM = flightRMs.get(0);
 			
 			customerRM = new CustomerResourceManager(carRMs, flightRMs, roomRMs);
+			customerRM.setFlightRM(flightRM);
+			customerRM.setCarRM(carRM);
+			customerRM.setRoomRM(roomRM);
 			
 		} catch (Exception e) {
 			System.out.println("[ERROR] Middleware cannot get rmi object");
@@ -647,27 +662,27 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 		txnId++;
 		transactions.put(id, Calendar.getInstance().getTime().getTime());
 		
-		for (ICarResourceManager carRM : carRMs){
+		for (int i = carRMs.size() - 1; i >= 0; i--){
 			try {
-				carRM.start();
+				carRMs.get(i).start();
 			} catch (ConnectException e){
-				handleCarRMCrash(carRM);
+				handleCarRMCrash(carRMs.get(i));
 			} 
 		}
 		
-		for (IFlightResourceManager flightRM : flightRMs){
+		for (int i = flightRMs.size() - 1; i >= 0; i--){
 			try {
-				flightRM.start();
+				flightRMs.get(i).start();
 			} catch (ConnectException e){
-				handleFlightRMCrash(flightRM);
+				handleFlightRMCrash(flightRMs.get(i));
 			}
 		}
 		
-		for (IRoomResourceManager roomRM : roomRMs){
+		for (int i = roomRMs.size() - 1; i >= 0; i--){
 			try {
-				roomRM.start();
+				roomRMs.get(i).start();
 			} catch (ConnectException e){
-				handleRoomRMCrash(roomRM);
+				handleRoomRMCrash(roomRMs.get(i));
 			}
 		}
 
@@ -682,31 +697,31 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	@Override
 	public boolean commit(int transactionId) throws RemoteException {
 		boolean success = true;
-		for (ICarResourceManager carRM : carRMs){
+		for (int i = carRMs.size() - 1; i >= 0; i--){
 			try {
-				success &= carRM.commit(transactionId);
+				success &= carRMs.get(i).commit(transactionId);
 			} catch (ConnectException e){
-				// TODO : handle this 
+				handleCarRMCrash(carRMs.get(i));
 			} catch (TransactionException e){
 				// TODO : handle this 
 			}
 		}
 		
-		for (IFlightResourceManager flightRM : flightRMs){
+		for (int i = flightRMs.size() - 1; i >= 0; i--){
 			try {
-				success &= flightRM.commit(transactionId);
+				success &= flightRMs.get(i).commit(transactionId);
 			} catch (ConnectException e){
-				//TODO: handle this 
+				handleFlightRMCrash(flightRMs.get(i));
 			} catch (TransactionException e){
 				// TODO : handle this 
 			}
 		}
 		
-		for (IRoomResourceManager roomRM : roomRMs){
+		for (int i = roomRMs.size() - 1; i >= 0; i--){
 			try {
-				success &= roomRM.commit(transactionId);
+				success &= roomRMs.get(i).commit(transactionId);
 			} catch (ConnectException e){
-				//TODO : handle this 
+				handleRoomRMCrash(roomRMs.get(i));
 			} catch (TransactionException e){
 				// TODO : handle this 
 			}
@@ -728,31 +743,31 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 
 	@Override
 	public void abort(int transactionId) throws RemoteException{
-		for (ICarResourceManager carRM : carRMs){
+		for (int i = carRMs.size() - 1; i >= 0; i--){
 			try {
-				carRM.abort(transactionId);
+				carRMs.get(i).abort(transactionId);
 			} catch (ConnectException e){
-				//TODO : handle this 
+				handleCarRMCrash(carRMs.get(i));
 			} catch (TransactionException e){
 				// TODO : handle this 
 			}
 		}
 		
-		for (IFlightResourceManager flightRM : flightRMs){
+		for (int i = flightRMs.size() - 1; i >= 0; i--){
 			try {
-				flightRM.abort(transactionId);
+				flightRMs.get(i).abort(transactionId);
 			} catch (ConnectException e){
-				//TODO: handle this 
+				handleFlightRMCrash(flightRMs.get(i));
 			} catch (TransactionException e){
 				// TODO : handle this 
 			}
 		}
 		
-		for (IRoomResourceManager roomRM : roomRMs){
+		for (int i = roomRMs.size() - 1; i >= 0; i--){
 			try {
-				roomRM.abort(transactionId);
+				roomRMs.get(i).abort(transactionId);
 			} catch (ConnectException e){
-				//TODO: handle this 
+				handleRoomRMCrash(roomRMs.get(i));
 			} catch (TransactionException e){
 				// TODO : handle this 
 			}
@@ -771,28 +786,28 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	public boolean shutdown() throws RemoteException{
 		boolean success = true;
 		
-		for (ICarResourceManager carRM : carRMs){
+		for (int i = carRMs.size() - 1; i >= 0; i--){
 			try {
-				success &= carRM.shutdown();
+				success &= carRMs.get(i).shutdown();
 			} catch (ConnectException e) {
-				// TODO: handle this 
+				handleCarRMCrash(carRMs.get(i)); 
 			}
 		}
 			
 		
-		for (IFlightResourceManager flightRM : flightRMs){
+		for (int i = flightRMs.size() - 1; i >= 0; i--){
 			try {
-				success &= flightRM.shutdown();
+				success &= flightRMs.get(i).shutdown();
 			} catch (ConnectException e){
-				// TODO: handle this 
+				handleFlightRMCrash(flightRMs.get(i));
 			}
 		}
 		
-		for (IRoomResourceManager roomRM : roomRMs){
+		for (int i = roomRMs.size() - 1; i >= 0; i--){
 			try {
-				success &= roomRM.shutdown();
+				success &= roomRMs.get(i).shutdown();
 			} catch (ConnectException e){
-				// TODO: handle this 
+				handleRoomRMCrash(roomRMs.get(i));
 			}
 		}
 		
@@ -807,31 +822,31 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 		
 		boolean success = true;
 
-		for (ICarResourceManager carRM : carRMs){
+		for (int i = carRMs.size() - 1; i >= 0; i--){
 			try {
-				success &= carRM.enlist(transactionId);
+				success &= carRMs.get(i).enlist(transactionId);
 			} catch (ConnectException e) {
-				// TODO: handle this 
+				handleCarRMCrash(carRMs.get(i)); 
 			} catch (TransactionException e){
 				success = false;
 			}
 		}
 		
-		for (IFlightResourceManager flightRM : flightRMs){
+		for (int i = flightRMs.size() - 1; i >= 0; i--){
 			try {
-				success &= flightRM.enlist(transactionId);
+				success &= flightRMs.get(i).enlist(transactionId);
 			} catch (ConnectException e) {
-				// TODO: handle this 
+				handleFlightRMCrash(flightRMs.get(i));
 			} catch (TransactionException e){
 				success = false;
 			}
 		}
 		
-		for (IRoomResourceManager roomRM : roomRMs){
+		for (int i = roomRMs.size() - 1; i >= 0; i--){
 			try {
-				success &= roomRM.enlist(transactionId);
+				success &= roomRMs.get(i).enlist(transactionId);
 			} catch (ConnectException e) {
-				// TODO: handle this 
+				handleRoomRMCrash(roomRMs.get(i));
 			} catch (TransactionException e){
 				success = false;
 			}

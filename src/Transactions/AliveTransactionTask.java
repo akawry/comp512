@@ -6,7 +6,7 @@ import java.util.* ;
 public class AliveTransactionTask extends TimerTask {
 
     private final Map<Integer,Long> transactions ;
-    public static final int TRANSACTION_TIMEOUT_SECONDS = 30 ;
+    public static final int TRANSACTION_TIMEOUT_SECONDS = 1000 ;
     private final ITransactionManager transactionManager;
     
     public AliveTransactionTask(Map<Integer,Long> t, ITransactionManager tm) {

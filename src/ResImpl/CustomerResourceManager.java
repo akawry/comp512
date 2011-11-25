@@ -1,5 +1,6 @@
 package ResImpl;
 
+import java.rmi.ConnectException;
 import java.rmi.RemoteException;
 import java.util.Calendar;
 import java.util.Enumeration;
@@ -7,8 +8,10 @@ import java.util.List;
 import java.util.Stack;
 import java.util.Vector;
 
+import FaultTolerance.CrashException;
 import LockManager.DeadlockException;
 import LockManager.TrxnObj;
+import ResImpl.RMI.RMIMiddleWare;
 import ResInterface.CarBackend;
 import ResInterface.CustomerFrontend;
 import ResInterface.FlightBackend;
@@ -16,6 +19,7 @@ import ResInterface.ICarResourceManager;
 import ResInterface.IFlightResourceManager;
 import ResInterface.IRoomResourceManager;
 import ResInterface.ReservationFrontend;
+import ResInterface.ResourceFrontend;
 import ResInterface.RoomBackend;
 import Transactions.ITransactionManager;
 import Transactions.InvalidTransactionException;
@@ -184,8 +188,12 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 			throw new InvalidTransactionException("No transaction with id "+id);
 		}
 		
-		Car car = carRM.getCar(id, location);
-		
+		Car car = null;
+		try {
+			car = carRM.getCar(id, location);
+		} catch (ConnectException e){
+			throw new CrashException(e.getMessage(), carRM, true);
+		}
 		
 		boolean success = false;
 		if (lockManager.Lock(id, Customer.getKey(customer), TrxnObj.WRITE)){
@@ -197,6 +205,8 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 			for (CarBackend carRM : carRMs){
 				try {
 					carRM.updateCar(id, location, car);
+				} catch (ConnectException e){
+					throw new CrashException(e.getMessage(), carRM);
 				} catch (TransactionException e){
 					// TODO: handle this !!!
 					return false;
@@ -214,7 +224,13 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 			throw new InvalidTransactionException("No transaction with id "+id);
 		}
 		
-		Flight flight = flightRM.getFlight(id, flightNumber);
+		Flight flight = null;
+		try {
+			flight = flightRM.getFlight(id, flightNumber);
+		} catch (ConnectException e){
+			throw new CrashException(e.getMessage(), flightRM, true);
+		}
+		
 		boolean success = false;
 		if (lockManager.Lock(id, Customer.getKey(customer), TrxnObj.WRITE)){
 			ops.push(new Operation(Operation.UNRESERVE, Customer.getKey(customer), Flight.getKey(flightNumber)));
@@ -225,6 +241,8 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 			for (FlightBackend flightRM : flightRMs){
 				try {
 					flightRM.updateFlight(id, flightNumber, flight);
+				} catch (ConnectException e){
+					throw new CrashException(e.getMessage(), flightRM);
 				} catch (TransactionException e){
 					// TODO: handle this !!!
 					return false;
@@ -241,7 +259,13 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 			throw new InvalidTransactionException("No transaction with id "+id);
 		}
 		
-		Hotel room = roomRM.getRoom(id, location);
+		Hotel room = null;
+		try {
+			room = roomRM.getRoom(id, location);
+		} catch (ConnectException e){
+			throw new CrashException(e.getMessage(), roomRM, true);
+		}
+		
 		boolean success = false;
 		if (lockManager.Lock(id, Customer.getKey(customer), TrxnObj.WRITE)){
 			ops.push(new Operation(Operation.UNRESERVE, Customer.getKey(customer), Hotel.getKey(location)));
@@ -252,6 +276,8 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 			for (RoomBackend roomRM : roomRMs){
 				try {
 					roomRM.updateRoom(id, location, room);
+				} catch (ConnectException e){
+					throw new CrashException(e.getMessage(), roomRM);
 				} catch (TransactionException e){
 					// TODO: handle this !!!
 					return false;
