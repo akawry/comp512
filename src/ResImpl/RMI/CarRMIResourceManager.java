@@ -66,9 +66,9 @@ public class CarRMIResourceManager extends AbstractRMIResourceManager implements
 	}
 
 	@Override
-	public void updateCar(int id, String location, Car car)
+	public boolean updateCar(int id, String location, Car car)
 			throws RemoteException, InvalidTransactionException, DeadlockException {
-		rm.updateCar(id, location, car);
+		return rm.updateCar(id, location, car);
 		
 	}
 
@@ -97,6 +97,11 @@ public class CarRMIResourceManager extends AbstractRMIResourceManager implements
 	public boolean enlist(int transactionId) throws RemoteException,
 			InvalidTransactionException {
 		return rm.enlist(transactionId);
+	}
+
+	@Override
+	public void undoLast(int id) throws RemoteException, InvalidTransactionException {
+		rm.undoLast(id);
 	}
 
 	

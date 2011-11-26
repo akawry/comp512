@@ -101,15 +101,17 @@ public class CarResourceManager extends AbstractResourceManager implements ICarR
 	}
 
 	@Override
-	public void updateCar(int id, String location, Car car) throws RemoteException, DeadlockException, InvalidTransactionException {
+	public boolean updateCar(int id, String location, Car car) throws RemoteException, DeadlockException, InvalidTransactionException {
 		Stack<Operation> ops = activeTransactions.get(id);
 		if (ops == null){
 			throw new InvalidTransactionException("No transaction with id "+id);
 		}
-		lockManager.Lock(id, location, TrxnObj.WRITE);
-		ops.push(new Operation(Operation.WRITE, Car.getKey(location), readData(id, Car.getKey(location))));
-		writeData(id, Car.getKey(location), car);
-		
+		if (lockManager.Lock(id, location, TrxnObj.WRITE)){
+			ops.push(new Operation(Operation.WRITE, Car.getKey(location), readData(id, Car.getKey(location))));
+			writeData(id, Car.getKey(location), car);
+			return true;
+		}
+		return false;
 	}
 
 }

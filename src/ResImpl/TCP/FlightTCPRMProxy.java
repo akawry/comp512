@@ -4,6 +4,7 @@ import java.rmi.RemoteException;
 
 import ResImpl.Flight;
 import ResInterface.FlightBackend;
+import Transactions.InvalidTransactionException;
 
 public class FlightTCPRMProxy extends AbstractTCPResourceManager implements FlightBackend {
 
@@ -22,15 +23,21 @@ public class FlightTCPRMProxy extends AbstractTCPResourceManager implements Flig
 	}
 
 	@Override
-	public void updateFlight(int id, int flightNumber, Flight flight)
+	public boolean updateFlight(int id, int flightNumber, Flight flight)
 			throws RemoteException {
-		send(concat("updateflight", id, flightNumber, flight.getCount(), flight.getReserved(), flight.getPrice()), flightRMHost, flightRMPort);
+		return new Boolean(send(concat("updateflight", id, flightNumber, flight.getCount(), flight.getReserved(), flight.getPrice()), flightRMHost, flightRMPort));
 	}
 
 	@Override
 	public String processInput(String line) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public void undoLast(int id) throws RemoteException, InvalidTransactionException {
+		// TODO Auto-generated method stub
+		
 	}
 	
 

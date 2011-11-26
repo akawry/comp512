@@ -9,5 +9,7 @@ import Transactions.InvalidTransactionException;
 public interface RoomBackend {
     public Hotel getRoom(int id, String location) throws RemoteException, DeadlockException, InvalidTransactionException;
     
-    public void updateRoom(int id, String location, Hotel room) throws RemoteException, DeadlockException, InvalidTransactionException;
+    public boolean updateRoom(int id, String location, Hotel room) throws RemoteException, DeadlockException, InvalidTransactionException;
+    
+    public void undoLast(int id) throws RemoteException, InvalidTransactionException;
 }

@@ -66,9 +66,9 @@ public class RoomRMIResourceManager extends AbstractRMIResourceManager implement
 	}
 
 	@Override
-	public void updateRoom(int id, String location, Hotel room)
+	public boolean updateRoom(int id, String location, Hotel room)
 			throws RemoteException, DeadlockException, InvalidTransactionException {
-		rm.updateRoom(id, location, room);
+		return rm.updateRoom(id, location, room);
 	}
 
 	@Override
@@ -94,6 +94,12 @@ public class RoomRMIResourceManager extends AbstractRMIResourceManager implement
 	@Override
 	public boolean enlist(int transactionId) throws RemoteException, InvalidTransactionException {
 		return rm.enlist(transactionId);
+	}
+
+	@Override
+	public void undoLast(int id) throws RemoteException,
+			InvalidTransactionException {
+		rm.undoLast(id);
 	}
 
 }

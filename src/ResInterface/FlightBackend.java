@@ -10,5 +10,7 @@ public interface FlightBackend {
 
     public Flight getFlight(int id, int flightNumber) throws RemoteException, DeadlockException, InvalidTransactionException;
     
-    public void updateFlight(int id, int flightNumber, Flight flight) throws RemoteException, DeadlockException, InvalidTransactionException;
+    public boolean updateFlight(int id, int flightNumber, Flight flight) throws RemoteException, DeadlockException, InvalidTransactionException;
+    
+    public void undoLast(int id) throws RemoteException, InvalidTransactionException;
 }

@@ -21,6 +21,7 @@ import Transactions.TransactionAbortedException;
 public abstract class AbstractResourceManager {
 
 	protected RMHashtable m_itemHT = new RMHashtable();
+	protected String host;
 	protected int port;
 	protected Registry registry;
 	protected LockManager lockManager = new LockManager();
@@ -53,21 +54,15 @@ public abstract class AbstractResourceManager {
 		ReservableItem curObj = (ReservableItem) readData(id, key);
 		// Check if there is such an item in the storage
 		if (curObj == null) {
-			Trace.warn(this+ "::deleteItem(" + id + ", " + key
-					+ ") failed--item doesn't exist");
+			Trace.warn(this+ "::deleteItem(" + id + ", " + key + ") failed--item doesn't exist");
 			return false;
 		} else {
 			if (curObj.getReserved() == 0) {
 				removeData(id, curObj.getKey());
-				Trace.info(this+ "::deleteItem(" + id + ", " + key
-						+ ") item deleted");
+				Trace.info(this+ "::deleteItem(" + id + ", " + key + ") item deleted");
 				return true;
 			} else {
-				Trace.info(this+ "::deleteItem("
-						+ id
-						+ ", "
-						+ key
-						+ ") item can't be deleted because some customers reserved it");
+				Trace.info(this+ "::deleteItem("+ id + ", "+ key + ") item can't be deleted because some customers reserved it");
 				return false;
 			}
 		} // if
@@ -99,35 +94,49 @@ public abstract class AbstractResourceManager {
 		return value;
 	}
 	
-	protected void undoAll(int id){
+	private void undo(int id, Operation op){
+		switch (op.getType()){
+		case Operation.ADD:
+			Trace.info(this+":: Undoing DELETE command");
+			writeData(id, (String)op.getKey(), (RMItem) op.getValue());
+			break;
+		case Operation.WRITE:
+			Trace.info(this+":: Undoing WRITE command. Reverting to: "+((RMItem)op.getValue()).toString());
+			writeData(id, (String)op.getKey(), (RMItem) op.getValue());
+			break;
+		case Operation.DELETE:
+			Trace.info(this+":: Undoing ADD command. Removing " + op.getKey());
+			try {
+				// deleting a resource 
+				deleteItem(id, (String) op.getKey());
+			} catch (ClassCastException e){
+				// deleting a customer 
+				removeData(id, (String) op.getKey());
+			}
+			break;
+		case Operation.UNRESERVE:
+			Trace.info(this+":: Undoing RESERVE command. Removing '" + op.getValue()+"' from '" + op.getKey()+"'");
+			Customer cust = (Customer) readData(id, op.getKey());
+			cust.unreserve((String)op.getValue());
+			break;
+		}
+	}
+
+	public void undoLast(int id) throws InvalidTransactionException{
 		Stack<Operation> ops = activeTransactions.get(id);
+		if (ops == null)
+			throw new InvalidTransactionException("No transaction with id " + id);
+		undo(id, ops.pop());
+	}
+	
+	protected void undoAll(int id) throws InvalidTransactionException{
+		Stack<Operation> ops = activeTransactions.get(id);
+		if (ops == null)
+			throw new InvalidTransactionException("No transaction with id " + id);
+		
 		while (ops.size() > 0){
 			Operation op = ops.pop();
-			switch (op.getType()){
-			case Operation.ADD:
-				Trace.info(this+":: Undoing DELETE command");
-				writeData(id, (String)op.getKey(), (RMItem) op.getValue());
-				break;
-			case Operation.WRITE:
-				Trace.info(this+":: Undoing WRITE command. Reverting to: "+((RMItem)op.getValue()).toString());
-				writeData(id, (String)op.getKey(), (RMItem) op.getValue());
-				break;
-			case Operation.DELETE:
-				Trace.info(this+":: Undoing ADD command. Removing " + op.getKey());
-				try {
-					// deleting a resource 
-					deleteItem(id, (String) op.getKey());
-				} catch (ClassCastException e){
-					// deleting a customer 
-					removeData(id, (String) op.getKey());
-				}
-				break;
-			case Operation.UNRESERVE:
-				Trace.info(this+":: Undoing RESERVE command. Removing '" + op.getValue()+"' from '" + op.getKey()+"'");
-				Customer cust = (Customer) readData(id, op.getKey());
-				cust.unreserve((String)op.getValue());
-				break;
-			}
+			undo(id, op);
 		}
 	}
 	

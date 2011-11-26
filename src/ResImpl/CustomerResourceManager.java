@@ -202,13 +202,18 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 		} 
 		
 		if (success){
-			for (CarBackend carRM : carRMs){
+			for (int i = carRMs.size() - 1; i >= 0; i--){
 				try {
-					carRM.updateCar(id, location, car);
+					success &= carRMs.get(i).updateCar(id, location, car);
+					if (!success){
+						for (int j = carRMs.size() - 1; j > i; j--){
+							carRMs.get(j).undoLast(id);
+						}
+						break;
+					}
 				} catch (ConnectException e){
-					throw new CrashException(e.getMessage(), carRM);
+					throw new CrashException(e.getMessage(), carRMs.get(i));
 				} catch (TransactionException e){
-					// TODO: handle this !!!
 					return false;
 				} 
 			}
@@ -238,13 +243,18 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 		}
 		
 		if (success){
-			for (FlightBackend flightRM : flightRMs){
+			for (int i = flightRMs.size() - 1; i >= 0; i--){
 				try {
-					flightRM.updateFlight(id, flightNumber, flight);
+					success &= flightRMs.get(i).updateFlight(id, flightNumber, flight);
+					if (!success){
+						for (int j = flightRMs.size() - 1; j > i; j--){
+							flightRMs.get(j).undoLast(id);
+						}
+						break;
+					}
 				} catch (ConnectException e){
-					throw new CrashException(e.getMessage(), flightRM);
+					throw new CrashException(e.getMessage(), flightRMs.get(i));
 				} catch (TransactionException e){
-					// TODO: handle this !!!
 					return false;
 				}
 			}
@@ -273,13 +283,18 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 		} 
 		
 		if (success){
-			for (RoomBackend roomRM : roomRMs){
+			for (int i = roomRMs.size() - 1; i >= 0; i--){
 				try {
-					roomRM.updateRoom(id, location, room);
+					success &= roomRMs.get(i).updateRoom(id, location, room);
+					if (!success){
+						for (int j = roomRMs.size() - 1; j > i; j--){
+							roomRMs.get(j).undoLast(id);
+						}
+						break;
+					}
 				} catch (ConnectException e){
-					throw new CrashException(e.getMessage(), roomRM);
+					throw new CrashException(e.getMessage(), roomRMs.get(i));
 				} catch (TransactionException e){
-					// TODO: handle this !!!
 					return false;
 				}
 			}

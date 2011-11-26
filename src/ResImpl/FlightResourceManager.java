@@ -98,14 +98,17 @@ public class FlightResourceManager extends AbstractResourceManager implements IF
 	}
 
 	@Override
-	public void updateFlight(int id, int flightNumber, Flight flight) throws RemoteException, DeadlockException, InvalidTransactionException {
+	public boolean updateFlight(int id, int flightNumber, Flight flight) throws RemoteException, DeadlockException, InvalidTransactionException {
 		Stack<Operation> ops = activeTransactions.get(id);
 		if (ops == null){
 			throw new InvalidTransactionException("No transaction with id "+id);
 		}
-		lockManager.Lock(id, ""+flightNumber, TrxnObj.WRITE);
-		ops.push(new Operation(Operation.WRITE, Flight.getKey(flightNumber), readData(id, Flight.getKey(flightNumber))));
-		writeData(id, Flight.getKey(flightNumber), flight);
+		if (lockManager.Lock(id, ""+flightNumber, TrxnObj.WRITE)){
+			ops.push(new Operation(Operation.WRITE, Flight.getKey(flightNumber), readData(id, Flight.getKey(flightNumber))));
+			writeData(id, Flight.getKey(flightNumber), flight);
+			return true;
+		}
+		return false;
 	}
 
 }

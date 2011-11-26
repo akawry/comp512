@@ -94,15 +94,18 @@ public class RoomResourceManager extends AbstractResourceManager implements Remo
 	}
 
 	@Override
-	public void updateRoom(int id, String location, Hotel room)
+	public boolean updateRoom(int id, String location, Hotel room)
 			throws RemoteException, DeadlockException, InvalidTransactionException {
 		Stack<Operation> ops = activeTransactions.get(id);
 		if (ops == null){
 			throw new InvalidTransactionException("No transaction with id "+id);
 		}
-		lockManager.Lock(id, location, TrxnObj.WRITE);
-		ops.push(new Operation(Operation.WRITE, Hotel.getKey(location), readData(id, Hotel.getKey(location))));
-		writeData(id, Hotel.getKey(location), room);
+		if (lockManager.Lock(id, location, TrxnObj.WRITE)){
+			ops.push(new Operation(Operation.WRITE, Hotel.getKey(location), readData(id, Hotel.getKey(location))));
+			writeData(id, Hotel.getKey(location), room);
+			return true;
+		}
+		return false;
 	}
 
 }

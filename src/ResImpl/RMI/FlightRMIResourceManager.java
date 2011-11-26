@@ -69,9 +69,9 @@ public class FlightRMIResourceManager extends AbstractRMIResourceManager impleme
 	}
 
 	@Override
-	public void updateFlight(int id, int flightNumber, Flight flight)
+	public boolean updateFlight(int id, int flightNumber, Flight flight)
 			throws RemoteException, DeadlockException, InvalidTransactionException {
-		rm.updateFlight(id, flightNumber, flight);
+		return rm.updateFlight(id, flightNumber, flight);
 	}
 
 	@Override
@@ -97,5 +97,10 @@ public class FlightRMIResourceManager extends AbstractRMIResourceManager impleme
 	@Override
 	public boolean enlist(int transactionId) throws RemoteException, InvalidTransactionException {
 		return rm.enlist(transactionId);
+	}
+
+	@Override
+	public void undoLast(int id) throws RemoteException, InvalidTransactionException {
+		rm.undoLast(id);
 	}
 }

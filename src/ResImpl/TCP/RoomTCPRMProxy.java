@@ -4,6 +4,7 @@ import java.rmi.RemoteException;
 
 import ResImpl.Hotel;
 import ResInterface.RoomBackend;
+import Transactions.InvalidTransactionException;
 
 public class RoomTCPRMProxy extends AbstractTCPResourceManager implements RoomBackend {
 
@@ -22,15 +23,22 @@ public class RoomTCPRMProxy extends AbstractTCPResourceManager implements RoomBa
 	}
 
 	@Override
-	public void updateRoom(int id, String location, Hotel room)
+	public boolean updateRoom(int id, String location, Hotel room)
 			throws RemoteException {
-		send(concat("updateroom", id, location, room.getCount(), room.getReserved(), room.getPrice()), roomRMHost, roomRMPort);
+		return new Boolean(send(concat("updateroom", id, location, room.getCount(), room.getReserved(), room.getPrice()), roomRMHost, roomRMPort));
 	}
 
 	@Override
 	public String processInput(String line) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public void undoLast(int id) throws RemoteException,
+			InvalidTransactionException {
+		// TODO Auto-generated method stub
+		
 	}
 	
 	
