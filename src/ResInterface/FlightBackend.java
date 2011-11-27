@@ -6,7 +6,7 @@ import LockManager.DeadlockException;
 import ResImpl.Flight;
 import Transactions.InvalidTransactionException;
 
-public interface FlightBackend {
+public interface FlightBackend extends Backend {
 
     public Flight getFlight(int id, int flightNumber) throws RemoteException, DeadlockException, InvalidTransactionException;
     

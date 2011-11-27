@@ -167,4 +167,16 @@ public class TCPMiddleWareClient extends AbstractTCPResourceManager implements R
 		return false;
 	}
 
+	@Override
+	public void crashHost(String host, int num) throws RemoteException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void crashType(String type, int num) throws RemoteException {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

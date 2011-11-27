@@ -16,7 +16,7 @@ import Transactions.ITransactionManager;
 import Transactions.InvalidTransactionException;
 import Transactions.TransactionAbortedException;
 
-public class FlightRMIResourceManager extends AbstractRMIResourceManager implements ITransactionManager, IFlightResourceManager, ICrashable, IPingable {
+public class FlightRMIResourceManager extends AbstractRMIResourceManager implements IFlightResourceManager {
 
 	private FlightResourceManager rm;
 	
@@ -102,5 +102,11 @@ public class FlightRMIResourceManager extends AbstractRMIResourceManager impleme
 	@Override
 	public void undoLast(int id) throws RemoteException, InvalidTransactionException {
 		rm.undoLast(id);
+	}
+
+	@Override
+	protected void unregister() throws Exception {
+		UnicastRemoteObject.unexportObject(this, true);
+		registry.unbind("RMIFlight");
 	}
 }

@@ -6,7 +6,7 @@ import LockManager.DeadlockException;
 import ResImpl.Car;
 import Transactions.InvalidTransactionException;
 
-public interface CarBackend {
+public interface CarBackend extends Backend {
 
 	 public Car getCar(int id, String location) throws RemoteException, DeadlockException, InvalidTransactionException;
 	    

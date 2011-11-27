@@ -39,6 +39,16 @@ public class FlightTCPRMProxy extends AbstractTCPResourceManager implements Flig
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public String getHost() throws RemoteException {
+		return flightRMHost;
+	}
+
+	@Override
+	public int getPort() throws RemoteException {
+		return flightRMPort;
+	}
 	
 
 }

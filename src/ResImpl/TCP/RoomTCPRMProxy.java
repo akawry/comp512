@@ -40,7 +40,15 @@ public class RoomTCPRMProxy extends AbstractTCPResourceManager implements RoomBa
 		// TODO Auto-generated method stub
 		
 	}
-	
-	
+
+	@Override
+	public String getHost() throws RemoteException {
+		return roomRMHost;
+	}
+
+	@Override
+	public int getPort() throws RemoteException {
+		return roomRMPort;
+	}
 
 }

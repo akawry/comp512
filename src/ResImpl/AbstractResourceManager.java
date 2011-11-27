@@ -21,7 +21,6 @@ import Transactions.TransactionAbortedException;
 public abstract class AbstractResourceManager {
 
 	protected RMHashtable m_itemHT = new RMHashtable();
-	protected String host;
 	protected int port;
 	protected Registry registry;
 	protected LockManager lockManager = new LockManager();

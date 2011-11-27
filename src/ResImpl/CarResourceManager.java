@@ -19,10 +19,10 @@ import Transactions.InvalidTransactionException;
 import Transactions.Operation;
 import Transactions.TransactionAbortedException;
 
-public class CarResourceManager extends AbstractResourceManager implements ICarResourceManager, ITransactionManager {
+public class CarResourceManager extends AbstractResourceManager {
 
 	
-	@Override
+	
 	// Create a new car location or add cars to an existing location
 	//  NOTE: if price <= 0 and the location already exists, it maintains its current price
 	public boolean addCars(int id, String location, int count, int price) throws DeadlockException, InvalidTransactionException {
@@ -59,7 +59,7 @@ public class CarResourceManager extends AbstractResourceManager implements ICarR
 		}
 	}
 
-	@Override
+	
 	public boolean deleteCars(int id, String location) throws DeadlockException, InvalidTransactionException {
 		Stack<Operation> ops = activeTransactions.get(id);
 		if (ops == null){
@@ -70,7 +70,7 @@ public class CarResourceManager extends AbstractResourceManager implements ICarR
 		return deleteItem(id, Car.getKey(location));
 	}
 
-	@Override
+	
 	public int queryCars(int id, String location) throws DeadlockException, InvalidTransactionException {
 		Stack<Operation> ops = activeTransactions.get(id);
 		if (ops == null){
@@ -80,7 +80,7 @@ public class CarResourceManager extends AbstractResourceManager implements ICarR
 		return queryNum(id, Car.getKey(location));
 	}
 
-	@Override
+	
 	public int queryCarsPrice(int id, String location) throws DeadlockException, InvalidTransactionException {
 		Stack<Operation> ops = activeTransactions.get(id);
 		if (ops == null){
@@ -90,7 +90,7 @@ public class CarResourceManager extends AbstractResourceManager implements ICarR
 		return queryPrice(id, Car.getKey(location));
 	}
 
-	@Override
+	
 	public Car getCar(int id, String location) throws DeadlockException, InvalidTransactionException {
 		Stack<Operation> ops = activeTransactions.get(id);
 		if (ops == null){
@@ -100,7 +100,7 @@ public class CarResourceManager extends AbstractResourceManager implements ICarR
 		return (Car) readData(id, Car.getKey(location));
 	}
 
-	@Override
+	
 	public boolean updateCar(int id, String location, Car car) throws RemoteException, DeadlockException, InvalidTransactionException {
 		Stack<Operation> ops = activeTransactions.get(id);
 		if (ops == null){

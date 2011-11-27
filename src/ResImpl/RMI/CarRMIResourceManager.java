@@ -1,5 +1,8 @@
 package ResImpl.RMI;
 
+import java.rmi.AccessException;
+import java.rmi.NoSuchObjectException;
+import java.rmi.NotBoundException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -16,7 +19,7 @@ import Transactions.ITransactionManager;
 import Transactions.InvalidTransactionException;
 import Transactions.TransactionAbortedException;
 
-public class CarRMIResourceManager extends AbstractRMIResourceManager implements ITransactionManager, ICarResourceManager, ICrashable, IPingable {
+public class CarRMIResourceManager extends AbstractRMIResourceManager implements ICarResourceManager {
 
 	private CarResourceManager rm;
 	
@@ -102,6 +105,12 @@ public class CarRMIResourceManager extends AbstractRMIResourceManager implements
 	@Override
 	public void undoLast(int id) throws RemoteException, InvalidTransactionException {
 		rm.undoLast(id);
+	}
+
+	@Override
+	protected void unregister() throws Exception {
+		UnicastRemoteObject.unexportObject(this, true);
+		registry.unbind("RMICar");
 	}
 
 	

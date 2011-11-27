@@ -18,9 +18,9 @@ import Transactions.InvalidTransactionException;
 import Transactions.Operation;
 import Transactions.TransactionAbortedException;
 
-public class FlightResourceManager extends AbstractResourceManager implements IFlightResourceManager, ITransactionManager {
+public class FlightResourceManager extends AbstractResourceManager {
 
-	@Override
+	
 	public boolean addFlight(int id, int flightNum, int flightSeats, int flightPrice) throws DeadlockException, InvalidTransactionException {
 		Trace.info("RM::addFlight(" + id + ", " + flightNum + ", $" + flightPrice + ", " + flightSeats + ") called" );
 		
@@ -56,7 +56,7 @@ public class FlightResourceManager extends AbstractResourceManager implements IF
 		}
 	}
 
-	@Override
+	
 	public boolean deleteFlight(int id, int flightNum) throws InvalidTransactionException, DeadlockException {
 		Stack<Operation> ops = activeTransactions.get(id);
 		if (ops == null){
@@ -67,7 +67,7 @@ public class FlightResourceManager extends AbstractResourceManager implements IF
 		return deleteItem(id, Flight.getKey(flightNum));
 	}
 
-	@Override
+	
 	public int queryFlight(int id, int flightNum) throws InvalidTransactionException, DeadlockException {
 		Stack<Operation> ops = activeTransactions.get(id);
 		if (ops == null){
@@ -77,7 +77,7 @@ public class FlightResourceManager extends AbstractResourceManager implements IF
 		return queryNum(id, Flight.getKey(flightNum));
 	}
 
-	@Override
+	
 	public int queryFlightPrice(int id, int flightNum ) throws InvalidTransactionException, DeadlockException {
 		Stack<Operation> ops = activeTransactions.get(id);
 		if (ops == null){
@@ -87,7 +87,7 @@ public class FlightResourceManager extends AbstractResourceManager implements IF
 		return queryPrice(id, Flight.getKey(flightNum));
 	}
 
-	@Override
+	
 	public Flight getFlight(int id, int flightNumber) throws DeadlockException, InvalidTransactionException {
 		Stack<Operation> ops = activeTransactions.get(id);
 		if (ops == null){
@@ -97,7 +97,7 @@ public class FlightResourceManager extends AbstractResourceManager implements IF
 		return (Flight) readData(id, Flight.getKey(flightNumber));
 	}
 
-	@Override
+	
 	public boolean updateFlight(int id, int flightNumber, Flight flight) throws RemoteException, DeadlockException, InvalidTransactionException {
 		Stack<Operation> ops = activeTransactions.get(id);
 		if (ops == null){

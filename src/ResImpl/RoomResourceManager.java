@@ -15,9 +15,9 @@ import ResInterface.RoomFrontend;
 import Transactions.InvalidTransactionException;
 import Transactions.Operation;
 
-public class RoomResourceManager extends AbstractResourceManager implements Remote, IRoomResourceManager {
+public class RoomResourceManager extends AbstractResourceManager {
 
-	@Override
+	
 	public boolean addRooms(int id, String location, int count, int price) throws DeadlockException, InvalidTransactionException {
 		Trace.info("RM::addRooms(" + id + ", " + location + ", " + count + ", $" + price + ") called" );
 		
@@ -52,7 +52,7 @@ public class RoomResourceManager extends AbstractResourceManager implements Remo
 		}
 	}
 
-	@Override
+	
 	public boolean deleteRooms(int id, String location) throws InvalidTransactionException, DeadlockException {
 		Stack<Operation> ops = activeTransactions.get(id);
 		if (ops == null){
@@ -63,7 +63,7 @@ public class RoomResourceManager extends AbstractResourceManager implements Remo
 		return deleteItem(id, Hotel.getKey(location));	
 	}
 
-	@Override
+	
 	public int queryRooms(int id, String location) throws InvalidTransactionException, DeadlockException {
 		Stack<Operation> ops = activeTransactions.get(id);
 		if (ops == null){
@@ -73,7 +73,7 @@ public class RoomResourceManager extends AbstractResourceManager implements Remo
 		return queryNum(id, Hotel.getKey(location));
 	}
 
-	@Override
+	
 	public int queryRoomsPrice(int id, String location) throws InvalidTransactionException, DeadlockException {
 		Stack<Operation> ops = activeTransactions.get(id);
 		if (ops == null){
@@ -83,7 +83,7 @@ public class RoomResourceManager extends AbstractResourceManager implements Remo
 		return queryPrice(id, Hotel.getKey(location));
 	}
 
-	@Override
+	
 	public Hotel getRoom(int id, String location) throws DeadlockException, InvalidTransactionException {
 		Stack<Operation> ops = activeTransactions.get(id);
 		if (ops == null){
@@ -93,7 +93,7 @@ public class RoomResourceManager extends AbstractResourceManager implements Remo
 		return (Hotel) readData(id, Hotel.getKey(location));
 	}
 
-	@Override
+	
 	public boolean updateRoom(int id, String location, Hotel room)
 			throws RemoteException, DeadlockException, InvalidTransactionException {
 		Stack<Operation> ops = activeTransactions.get(id);

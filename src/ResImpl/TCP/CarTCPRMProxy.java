@@ -41,5 +41,15 @@ public class CarTCPRMProxy extends AbstractTCPResourceManager implements CarBack
 		
 	}
 
+	@Override
+	public String getHost() throws RemoteException {
+		return carRMHost;
+	}
+
+	@Override
+	public int getPort() throws RemoteException {
+		return carRMPort;
+	}
+
 
 }

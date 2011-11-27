@@ -634,11 +634,37 @@ public abstract class AbstractClient {
             e.printStackTrace();
           }
           break;
-
+          
+        case 26: //crash a server 
+        	if (arguments.size() != 2 && arguments.size() != 3){
+        		wrongNumber();
+        		break;
+        	}
+        	
+        	try {
+        		String arg = getString(arguments.get(1));
+        		int num = 1;
+    			try {
+    				num = getInt(arguments.get(2));
+    			} catch (Exception e){
+    				
+    			}
+        		if (arg.equalsIgnoreCase("car") || 
+        				arg.equalsIgnoreCase("room") || 
+        				arg.equalsIgnoreCase("flight")){	
+        			rm.crashType(arg, num);
+        		} else {
+        			rm.crashHost(arg, num);
+        		}
+        	} catch (Exception e){
+        		System.out.println("EXCEPTION:");
+                System.out.println(e.getMessage());
+                e.printStackTrace();
+        	}
+        	break;
 
         default:
-          System.out
-            .println("The interface does not support this command.");
+          System.out.println("The interface does not support this command.");
           break;
       }// end of switch
     }// end of while(true)
@@ -707,7 +733,9 @@ public abstract class AbstractClient {
       return 24;
     else if (argument.compareToIgnoreCase("commit") == 0)
       return 25;
-    else
+    else if (argument.compareToIgnoreCase("crash") == 0)
+    	return 26;
+    else 
       return 666;
 
   }

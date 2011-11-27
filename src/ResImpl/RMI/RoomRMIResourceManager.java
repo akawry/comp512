@@ -16,11 +16,11 @@ import Transactions.ITransactionManager;
 import Transactions.InvalidTransactionException;
 import Transactions.TransactionAbortedException;
 
-public class RoomRMIResourceManager extends AbstractRMIResourceManager implements ITransactionManager, IRoomResourceManager, ICrashable, IPingable {
+public class RoomRMIResourceManager extends AbstractRMIResourceManager implements IRoomResourceManager {
 
 	private RoomResourceManager rm;
 	
-	public RoomRMIResourceManager(RoomResourceManager rm) {
+	public RoomRMIResourceManager(RoomResourceManager rm) { 
 		this.rm = rm;
 	}
 	
@@ -100,6 +100,12 @@ public class RoomRMIResourceManager extends AbstractRMIResourceManager implement
 	public void undoLast(int id) throws RemoteException,
 			InvalidTransactionException {
 		rm.undoLast(id);
+	}
+
+	@Override
+	protected void unregister() throws Exception {
+		UnicastRemoteObject.unexportObject(this, true);
+		registry.unbind("RMIRoom");
 	}
 
 }

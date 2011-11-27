@@ -1,6 +1,7 @@
 package ResImpl.RMI;
 
 import java.rmi.ConnectException;
+import java.rmi.NoSuchObjectException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -9,7 +10,9 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Random;
 import java.util.Vector;
 import java.util.Timer;
 import java.util.HashMap;
@@ -17,6 +20,7 @@ import java.util.Map;
 
 import FaultTolerance.CrashException;
 import FaultTolerance.ICrashable;
+import FaultTolerance.Suspect;
 import LockManager.DeadlockException;
 import ResImpl.AbstractResourceManager;
 import ResImpl.Car;
@@ -54,9 +58,10 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	private List<IFlightResourceManager> flightRMs;
 	private List<IRoomResourceManager> roomRMs;
 	
-	private List<ICarResourceManager> suspectedCrashedCar;
-	private List<IFlightResourceManager> suspectedCrashedFlight;
-	private List<IRoomResourceManager> suspectedCrashedRoom;
+	private Hashtable<Object, String> hosts;
+	private Hashtable<Object, Integer> ports;
+	
+	private List<Suspect> suspectedCrashed;
 	
 	private int txnId = 1;
 	private AliveTransactionTask aliveTransactionTask;
@@ -83,9 +88,10 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 		flightRMs = new ArrayList<IFlightResourceManager>();
 		roomRMs = new ArrayList<IRoomResourceManager>();
 		
-		suspectedCrashedCar = new ArrayList<ICarResourceManager>();
-		suspectedCrashedFlight = new ArrayList<IFlightResourceManager>();
-		suspectedCrashedRoom = new ArrayList<IRoomResourceManager>();
+		hosts = new Hashtable<Object, String>();
+		ports = new Hashtable<Object, Integer>();
+		
+		suspectedCrashed = new ArrayList<Suspect>();
 		
 	}
 
@@ -624,17 +630,26 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 
 		try {
 			for (int i = 0; i < carservers.length; i++){
-				carRMs.add((ICarResourceManager) LocateRegistry.getRegistry(carservers[i],carports[i]).lookup("RMICar"));
+				ICarResourceManager rm = (ICarResourceManager) LocateRegistry.getRegistry(carservers[i],carports[i]).lookup("RMICar");
+				hosts.put(rm, rm.getHost());
+				ports.put(rm, rm.getPort());
+				carRMs.add(rm);
 			}
 			carRM = carRMs.get(0);
 			
 			for (int i = 0; i < roomservers.length; i++){
-				roomRMs.add((IRoomResourceManager) LocateRegistry.getRegistry(roomservers[i], roomports[i]).lookup("RMIRoom"));
+				IRoomResourceManager rm = (IRoomResourceManager) LocateRegistry.getRegistry(roomservers[i], roomports[i]).lookup("RMIRoom");
+				hosts.put(rm, rm.getHost());
+				ports.put(rm, rm.getPort());
+				roomRMs.add(rm);
 			}
 			roomRM = roomRMs.get(0);
 			
 			for (int i = 0; i < flightservers.length; i++){
-				flightRMs.add((IFlightResourceManager) LocateRegistry.getRegistry(flightservers[i], flightports[i]).lookup("RMIFlight"));
+				IFlightResourceManager rm = (IFlightResourceManager) LocateRegistry.getRegistry(flightservers[i], flightports[i]).lookup("RMIFlight");
+				hosts.put(rm, rm.getHost());
+				ports.put(rm, rm.getPort());
+				flightRMs.add(rm);
 			}
 			flightRM = flightRMs.get(0);
 			
@@ -875,12 +890,6 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 		
 		return success;
 	}
-
-	@Override
-	public void crash() throws RemoteException {
-		System.exit(1);
-	}
-	
 	
 	/**
 	 * Assign the next car resource manager to read from 
@@ -888,14 +897,16 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	 * For now, uses simple round robin technique 
 	 */
 	public void scheduleNextCarRM(){
-		int idx = carRMs.indexOf(carRM);
-		if (idx < carRMs.size() - 1)
-			idx++;
-		else
-			idx = 0;
-		
-		carRM = carRMs.get(idx);
-		customerRM.setCarRM(carRM);
+		if (carRMs.size() > 0){
+			int idx = carRMs.indexOf(carRM);
+			if (idx < carRMs.size() - 1)
+				idx++;
+			else
+				idx = 0;
+			
+			carRM = carRMs.get(idx);
+			customerRM.setCarRM(carRM);
+		}
 	}
 	
 	
@@ -905,14 +916,16 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	 * For now, uses simple round robin technique 
 	 */
 	public void scheduleNextFlightRM(){
-		int idx = flightRMs.indexOf(flightRM);
-		if (idx < flightRMs.size() - 1)
-			idx++;
-		else
-			idx = 0;
-		
-		flightRM = flightRMs.get(idx);
-		customerRM.setFlightRM(flightRM);
+		if (flightRMs.size() > 0){
+			int idx = flightRMs.indexOf(flightRM);
+			if (idx < flightRMs.size() - 1)
+				idx++;
+			else
+				idx = 0;
+			
+			flightRM = flightRMs.get(idx);
+			customerRM.setFlightRM(flightRM);
+		}
 	}
 	
 	/**
@@ -921,14 +934,16 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	 * For now, uses simple round robin technique 
 	 */
 	public void scheduleNextRoomRM(){
-		int idx = roomRMs.indexOf(roomRM);
-		if (idx < roomRMs.size() - 1)
-			idx++;
-		else
-			idx = 0;
-		
-		roomRM = roomRMs.get(idx);
-		customerRM.setRoomRM(roomRM);
+		if (roomRMs.size() > 0){
+			int idx = roomRMs.indexOf(roomRM);
+			if (idx < roomRMs.size() - 1)
+				idx++;
+			else
+				idx = 0;
+			
+			roomRM = roomRMs.get(idx);
+			customerRM.setRoomRM(roomRM);
+		}
 	}
 	
 	/**
@@ -938,8 +953,10 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	 */
 	public void handleFlightRMCrash(IFlightResourceManager flightRM){
 		Trace.error("[ERROR] One of the flight resource managers crashed ... ");
-		this.flightRMs.remove(flightRM);
+		
+		//this.flightRMs.remove(flightRM);
 		this.scheduleNextFlightRM();
+		this.suspectedCrashed.add(new Suspect(hosts.get(flightRM), ports.get(flightRM), Suspect.FLIGHT));
 	}
 	
 	/**
@@ -950,6 +967,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 		Trace.error("[ERROR] One of the flight resource managers crashed ... ");
 		this.flightRMs.remove(flightRM);
 		this.scheduleNextFlightRM();
+		this.suspectedCrashed.add(new Suspect(hosts.get(flightRM), ports.get(flightRM), Suspect.FLIGHT));
 	}
 	
 	/**
@@ -961,6 +979,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 		Trace.error("[ERROR] One of the car resource managers crashed ... ");
 		this.carRMs.remove(carRM);
 		this.scheduleNextCarRM();
+		this.suspectedCrashed.add(new Suspect(hosts.get(carRM), ports.get(carRM), Suspect.CAR));
 	}
 	
 	/**
@@ -971,6 +990,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 		Trace.error("[ERROR] One of the car resource managers crashed ... ");
 		this.carRMs.remove(this.carRM);
 		this.scheduleNextCarRM();
+		this.suspectedCrashed.add(new Suspect(hosts.get(carRM), ports.get(carRM), Suspect.CAR));
 	}
 	
 	/**
@@ -982,6 +1002,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 		Trace.error("[ERROR] One of the room resource managers crashed ... ");
 		this.roomRMs.remove(roomRM);
 		this.scheduleNextRoomRM();
+		this.suspectedCrashed.add(new Suspect(hosts.get(roomRM), ports.get(roomRM), Suspect.ROOM));
 	}
 	
 	/**
@@ -992,5 +1013,54 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 		Trace.error("[ERROR] One of the room resource managers crashed ... ");
 		this.roomRMs.remove(roomRM);
 		this.scheduleNextRoomRM();
+		this.suspectedCrashed.add(new Suspect(hosts.get(roomRM), ports.get(roomRM), Suspect.ROOM));
+	}
+
+	@Override
+	public void crashHost(String host, int num) throws RemoteException {
+		for (Object o : hosts.keySet()){
+			if (hosts.get(o).equalsIgnoreCase(host)){
+				((ICrashable) o).crash();
+				if (o instanceof ICarResourceManager)
+					carRMs.remove(o);
+				else if (o instanceof IFlightResourceManager)
+					flightRMs.remove(o);
+				else if (o instanceof IRoomResourceManager)
+					roomRMs.remove(o);
+				num--;
+				if (num == 0)
+					break;
+			}
+		}
+	}
+
+	@Override
+	public void crashType(String type, int num) throws RemoteException {
+		Random rand = new Random();
+		for (int i = 0; i < num; i++){
+			if (type.equalsIgnoreCase("car")){
+				if (carRMs.size() > 0){
+					ICarResourceManager rm = carRMs.remove(rand.nextInt(carRMs.size()));
+					rm.crash();
+				}
+			} else if (type.equalsIgnoreCase("flight")){
+				if (flightRMs.size() > 0){
+					IFlightResourceManager rm = flightRMs.remove(rand.nextInt(flightRMs.size()));
+					rm.crash();
+				}
+			} else if (type.equalsIgnoreCase("room")){
+				if (roomRMs.size() > 0){
+					IRoomResourceManager rm = roomRMs.remove(rand.nextInt(roomRMs.size()));
+					rm.crash();
+				}
+			} 
+		}
+	}
+
+
+	@Override
+	protected void unregister() throws Exception {
+		UnicastRemoteObject.unexportObject(this, true);
+		registry.unbind("RMIMiddleware");
 	}
 }
