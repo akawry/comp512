@@ -9,10 +9,14 @@ import java.util.Vector;
 
 import FaultTolerance.Suspect;
 import LockManager.DeadlockException;
+import ResImpl.CustomerResourceManager;
 import ResImpl.Trace;
+import ResInterface.ReservationFrontend;
 import ResInterface.ResourceFrontend;
+import Transactions.ITransactionManager;
 import Transactions.InvalidTransactionException;
 import Transactions.TransactionAbortedException;
+import Transactions.TransactionException;
 
 public class RMIMiddlewareGroupManager implements ResourceFrontend {
 
@@ -255,17 +259,29 @@ public class RMIMiddlewareGroupManager implements ResourceFrontend {
 	@Override
 	public int newCustomer(int id) throws RemoteException, DeadlockException, InvalidTransactionException {
 		int cid = -1;
-		for (int i = middlewares.size() - 1; i >= 0; i--){
+		boolean success = true;
+		int i = 0;
+		for (i = middlewares.size() - 1; i >= 0; i--){
 			try {
 				cid = middlewares.get(i).newCustomer(id);
+				break;
 			} catch (ConnectException e){
 				handleMiddlewareCrash(middlewares.get(i));
 			}
-			if (cid == -1){
-				for (int j = middlewares.size() - 1; j > i; j--){
-					middlewares.get(i).undoLast(id);
+		}
+		if (i > 0){
+			for (int j = i - 1; j >= 0; j--){
+				try {
+					success &= middlewares.get(j).newCustomer(id, cid);
+					if (!success){
+						for (int k = middlewares.size() - 1; k > j; k--){
+							middlewares.get(k).undoLast(id);
+						}
+						break;
+					}
+				} catch (ConnectException e){
+					handleMiddlewareCrash(middlewares.get(j));
 				}
-				break;
 			}
 		}
 		return cid;
@@ -326,24 +342,84 @@ public class RMIMiddlewareGroupManager implements ResourceFrontend {
 
 	@Override
 	public boolean reserveCar(int id, int customer, String location) throws RemoteException, InvalidTransactionException, DeadlockException {
-		// TODO Auto-generated method stub
-		return false;
+		boolean success = true;
+		for (int i = middlewares.size() - 1; i >= 0; i--){
+			try {
+				middlewares.get(i).keepAlive(id);
+				success &= middlewares.get(i).reserveCarForCustomer(id, customer, location);
+				if (!success){
+					for (int j = middlewares.size() - 1; j > i; j--){
+						middlewares.get(j).undoLast(id);
+					}
+					break;
+				}
+			} catch (ConnectException e){
+				handleMiddlewareCrash(middlewares.get(i));
+			}
+		}
+		
+		if (success){
+			middleware.reserveCar(id, customer, location);
+			scheduleNextMiddleware();
+		}
+		
+		return success;
 	}
 
 	@Override
 	public boolean reserveFlight(int id, int customer, int flightNumber)
 			throws RemoteException, DeadlockException,
 			InvalidTransactionException {
-		// TODO Auto-generated method stub
-		return false;
+		boolean success = true;
+		for (int i = middlewares.size() - 1; i >= 0; i--){
+			try {
+				middlewares.get(i).keepAlive(id);
+				success &= middlewares.get(i).reserveFlightForCustomer(id, customer, flightNumber);
+				if (!success){
+					for (int j = middlewares.size() - 1; j > i; j--){
+						middlewares.get(j).undoLast(id);
+					}
+					break;
+				}
+			} catch (ConnectException e){
+				handleMiddlewareCrash(middlewares.get(i));
+			}
+		}
+		
+		if (success){
+			middleware.reserveFlight(id, customer, flightNumber);
+			scheduleNextMiddleware();
+		}
+		
+		return success;
 	}
 
 	@Override
 	public boolean reserveRoom(int id, int customer, String location)
 			throws RemoteException, DeadlockException,
 			InvalidTransactionException {
-		// TODO Auto-generated method stub
-		return false;
+		boolean success = true;
+		for (int i = middlewares.size() - 1; i >= 0; i--){
+			try {
+				middlewares.get(i).keepAlive(id);
+				success &= middlewares.get(i).reserveRoomForCustomer(id, customer, location);
+				if (!success){
+					for (int j = middlewares.size() - 1; j > i; j--){
+						middlewares.get(j).undoLast(id);
+					}
+					break;
+				}
+			} catch (ConnectException e){
+				handleMiddlewareCrash(middlewares.get(i));
+			}
+		}
+		
+		if (success){
+			middleware.reserveRoom(id, customer, location);
+			scheduleNextMiddleware();
+		}
+		
+		return success;
 	}
 
 	@Override
@@ -357,28 +433,101 @@ public class RMIMiddlewareGroupManager implements ResourceFrontend {
 
 	@Override
 	public int start() throws RemoteException, InvalidTransactionException {
-		// TODO Auto-generated method stub
-		return 0;
+		int id = -1;
+		for (int i = middlewares.size() - 1; i >= 0; i--){
+			try {
+				id = middlewares.get(i).nextTransactionId();
+				middlewares.get(i).startCustomerRM();
+				middlewares.get(i).enlistCustomerRM(id);
+			} catch (ConnectException e){
+				handleMiddlewareCrash(middlewares.get(i));
+			}
+		}
+		
+		for (int i = middlewares.size() - 1; i >= 0; i--){
+			try {
+				middlewares.get(i).start();
+				break;
+			} catch (ConnectException e){
+				handleMiddlewareCrash(middlewares.get(i));
+			}
+		}
+		
+		return id;
 	}
 
 	@Override
 	public boolean commit(int transactionId) throws RemoteException,
 			TransactionAbortedException, InvalidTransactionException {
-		// TODO Auto-generated method stub
-		return false;
+		
+		boolean success = false;
+		try {
+			success = middleware.commit(transactionId);
+		} catch (ConnectException e){
+			handleMiddlewareCrash(middleware);
+			scheduleNextMiddleware();
+			if (middlewares.size() > 0)
+				return commit(transactionId);
+		}
+		
+		if (success){
+			for (int i = middlewares.size() - 1; i >= 0; i--){
+				try {
+					middlewares.get(i).removeTransaction(transactionId);
+				} catch (ConnectException e){
+					handleMiddlewareCrash(middlewares.get(i));
+				}
+			}
+		}
+		
+		return success;
 	}
 
 	@Override
 	public void abort(int transactionId) throws RemoteException,
 			InvalidTransactionException {
-		// TODO Auto-generated method stub
+		try {
+			middleware.abort(transactionId);
+		} catch (ConnectException e){
+			handleMiddlewareCrash(middleware);
+			scheduleNextMiddleware();
+			if (middlewares.size() > 0)
+				abort(transactionId);
+			return;
+		}
 		
+		for (int i = middlewares.size() - 1; i >= 0; i--){
+			try {
+				middlewares.get(i).removeTransaction(transactionId);
+				middlewares.get(i).abortCustomerRM(transactionId);
+			} catch (ConnectException e){
+				handleMiddlewareCrash(middlewares.get(i));
+			}
+		}
 	}
 
 	@Override
 	public boolean shutdown() throws RemoteException {
-		// TODO Auto-generated method stub
-		return false;
+		boolean success = true;
+		try {
+			success = middleware.shutdown();
+		} catch (ConnectException e){
+			handleMiddlewareCrash(middleware);
+			scheduleNextMiddleware();
+			if (middlewares.size() > 0)
+				return shutdown();
+		}
+		
+		for (int i = middlewares.size() - 1; i >= 0; i--){
+			try {
+				middlewares.get(i).clearAllTransactions();
+				middlewares.get(i).shutdownCustomerRM();
+			} catch (ConnectException e){
+				handleMiddlewareCrash(middlewares.get(i));
+			}
+		}
+		
+		return success;
 	}
 
 	@Override
@@ -423,7 +572,7 @@ public class RMIMiddlewareGroupManager implements ResourceFrontend {
 
 	@Override
 	public void undoLast(int id) throws RemoteException, InvalidTransactionException {
-		// shouldn't ever be accessed ... 
+
 	}
 
 	@Override
@@ -436,5 +585,92 @@ public class RMIMiddlewareGroupManager implements ResourceFrontend {
 	public int getPort() throws RemoteException {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+
+	@Override
+	public void keepAlive(int id) throws RemoteException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int nextTransactionId() throws RemoteException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int startCustomerRM() throws RemoteException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public boolean enlistCustomerRM(int id) throws RemoteException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean commitCustomerRM(int transactionId) throws RemoteException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void removeTransaction(int id) throws RemoteException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void abortCustomerRM(int transactionId) throws RemoteException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void clearAllTransactions() throws RemoteException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean shutdownCustomerRM() throws RemoteException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean reserveCarForCustomer(int id, int customer, String location)
+			throws RemoteException, InvalidTransactionException,
+			DeadlockException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean reserveFlightForCustomer(int id, int customer,
+			int flightNumber) throws RemoteException, DeadlockException,
+			InvalidTransactionException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean reserveRoomForCustomer(int id, int customer, String location)
+			throws RemoteException, DeadlockException,
+			InvalidTransactionException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean itineraryForCustomer(int id, int customer,
+			Vector<String> flightNumbers, String location, boolean Car,
+			boolean Room) throws RemoteException, NumberFormatException,
+			DeadlockException, InvalidTransactionException {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }

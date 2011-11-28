@@ -3,6 +3,9 @@ package ResImpl.TCP;
 import java.rmi.RemoteException;
 import java.util.Vector;
 
+import LockManager.DeadlockException;
+import ResImpl.CustomerResourceManager;
+import ResInterface.ReservationFrontend;
 import ResInterface.ResourceFrontend;
 import Transactions.InvalidTransactionException;
 import Transactions.TransactionAbortedException;
@@ -200,6 +203,92 @@ public class TCPMiddleWareClient extends AbstractTCPResourceManager implements R
 	@Override 
 	public int getPort(){
 		return middleWareServerPort;
+	}
+
+	@Override
+	public void keepAlive(int id) throws RemoteException {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	@Override
+	public int nextTransactionId(){
+		return -1;
+	}
+
+	@Override
+	public int startCustomerRM() throws RemoteException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public boolean enlistCustomerRM(int id) throws RemoteException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void removeTransaction(int id) throws RemoteException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void clearAllTransactions() throws RemoteException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean commitCustomerRM(int transactionId) throws RemoteException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void abortCustomerRM(int transactionId) throws RemoteException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean shutdownCustomerRM() throws RemoteException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean reserveCarForCustomer(int id, int customer, String location)
+			throws RemoteException, InvalidTransactionException,
+			DeadlockException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean reserveFlightForCustomer(int id, int customer,
+			int flightNumber) throws RemoteException, DeadlockException,
+			InvalidTransactionException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean reserveRoomForCustomer(int id, int customer, String location)
+			throws RemoteException, DeadlockException,
+			InvalidTransactionException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean itineraryForCustomer(int id, int customer,
+			Vector<String> flightNumbers, String location, boolean Car,
+			boolean Room) throws RemoteException, NumberFormatException,
+			DeadlockException, InvalidTransactionException {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }

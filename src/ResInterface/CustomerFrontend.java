@@ -21,5 +21,5 @@ public interface CustomerFrontend extends Remote {
     public String queryCustomerInfo(int id,int customer) throws RemoteException, DeadlockException, InvalidTransactionException;
     
     public void undoLast(int id) throws RemoteException, InvalidTransactionException;
-	
+    
 }

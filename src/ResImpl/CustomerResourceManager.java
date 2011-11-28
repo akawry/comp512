@@ -1,5 +1,6 @@
 package ResImpl;
 
+import java.io.Serializable;
 import java.rmi.ConnectException;
 import java.rmi.RemoteException;
 import java.util.Calendar;
@@ -201,26 +202,9 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 			success = this.reserveItem(id, customer, car, location);
 		} 
 		
-		if (success){
-			for (int i = carRMs.size() - 1; i >= 0; i--){
-				try {
-					success &= carRMs.get(i).updateCar(id, location, car);
-					if (!success){
-						for (int j = carRMs.size() - 1; j > i; j--){
-							carRMs.get(j).undoLast(id);
-						}
-						break;
-					}
-				} catch (ConnectException e){
-					throw new CrashException(e.getMessage(), carRMs.get(i));
-				} catch (TransactionException e){
-					return false;
-				} 
-			}
-		}
 		return success;
 	}
-
+	
 	@Override
 	public boolean reserveFlight(int id, int customer, int flightNumber)
 			throws RemoteException, DeadlockException, InvalidTransactionException {
@@ -242,23 +226,6 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 			success = reserveItem(id, customer, flight, String.valueOf(flightNumber));
 		}
 		
-		if (success){
-			for (int i = flightRMs.size() - 1; i >= 0; i--){
-				try {
-					success &= flightRMs.get(i).updateFlight(id, flightNumber, flight);
-					if (!success){
-						for (int j = flightRMs.size() - 1; j > i; j--){
-							flightRMs.get(j).undoLast(id);
-						}
-						break;
-					}
-				} catch (ConnectException e){
-					throw new CrashException(e.getMessage(), flightRMs.get(i));
-				} catch (TransactionException e){
-					return false;
-				}
-			}
-		}
 		return success;
 	}
 
@@ -282,23 +249,6 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 			success = this.reserveItem(id, customer, room, location);
 		} 
 		
-		if (success){
-			for (int i = roomRMs.size() - 1; i >= 0; i--){
-				try {
-					success &= roomRMs.get(i).updateRoom(id, location, room);
-					if (!success){
-						for (int j = roomRMs.size() - 1; j > i; j--){
-							roomRMs.get(j).undoLast(id);
-						}
-						break;
-					}
-				} catch (ConnectException e){
-					throw new CrashException(e.getMessage(), roomRMs.get(i));
-				} catch (TransactionException e){
-					return false;
-				}
-			}
-		}
 		return success;
 	}
 
@@ -416,5 +366,38 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 	
 	public void setRoomRM(RoomBackend roomRM){
 		this.roomRM = roomRM;
+	}
+
+	@Override
+	public boolean reserveCarForCustomer(int id, int customer, String location)
+			throws RemoteException, InvalidTransactionException,
+			DeadlockException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean reserveFlightForCustomer(int id, int customer,
+			int flightNumber) throws RemoteException, DeadlockException,
+			InvalidTransactionException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean reserveRoomForCustomer(int id, int customer, String location)
+			throws RemoteException, DeadlockException,
+			InvalidTransactionException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean itineraryForCustomer(int id, int customer,
+			Vector<String> flightNumbers, String location, boolean Car,
+			boolean Room) throws RemoteException, NumberFormatException,
+			DeadlockException, InvalidTransactionException {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }
