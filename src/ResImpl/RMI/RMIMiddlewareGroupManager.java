@@ -11,6 +11,7 @@ import FaultTolerance.Suspect;
 import LockManager.DeadlockException;
 import ResImpl.CustomerResourceManager;
 import ResImpl.Trace;
+import ResInterface.IMiddleWare;
 import ResInterface.ReservationFrontend;
 import ResInterface.ResourceFrontend;
 import Transactions.ITransactionManager;
@@ -20,19 +21,19 @@ import Transactions.TransactionException;
 
 public class RMIMiddlewareGroupManager implements ResourceFrontend {
 
-	private List<ResourceFrontend> middlewares;
-	private ResourceFrontend middleware;
+	private List<IMiddleWare> middlewares;
+	private IMiddleWare middleware;
 	private List<Suspect> suspectedCrashed;
-	private Hashtable<ResourceFrontend, String> hosts;
-	private Hashtable<ResourceFrontend, Integer> ports;
+	private Hashtable<IMiddleWare, String> hosts;
+	private Hashtable<IMiddleWare, Integer> ports;
 	
-	public RMIMiddlewareGroupManager(List<ResourceFrontend> rms){
+	public RMIMiddlewareGroupManager(List<IMiddleWare> rms){
 		this.middlewares = rms;
 		this.middleware = rms.get(0);
 		this.suspectedCrashed = new ArrayList<Suspect>();
-		hosts = new Hashtable<ResourceFrontend, String>();
-		ports = new Hashtable<ResourceFrontend, Integer>();
-		for (ResourceFrontend mw : rms){
+		hosts = new Hashtable<IMiddleWare, String>();
+		ports = new Hashtable<IMiddleWare, Integer>();
+		for (IMiddleWare mw : rms){
 			try {
 				hosts.put(mw, mw.getHost());
 				ports.put(mw, mw.getPort());
@@ -573,104 +574,5 @@ public class RMIMiddlewareGroupManager implements ResourceFrontend {
 	@Override
 	public void undoLast(int id) throws RemoteException, InvalidTransactionException {
 
-	}
-
-	@Override
-	public String getHost() throws RemoteException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public int getPort() throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public void keepAlive(int id) throws RemoteException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public int nextTransactionId() throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public int startCustomerRM() throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public boolean enlistCustomerRM(int id) throws RemoteException {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean commitCustomerRM(int transactionId) throws RemoteException {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void removeTransaction(int id) throws RemoteException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void abortCustomerRM(int transactionId) throws RemoteException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void clearAllTransactions() throws RemoteException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public boolean shutdownCustomerRM() throws RemoteException {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean reserveCarForCustomer(int id, int customer, String location)
-			throws RemoteException, InvalidTransactionException,
-			DeadlockException {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean reserveFlightForCustomer(int id, int customer,
-			int flightNumber) throws RemoteException, DeadlockException,
-			InvalidTransactionException {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean reserveRoomForCustomer(int id, int customer, String location)
-			throws RemoteException, DeadlockException,
-			InvalidTransactionException {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean itineraryForCustomer(int id, int customer,
-			Vector<String> flightNumbers, String location, boolean Car,
-			boolean Room) throws RemoteException, NumberFormatException,
-			DeadlockException, InvalidTransactionException {
-		// TODO Auto-generated method stub
-		return false;
 	}
 }

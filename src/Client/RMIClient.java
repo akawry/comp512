@@ -43,7 +43,7 @@ public class RMIClient extends AbstractClient
 			{
 				for (int i = 0; i < serverhosts.length; i++){
 					Registry registry = LocateRegistry.getRegistry(serverhosts[i],serverports[i]);
-					rms.add((ResourceFrontend) registry.lookup("RMIMiddleware"));
+					rms.add((IMiddleWare) registry.lookup("RMIMiddleware"));
 				}
 				rm = new RMIMiddlewareGroupManager(rms);
 			} 

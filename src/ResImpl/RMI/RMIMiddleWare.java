@@ -37,6 +37,7 @@ import ResInterface.CarFrontend;
 import ResInterface.FlightFrontend;
 import ResInterface.ICarResourceManager;
 import ResInterface.IFlightResourceManager;
+import ResInterface.IMiddleWare;
 import ResInterface.IRoomResourceManager;
 import ResInterface.ReservationFrontend;
 import ResInterface.ResourceFrontend;
@@ -48,7 +49,7 @@ import Transactions.TransactionAbortedException;
 import Transactions.TransactionException;
 import Transactions.TransactionManager;
 
-public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote, ResourceFrontend {
+public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote, IMiddleWare {
 
 	private ICarResourceManager carRM;
 	private IFlightResourceManager flightRM;

@@ -11,21 +11,13 @@ public interface ReservationFrontend {
     /* reserve a car at this location */
     public boolean reserveCar(int id, int customer, String location) throws RemoteException, InvalidTransactionException, DeadlockException;
     
-    public boolean reserveCarForCustomer(int id, int customer, String location) throws RemoteException, InvalidTransactionException, DeadlockException;
-    
     /* Reserve a seat on this flight*/
     public boolean reserveFlight(int id, int customer, int flightNumber) throws RemoteException, DeadlockException, InvalidTransactionException; 
-    
-    public boolean reserveFlightForCustomer(int id, int customer, int flightNumber) throws RemoteException, DeadlockException, InvalidTransactionException; 
-    
+
     /* reserve a room certain at this location */
     public boolean reserveRoom(int id, int customer, String location) throws RemoteException, DeadlockException, InvalidTransactionException; 
     
-    public boolean reserveRoomForCustomer(int id, int customer, String location) throws RemoteException, DeadlockException, InvalidTransactionException; 
-
 	/* reserve an itinerary */
     public boolean itinerary(int id,int customer,Vector<String> flightNumbers,String location, boolean Car, boolean Room) throws RemoteException, NumberFormatException, DeadlockException, InvalidTransactionException; 
 	
-    public boolean itineraryForCustomer(int id,int customer,Vector<String> flightNumbers,String location, boolean Car, boolean Room) throws RemoteException, NumberFormatException, DeadlockException, InvalidTransactionException; 
-    
 }

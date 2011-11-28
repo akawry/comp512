@@ -12,7 +12,7 @@ import java.io.*;
 public abstract class AbstractClient {
   static String message = "blank";
   static ResourceFrontend rm = null;
-  static List<ResourceFrontend> rms = new ArrayList<ResourceFrontend>();
+  static List<IMiddleWare> rms = new ArrayList<IMiddleWare>();
 
   public static void automaticInput(int clientnb, int loopnb, int trsec, int type) {
     int total = 0 ;

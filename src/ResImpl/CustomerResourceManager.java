@@ -367,37 +367,4 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 	public void setRoomRM(RoomBackend roomRM){
 		this.roomRM = roomRM;
 	}
-
-	@Override
-	public boolean reserveCarForCustomer(int id, int customer, String location)
-			throws RemoteException, InvalidTransactionException,
-			DeadlockException {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean reserveFlightForCustomer(int id, int customer,
-			int flightNumber) throws RemoteException, DeadlockException,
-			InvalidTransactionException {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean reserveRoomForCustomer(int id, int customer, String location)
-			throws RemoteException, DeadlockException,
-			InvalidTransactionException {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean itineraryForCustomer(int id, int customer,
-			Vector<String> flightNumbers, String location, boolean Car,
-			boolean Room) throws RemoteException, NumberFormatException,
-			DeadlockException, InvalidTransactionException {
-		// TODO Auto-generated method stub
-		return false;
-	}
 }
