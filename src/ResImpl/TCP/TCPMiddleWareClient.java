@@ -179,4 +179,27 @@ public class TCPMiddleWareClient extends AbstractTCPResourceManager implements R
 		
 	}
 
+	@Override
+	public void undoLast(int id) throws RemoteException,
+			InvalidTransactionException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void crash() throws RemoteException {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	@Override
+	public String getHost(){
+		return middleWareServerHost;
+	}
+	
+	@Override 
+	public int getPort(){
+		return middleWareServerPort;
+	}
+
 }

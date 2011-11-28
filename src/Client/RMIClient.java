@@ -1,6 +1,8 @@
 package Client; 
 
 import java.rmi.*;
+
+import ResImpl.RMI.RMIMiddlewareGroupManager;
 import ResInterface.*;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -43,8 +45,7 @@ public class RMIClient extends AbstractClient
 					Registry registry = LocateRegistry.getRegistry(serverhosts[i],serverports[i]);
 					rms.add((ResourceFrontend) registry.lookup("RMIMiddleware"));
 				}
-				rm = rms.get(0);
-				//System.out.println("[OK] Client successfully connected to server at " + serverhost  + " on port " + serverport);
+				rm = new RMIMiddlewareGroupManager(rms);
 			} 
 			catch (Exception e) 
 			{	

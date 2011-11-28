@@ -18,6 +18,8 @@ public interface CustomerFrontend extends Remote {
     public boolean deleteCustomer(int id,int customer) throws RemoteException, DeadlockException, InvalidTransactionException; 
 
     /* return a bill */
-    public String queryCustomerInfo(int id,int customer) throws RemoteException, DeadlockException, InvalidTransactionException; 
+    public String queryCustomerInfo(int id,int customer) throws RemoteException, DeadlockException, InvalidTransactionException;
+    
+    public void undoLast(int id) throws RemoteException, InvalidTransactionException;
 	
 }

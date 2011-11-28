@@ -47,7 +47,7 @@ import Transactions.TransactionAbortedException;
 import Transactions.TransactionException;
 import Transactions.TransactionManager;
 
-public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote, ResourceFrontend, ICrashable {
+public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote, ResourceFrontend {
 
 	private ICarResourceManager carRM;
 	private IFlightResourceManager flightRM;
@@ -105,6 +105,10 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 
 	public RoomFrontend getRoomResourceManager() {
 		return roomRM;
+	}
+	
+	public CustomerResourceManager getCustomerResourceManager(){
+		return customerRM;
 	}
 
 	public void setCarResourceManager(CarRMIResourceManager carRM) {
@@ -684,7 +688,6 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 
 	@Override
 	public int start() throws RemoteException, InvalidTransactionException {
-		boolean success = true;
 		int id = txnId;
 		txnId++;
 		transactions.put(id, Calendar.getInstance().getTime().getTime());
@@ -714,9 +717,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 		}
 
 		customerRM.start();
-		
-		if (success)
-			enlist(id);
+		enlist(id);
 		
 		return id;
 	}
@@ -953,9 +954,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	 */
 	public void handleFlightRMCrash(IFlightResourceManager flightRM){
 		Trace.error("[ERROR] One of the flight resource managers crashed ... ");
-		
-		//this.flightRMs.remove(flightRM);
-		this.scheduleNextFlightRM();
+		this.flightRMs.remove(flightRM);
 		this.suspectedCrashed.add(new Suspect(hosts.get(flightRM), ports.get(flightRM), Suspect.FLIGHT));
 	}
 	
@@ -978,7 +977,6 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	public void handleCarRMCrash(ICarResourceManager carRM){
 		Trace.error("[ERROR] One of the car resource managers crashed ... ");
 		this.carRMs.remove(carRM);
-		this.scheduleNextCarRM();
 		this.suspectedCrashed.add(new Suspect(hosts.get(carRM), ports.get(carRM), Suspect.CAR));
 	}
 	
@@ -1001,7 +999,6 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	public void handleRoomRMCrash(IRoomResourceManager roomRM){
 		Trace.error("[ERROR] One of the room resource managers crashed ... ");
 		this.roomRMs.remove(roomRM);
-		this.scheduleNextRoomRM();
 		this.suspectedCrashed.add(new Suspect(hosts.get(roomRM), ports.get(roomRM), Suspect.ROOM));
 	}
 	
@@ -1062,5 +1059,10 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	protected void unregister() throws Exception {
 		UnicastRemoteObject.unexportObject(this, true);
 		registry.unbind("RMIMiddleware");
+	}
+
+	@Override
+	public void undoLast(int id) throws RemoteException, InvalidTransactionException {
+		customerRM.undoLast(id);
 	}
 }

@@ -26,7 +26,7 @@ import Transactions.InvalidTransactionException;
 import Transactions.Operation;
 import Transactions.TransactionException;
 
-public class CustomerResourceManager extends AbstractResourceManager implements ITransactionManager, CustomerFrontend,ReservationFrontend {
+public class CustomerResourceManager extends AbstractResourceManager implements ITransactionManager, CustomerFrontend, ReservationFrontend {
 	private List<IFlightResourceManager> flightRMs;
 	private List<IRoomResourceManager> roomRMs;
 	private List<ICarResourceManager> carRMs;

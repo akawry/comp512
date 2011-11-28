@@ -538,8 +538,7 @@ public abstract class AbstractClient {
             Vector flightNumbers = new Vector();
             for (int i = 0; i < arguments.size() - 6; i++)
               flightNumbers.addElement(arguments.elementAt(3 + i));
-            location = getString(arguments.elementAt(arguments
-                  .size() - 3));
+            location = getString(arguments.elementAt(arguments.size() - 3));
             Car = getBoolean(arguments.elementAt(arguments.size() - 2));
             Room = getBoolean(arguments.elementAt(arguments.size() - 1));
 
