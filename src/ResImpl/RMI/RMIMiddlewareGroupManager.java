@@ -5,6 +5,7 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Random;
 import java.util.Vector;
 
 import FaultTolerance.Suspect;
@@ -60,9 +61,13 @@ public class RMIMiddlewareGroupManager implements ResourceFrontend {
 	}
 	
 	private void handleMiddlewareCrash(ResourceFrontend middleware2){
-		Trace.error("[ERROR] One of the middlewares crashed ... ");
+		if (middlewares.size() > 0){
+			Trace.error("[ERROR] One of the middlewares crashed ... ");
+		} else {
+			Trace.error("[ERROR] No more middlewares alive ... ");
+		}
 		middlewares.remove(middleware2);
-		this.suspectedCrashed.add(new Suspect(hosts.get(middleware2), ports.get(middleware2), Suspect.MIDDLEWARE));
+		this.suspectedCrashed.add(new Suspect(hosts.get(middleware2), ports.get(middleware2), Suspect.MIDDLEWARE));	
 	}
 
 	@Override
@@ -572,16 +577,28 @@ public class RMIMiddlewareGroupManager implements ResourceFrontend {
 
 	@Override
 	public void crashType(String type, int num) throws RemoteException {
-		try {
-			middleware.crashType(type, num);
-		} catch (ConnectException e){
-			handleMiddlewareCrash(middleware);
+		if (type.equalsIgnoreCase("middleware")){
+			Random rand = new Random();
+			for (int i = 0; i < num; i++){
+				if (middlewares.size() > 0){
+					IMiddleWare mw = middlewares.remove(rand.nextInt(middlewares.size()));
+					mw.crash();
+				} else {
+					break;
+				}
+			}
+		} else {
+			try {
+				middleware.crashType(type, num);
+			} catch (ConnectException e){
+				handleMiddlewareCrash(middleware);
+				scheduleNextMiddleware();
+				if (middlewares.size() > 0)
+					crashType(type, num);
+				return;
+			}
 			scheduleNextMiddleware();
-			if (middlewares.size() > 0)
-				crashType(type, num);
-			return;
 		}
-		scheduleNextMiddleware();
 	}
 
 	@Override

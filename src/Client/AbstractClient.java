@@ -649,7 +649,8 @@ public abstract class AbstractClient {
     			}
         		if (arg.equalsIgnoreCase("car") || 
         				arg.equalsIgnoreCase("room") || 
-        				arg.equalsIgnoreCase("flight")){	
+        				arg.equalsIgnoreCase("flight") || 
+        				arg.equalsIgnoreCase("middleware")){	
         			rm.crashType(arg, num);
         		} else {
         			rm.crashHost(arg, num);

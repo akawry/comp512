@@ -947,7 +947,10 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	 * @param e the original exception 
 	 */
 	public void handleFlightRMCrash(IFlightResourceManager flightRM){
-		Trace.error("[ERROR] One of the flight resource managers crashed ... ");
+		if (flightRMs.size() > 0)
+			Trace.error("[ERROR] One of the flight resource managers crashed ... ");
+		else
+			Trace.error("[ERROR] No more flight resource managers alive ... ");
 		this.flightRMs.remove(flightRM);
 		this.suspectedCrashed.add(new Suspect(hosts.get(flightRM), ports.get(flightRM), Suspect.FLIGHT));
 	}
@@ -957,7 +960,10 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	 * the current flight resource manager is no longer connected.
 	 */
 	public void handleFlightRMCrash(){
-		Trace.error("[ERROR] One of the flight resource managers crashed ... ");
+		if (flightRMs.size() > 0)
+			Trace.error("[ERROR] One of the flight resource managers crashed ... ");
+		else
+			Trace.error("[ERROR] No more flight resource managers alive ... ");
 		this.flightRMs.remove(flightRM);
 		this.scheduleNextFlightRM();
 		this.suspectedCrashed.add(new Suspect(hosts.get(flightRM), ports.get(flightRM), Suspect.FLIGHT));
@@ -969,7 +975,10 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	 * @param e the original exception 
 	 */
 	public void handleCarRMCrash(ICarResourceManager carRM){
-		Trace.error("[ERROR] One of the car resource managers crashed ... ");
+		if (carRMs.size() > 0)
+			Trace.error("[ERROR] One of the car resource managers crashed ... ");
+		else
+			Trace.error("[ERROR] No more car resource managers alive ... ");
 		this.carRMs.remove(carRM);
 		this.suspectedCrashed.add(new Suspect(hosts.get(carRM), ports.get(carRM), Suspect.CAR));
 	}
@@ -979,7 +988,10 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	 * the current car resource manager is no longer connected.
 	 */
 	public void handleCarRMCrash(){
-		Trace.error("[ERROR] One of the car resource managers crashed ... ");
+		if (carRMs.size() > 0)
+			Trace.error("[ERROR] One of the car resource managers crashed ... ");
+		else
+			Trace.error("[ERROR] No more car resource managers alive ... ");
 		this.carRMs.remove(this.carRM);
 		this.scheduleNextCarRM();
 		this.suspectedCrashed.add(new Suspect(hosts.get(carRM), ports.get(carRM), Suspect.CAR));
@@ -991,7 +1003,10 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	 * @param e the original exception 
 	 */
 	public void handleRoomRMCrash(IRoomResourceManager roomRM){
-		Trace.error("[ERROR] One of the room resource managers crashed ... ");
+		if (roomRMs.size() > 0)
+			Trace.error("[ERROR] One of the room resource managers crashed ... ");
+		else
+			Trace.error("[ERROR] No more room resource managers alive ... ");
 		this.roomRMs.remove(roomRM);
 		this.suspectedCrashed.add(new Suspect(hosts.get(roomRM), ports.get(roomRM), Suspect.ROOM));
 	}
@@ -1001,7 +1016,10 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	 * the current room resource manager is no longer connected.
 	 */
 	public void handleRoomRMCrash(){
-		Trace.error("[ERROR] One of the room resource managers crashed ... ");
+		if (roomRMs.size() > 0)
+			Trace.error("[ERROR] One of the room resource managers crashed ... ");
+		else
+			Trace.error("[ERROR] No more room resource managers alive ... ");
 		this.roomRMs.remove(roomRM);
 		this.scheduleNextRoomRM();
 		this.suspectedCrashed.add(new Suspect(hosts.get(roomRM), ports.get(roomRM), Suspect.ROOM));
