@@ -4,6 +4,7 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 import LockManager.DeadlockException;
+import ResImpl.RMItem;
 import Transactions.InvalidTransactionException;
 
 public interface CustomerFrontend extends Remote {
@@ -21,5 +22,5 @@ public interface CustomerFrontend extends Remote {
     public String queryCustomerInfo(int id,int customer) throws RemoteException, DeadlockException, InvalidTransactionException;
     
     public void undoLast(int id) throws RemoteException, InvalidTransactionException;
-    
+
 }

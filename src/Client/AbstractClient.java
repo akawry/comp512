@@ -453,7 +453,7 @@ public abstract class AbstractClient {
             Id = getInt(arguments.elementAt(1));
             int customer = getInt(arguments.elementAt(2));
             flightNum = getInt(arguments.elementAt(3));
-            if (rm.reserveFlight(Id, customer, flightNum))
+            if (rm.reserveFlight(Id, customer, flightNum, false))
               System.out.println("Flight Reserved");
             else
               System.out.println("Flight could not be reserved.");
@@ -479,7 +479,7 @@ public abstract class AbstractClient {
             int customer = getInt(arguments.elementAt(2));
             location = getString(arguments.elementAt(3));
 
-            if (rm.reserveCar(Id, customer, location))
+            if (rm.reserveCar(Id, customer, location, false))
               System.out.println("Car Reserved");
             else
               System.out.println("Car could not be reserved.");
@@ -504,7 +504,7 @@ public abstract class AbstractClient {
             int customer = getInt(arguments.elementAt(2));
             location = getString(arguments.elementAt(3));
 
-            if (rm.reserveRoom(Id, customer, location))
+            if (rm.reserveRoom(Id, customer, location, false))
               System.out.println("Room Reserved");
             else
               System.out.println("Room could not be reserved.");
@@ -542,8 +542,7 @@ public abstract class AbstractClient {
             Car = getBoolean(arguments.elementAt(arguments.size() - 2));
             Room = getBoolean(arguments.elementAt(arguments.size() - 1));
 
-            if (rm.itinerary(Id, customer, flightNumbers, location,
-                  Car, Room))
+            if (rm.itinerary(Id, customer, flightNumbers, location, Car, Room, false))
               System.out.println("Itinerary Reserved");
             else
               System.out.println("Itinerary could not be reserved.");

@@ -10,6 +10,7 @@ import java.util.Vector;
 import FaultTolerance.Suspect;
 import LockManager.DeadlockException;
 import ResImpl.CustomerResourceManager;
+import ResImpl.RMItem;
 import ResImpl.Trace;
 import ResInterface.IMiddleWare;
 import ResInterface.ReservationFrontend;
@@ -342,94 +343,106 @@ public class RMIMiddlewareGroupManager implements ResourceFrontend {
 	}
 
 	@Override
-	public boolean reserveCar(int id, int customer, String location) throws RemoteException, InvalidTransactionException, DeadlockException {
+	public boolean reserveCar(int id, int customer, String location, boolean local) throws RemoteException, InvalidTransactionException, DeadlockException {
 		boolean success = true;
+		boolean updateLocal = false;
 		for (int i = middlewares.size() - 1; i >= 0; i--){
 			try {
 				middlewares.get(i).keepAlive(id);
-				success &= middlewares.get(i).reserveCarForCustomer(id, customer, location);
+				success &= middlewares.get(i).reserveCar(id, customer, location, updateLocal);
 				if (!success){
 					for (int j = middlewares.size() - 1; j > i; j--){
 						middlewares.get(j).undoLast(id);
 					}
 					break;
+				} else {
+					updateLocal = true;
 				}
 			} catch (ConnectException e){
 				handleMiddlewareCrash(middlewares.get(i));
 			}
-		}
-		
-		if (success){
-			middleware.reserveCar(id, customer, location);
-			scheduleNextMiddleware();
 		}
 		
 		return success;
 	}
 
 	@Override
-	public boolean reserveFlight(int id, int customer, int flightNumber)
+	public boolean reserveFlight(int id, int customer, int flightNumber, boolean local)
 			throws RemoteException, DeadlockException,
 			InvalidTransactionException {
 		boolean success = true;
+		boolean updateLocal = false;
 		for (int i = middlewares.size() - 1; i >= 0; i--){
 			try {
 				middlewares.get(i).keepAlive(id);
-				success &= middlewares.get(i).reserveFlightForCustomer(id, customer, flightNumber);
+				success &= middlewares.get(i).reserveFlight(id, customer, flightNumber, updateLocal);
 				if (!success){
 					for (int j = middlewares.size() - 1; j > i; j--){
 						middlewares.get(j).undoLast(id);
 					}
 					break;
+				} else {
+					updateLocal = true;
 				}
 			} catch (ConnectException e){
 				handleMiddlewareCrash(middlewares.get(i));
 			}
 		}
-		
-		if (success){
-			middleware.reserveFlight(id, customer, flightNumber);
-			scheduleNextMiddleware();
-		}
-		
+
 		return success;
 	}
 
 	@Override
-	public boolean reserveRoom(int id, int customer, String location)
+	public boolean reserveRoom(int id, int customer, String location, boolean local)
 			throws RemoteException, DeadlockException,
 			InvalidTransactionException {
 		boolean success = true;
+		boolean updateLocal = false;
 		for (int i = middlewares.size() - 1; i >= 0; i--){
 			try {
 				middlewares.get(i).keepAlive(id);
-				success &= middlewares.get(i).reserveRoomForCustomer(id, customer, location);
+				success &= middlewares.get(i).reserveRoom(id, customer, location, updateLocal);
 				if (!success){
 					for (int j = middlewares.size() - 1; j > i; j--){
 						middlewares.get(j).undoLast(id);
 					}
 					break;
+				} else {
+					updateLocal = true;
 				}
 			} catch (ConnectException e){
 				handleMiddlewareCrash(middlewares.get(i));
 			}
 		}
-		
-		if (success){
-			middleware.reserveRoom(id, customer, location);
-			scheduleNextMiddleware();
-		}
-		
+
 		return success;
 	}
 
 	@Override
 	public boolean itinerary(int id, int customer,
 			Vector<String> flightNumbers, String location, boolean Car,
-			boolean Room) throws RemoteException, NumberFormatException,
+			boolean Room, boolean local) throws RemoteException, NumberFormatException,
 			DeadlockException, InvalidTransactionException {
-		// TODO Auto-generated method stub
-		return false;
+		boolean success = true;
+		boolean updateLocal = false;
+		for (int i = middlewares.size() - 1; i >= 0; i--){
+			try {
+				middlewares.get(i).keepAlive(id);
+				success &= middlewares.get(i).itinerary(id, customer, flightNumbers, location, Car, Room, updateLocal);
+				if (!success){
+					for (int j = middlewares.size() - 1; j > i; j--){
+						middlewares.get(j).undoLast(id);
+					}
+					break;
+				} else {
+					updateLocal = true;
+				}
+			} catch (ConnectException e){
+				handleMiddlewareCrash(middlewares.get(i));
+			}
+		}
+
+		return success;
 	}
 
 	@Override

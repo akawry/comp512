@@ -104,32 +104,32 @@ public class TCPMiddleWareClient extends AbstractTCPResourceManager implements R
 	}
 
 	@Override
-	public boolean reserveCar(int id, int customer, String location) {
-		return new Boolean(send(concat("reservecar", id, customer, location), middleWareServerHost, middleWareServerPort));
+	public boolean reserveCar(int id, int customer, String location, boolean local) {
+		return new Boolean(send(concat("reservecar", id, customer, location, local), middleWareServerHost, middleWareServerPort));
 	}
 
 	@Override
-	public boolean reserveFlight(int id, int customer, int flightNumber) {
-		return new Boolean(send(concat("reserveflight", id, customer, flightNumber), middleWareServerHost, middleWareServerPort));
+	public boolean reserveFlight(int id, int customer, int flightNumber, boolean local) {
+		return new Boolean(send(concat("reserveflight", id, customer, flightNumber, local), middleWareServerHost, middleWareServerPort));
 
 	}
 
 	@Override
-	public boolean reserveRoom(int id, int customer, String location) {
-		return new Boolean(send(concat("reserveroom", id, customer, location), middleWareServerHost, middleWareServerPort));
+	public boolean reserveRoom(int id, int customer, String location, boolean local) {
+		return new Boolean(send(concat("reserveroom", id, customer, location, local), middleWareServerHost, middleWareServerPort));
 	}
 
 	@Override
 	public boolean itinerary(int id, int customer,
 			Vector<String> flightNumbers, String location, boolean Car,
-			boolean Room) {
+			boolean Room, boolean local) {
 		String flights = "";
 		for (int i = 0; i < flightNumbers.size(); i++){
 			flights += flightNumbers.get(i);
 			if (i < flightNumbers.size() - 1)
 				flights += ",";
 		}
-		return new Boolean(send(concat("itinerary", id, customer, flights, location, Car, Room), middleWareServerHost, middleWareServerPort));
+		return new Boolean(send(concat("itinerary", id, customer, flights, location, Car, Room, local), middleWareServerHost, middleWareServerPort));
 	}
 
 	@Override

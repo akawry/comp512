@@ -17,14 +17,6 @@ public interface IMiddleWare extends ResourceFrontend{
 	public void abortCustomerRM(int transactionId) throws RemoteException;
 	
 	public boolean shutdownCustomerRM() throws RemoteException;
-	
-    public boolean reserveCarForCustomer(int id, int customer, String location) throws RemoteException, InvalidTransactionException, DeadlockException;
-    
-    public boolean reserveFlightForCustomer(int id, int customer, int flightNumber) throws RemoteException, DeadlockException, InvalidTransactionException; 
-    
-    public boolean reserveRoomForCustomer(int id, int customer, String location) throws RemoteException, DeadlockException, InvalidTransactionException; 
-
-    public boolean itineraryForCustomer(int id,int customer,Vector<String> flightNumbers,String location, boolean Car, boolean Room) throws RemoteException, NumberFormatException, DeadlockException, InvalidTransactionException; 
 
 	public String getHost() throws RemoteException;
 	

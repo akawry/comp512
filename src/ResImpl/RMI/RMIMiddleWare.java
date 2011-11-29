@@ -226,35 +226,10 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	}
 
 	@Override
-	public boolean reserveFlight(int id, int customer, int flightNumber) throws RemoteException {
-		boolean success = true;
+	public boolean reserveFlight(int id, int customer, int flightNumber, boolean local) throws RemoteException {
 		try {
-			
-			Flight flight = null;
-			try {
-				flight = flightRM.getFlight(id, flightNumber);
-			} catch (ConnectException e){
-				handleFlightRMCrash(flightRM);
-				if (flightRMs.size() > 0)
-					return reserveFlight(id, customer, flightNumber);
-			}
-			
-			for (int i = flightRMs.size() - 1; i >= 0; i--){
-				try {
-					success &= flightRMs.get(i).updateFlight(id, flightNumber, flight);
-					if (!success){
-						for (int j = flightRMs.size() - 1; j > i; j--){
-							flightRMs.get(j).undoLast(id);
-						}
-						break;
-					}
-				} catch (ConnectException e){
-					handleFlightRMCrash(flightRMs.get(i));
-				} catch (TransactionException e){
-					return false;
-				}
-			}
-			
+			transactions.put(id, Calendar.getInstance().getTime().getTime());
+			return customerRM.reserveFlight(id, customer, flightNumber, local);
 		} catch (DeadlockException e) {
 			abort(id);
 		} catch (TransactionException e) {
@@ -262,10 +237,10 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 		} catch (CrashException e){
 			handleFlightRMCrash((IFlightResourceManager) e.getOffendingRM());
 			if (e.shouldRetry()){
-				return reserveFlight(id, customer, flightNumber);
+				return reserveFlight(id, customer, flightNumber, local);
 			}
 		} 
-		return success;
+		return false;
 	}
 
 	@Override
@@ -369,34 +344,10 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	}
 
 	@Override
-	public boolean reserveRoom(int id, int customer, String location) throws RemoteException {
-		boolean success = true;
+	public boolean reserveRoom(int id, int customer, String location, boolean local) throws RemoteException {
 		try {
-			
-			Hotel room = null;
-			try {
-				room = roomRM.getRoom(id, location);
-			} catch (ConnectException e){
-				handleRoomRMCrash();
-				if (roomRMs.size() > 0)
-					return reserveRoom(id, customer, location);
-			}
-			
-			for (int i = roomRMs.size() - 1; i >= 0; i--){
-				try {
-					success &= roomRMs.get(i).updateRoom(id, location, room);
-					if (!success){
-						for (int j = roomRMs.size() - 1; j > i; j--){
-							roomRMs.get(j).undoLast(id);
-						}
-						break;
-					}
-				} catch (ConnectException e){
-					handleRoomRMCrash(roomRMs.get(i));
-				} catch (TransactionException e){
-					return false;
-				}
-			}
+			transactions.put(id, Calendar.getInstance().getTime().getTime());
+			return customerRM.reserveRoom(id, customer, location, local);
 		} catch (DeadlockException e) {
 			abort(id);
 		} catch (InvalidTransactionException e) {
@@ -404,10 +355,10 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 		} catch (CrashException e){
 			handleRoomRMCrash((IRoomResourceManager) e.getOffendingRM());
 			if (e.shouldRetry())
-				return reserveRoom(id, customer, location);
+				return reserveRoom(id, customer, location, local);
 		}
-		
-		return success;
+
+		return false;
 	}
 
 	@Override
@@ -511,34 +462,11 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	}
 
 	@Override
-	public boolean reserveCar(int id, int customer, String location) throws RemoteException {
-		boolean success = true;
-		try {	
-			Car car = null;
-			try {
-				car = carRM.getCar(id, location);
-			} catch (ConnectException e){
-				handleCarRMCrash();
-				if (carRMs.size() > 0)
-					return reserveCar(id, customer, location);
-			}
-			
-			for (int i = carRMs.size() - 1; i >= 0; i--){
-				try {
-					success &= carRMs.get(i).updateCar(id, location, car);
-					if (!success){
-						for (int j = carRMs.size() - 1; j > i; j--){
-							carRMs.get(j).undoLast(id);
-						}
-						break;
-					}
-				} catch (ConnectException e){
-					handleCarRMCrash(carRMs.get(i));
-				} catch (TransactionException e){
-					return false;
-				} 
-			}
-		
+	public boolean reserveCar(int id, int customer, String location, boolean local)
+			throws RemoteException {
+		try {
+			transactions.put(id, Calendar.getInstance().getTime().getTime());
+			return customerRM.reserveCar(id, customer, location, local);
 		} catch (InvalidTransactionException e) {
 			Trace.error("[ERROR] "+e.getMessage());
 		} catch (DeadlockException e) {
@@ -546,9 +474,9 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 		} catch (CrashException e){
 			handleCarRMCrash((ICarResourceManager) e.getOffendingRM());
 			if (e.shouldRetry())
-				return reserveCar(id, customer, location);
+				return reserveCar(id, customer, location, local);
 		}
-		return success;
+		return false;
 	}
 
 	@Override
@@ -606,10 +534,10 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	@Override
 	public boolean itinerary(int id, int customer,
 			Vector<String> flightNumbers, String location, boolean Car,
-			boolean Room) throws RemoteException {
+			boolean Room, boolean local) throws RemoteException {
 		try {
 			keepAlive(id);
-			return customerRM.itinerary(id, customer, flightNumbers, location, Car, Room);
+			return customerRM.itinerary(id, customer, flightNumbers, location, Car, Room, local);
 		} catch (NumberFormatException e) {
 			
 		} catch (InvalidTransactionException e) {
@@ -1168,34 +1096,5 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	@Override
 	public void clearAllTransactions() throws RemoteException {
 		transactions.clear();
-	}
-
-	@Override
-	public boolean reserveCarForCustomer(int id, int customer, String location)
-			throws RemoteException, InvalidTransactionException,
-			DeadlockException {
-		return customerRM.reserveCar(id, customer, location);
-	}
-
-	@Override
-	public boolean reserveFlightForCustomer(int id, int customer,
-			int flightNumber) throws RemoteException, DeadlockException,
-			InvalidTransactionException {
-		return customerRM.reserveFlight(id, customer, flightNumber);
-	}
-
-	@Override
-	public boolean reserveRoomForCustomer(int id, int customer, String location)
-			throws RemoteException, DeadlockException,
-			InvalidTransactionException {
-		return customerRM.reserveRoom(id, customer, location);
-	}
-
-	@Override
-	public boolean itineraryForCustomer(int id, int customer,
-			Vector<String> flightNumbers, String location, boolean Car,
-			boolean Room) throws RemoteException, NumberFormatException,
-			DeadlockException, InvalidTransactionException {
-		return customerRM.itinerary(id, customer, flightNumbers, location, Car, Room);
 	}
 }

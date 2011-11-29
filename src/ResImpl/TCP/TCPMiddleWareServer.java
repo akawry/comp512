@@ -42,11 +42,11 @@ public class TCPMiddleWareServer extends AbstractTCPResourceManager {
 	
 				String[] info;
 				if (type.contains("car")){
-					res = "" + rm.reserveCar(id, cid, toks[3]);
+					res = "" + rm.reserveCar(id, cid, toks[3], false);
 				} else if (type.contains("flight")){
-					res = "" + rm.reserveFlight(id, cid, Integer.parseInt(toks[3]));
+					res = "" + rm.reserveFlight(id, cid, Integer.parseInt(toks[3]), false);
 				} else if (type.contains("room")){
-					res = "" + rm.reserveRoom(id, cid, toks[3]);
+					res = "" + rm.reserveRoom(id, cid, toks[3], false);
 				}
 			
 			} catch(Exception e){
@@ -99,7 +99,7 @@ public class TCPMiddleWareServer extends AbstractTCPResourceManager {
 			boolean car = new Boolean(toks[toks.length - 2]);
 			boolean room = new Boolean(toks[toks.length - 1]);
 			try {
-				res = "" + rm.itinerary(Integer.parseInt(toks[1]), Integer.parseInt(toks[2]), flightNums, location, car, room);
+				res = "" + rm.itinerary(Integer.parseInt(toks[1]), Integer.parseInt(toks[2]), flightNums, location, car, room, false);
 			} catch (Exception e) {
 				e.printStackTrace();
 				res = "false";
