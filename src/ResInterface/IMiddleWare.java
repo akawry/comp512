@@ -25,9 +25,5 @@ public interface IMiddleWare extends ResourceFrontend{
 	public void keepAlive(int id) throws RemoteException;
 
 	int nextTransactionId() throws RemoteException;
-	
-	void removeTransaction(int id) throws RemoteException;
-	
-	void clearAllTransactions() throws RemoteException;
     
 }

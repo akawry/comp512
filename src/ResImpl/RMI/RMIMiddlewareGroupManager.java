@@ -492,7 +492,7 @@ public class RMIMiddlewareGroupManager implements ResourceFrontend {
 		if (success){
 			for (int i = middlewares.size() - 1; i >= 0; i--){
 				try {
-					middlewares.get(i).removeTransaction(transactionId);
+					middlewares.get(i).commitCustomerRM(transactionId);
 				} catch (ConnectException e){
 					handleMiddlewareCrash(middlewares.get(i));
 				}
@@ -517,7 +517,6 @@ public class RMIMiddlewareGroupManager implements ResourceFrontend {
 		
 		for (int i = middlewares.size() - 1; i >= 0; i--){
 			try {
-				middlewares.get(i).removeTransaction(transactionId);
 				middlewares.get(i).abortCustomerRM(transactionId);
 			} catch (ConnectException e){
 				handleMiddlewareCrash(middlewares.get(i));
@@ -539,7 +538,6 @@ public class RMIMiddlewareGroupManager implements ResourceFrontend {
 		
 		for (int i = middlewares.size() - 1; i >= 0; i--){
 			try {
-				middlewares.get(i).clearAllTransactions();
 				middlewares.get(i).shutdownCustomerRM();
 			} catch (ConnectException e){
 				handleMiddlewareCrash(middlewares.get(i));

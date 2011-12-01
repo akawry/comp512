@@ -697,11 +697,6 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 		keepAlive(txnId);
 		return txnId;
 	}
-	
-	@Override
-	public void removeTransaction(int id) throws RemoteException {
-		transactions.remove(id);
-	}
 
 	@Override
 	public int start() throws RemoteException, InvalidTransactionException {
@@ -738,6 +733,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	@Override
 	public boolean commitCustomerRM(int transactionId) throws RemoteException {	
 		try {
+			transactions.remove(transactionId);
 			return customerRM.commit(transactionId);
 		} catch (TransactionException e){
 			return false; 
@@ -1103,6 +1099,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	@Override
 	public void abortCustomerRM(int transactionId) throws RemoteException {
 		try {
+			transactions.remove(transactionId);
 			customerRM.abort(transactionId);
 		} catch (InvalidTransactionException e) {
 			e.printStackTrace();
@@ -1111,11 +1108,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 
 	@Override
 	public boolean shutdownCustomerRM() throws RemoteException {
-		return customerRM.shutdown();
-	}
-
-	@Override
-	public void clearAllTransactions() throws RemoteException {
 		transactions.clear();
+		return customerRM.shutdown();
 	}
 }
