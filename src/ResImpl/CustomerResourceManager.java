@@ -97,6 +97,7 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 
 	@Override
 	public boolean deleteCustomer(int id, int customerID) throws DeadlockException, InvalidTransactionException {
+		boolean success = true;
 		Trace.info(this+":: deleteCustomer(" + id + ", " + customerID + ") called" );
 		Stack<Operation> ops = activeTransactions.get(id);
 		if (ops == null){
@@ -118,25 +119,49 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 				try {
 					if (key.startsWith("car")){
 						String mkey = key.substring("car-".length()); 
-						Car item = carRM.getCar(-1, mkey);
-						Trace.info(this+":: deleteCustomer(" + id + ", " + customerID + ") has reserved " + reserveditem.getKey() + "which is reserved" +  item.getReserved() +  " times and is still available " + item.getCount() + " times"  );
+						
+						Car item = getCar(id, mkey);
+						
+						if (item == null){
+							Trace.error(this+":: deleteCustomer(" + id + ", " + customerID + ") failed because the car rm could not be contacted.");
+							return false;
+						}
+						
+						Trace.info(this+":: deleteCustomer(" + id + ", " + customerID + ") has reserved " + reserveditem.getKey() + " which is reserved " +  item.getReserved() +  " times and is still available " + item.getCount() + " times"  );
 						item.setReserved(item.getReserved()-reserveditem.getCount());
 						item.setCount(item.getCount()+reserveditem.getCount());
-						carRM.updateCar(-1, mkey, item);
+						
+						success &= sendCarUpdate(id, mkey, item);
+						
 					} else if (key.startsWith("flight")){
 						int mkey = Integer.parseInt(key.substring("flight-".length())); 
-						Flight item = flightRM.getFlight(-1, mkey);
-						Trace.info(this+":: deleteCustomer(" + id + ", " + customerID + ") has reserved " + reserveditem.getKey() + "which is reserved" +  item.getReserved() +  " times and is still available " + item.getCount() + " times"  );
+						Flight item = getFlight(id, mkey);
+						
+						if (item == null){
+							Trace.error(this+":: deleteCustomer(" + id + ", " + customerID + ") failed because the flight rm could not be contacted.");
+							return false;
+						}
+						
+						Trace.info(this+":: deleteCustomer(" + id + ", " + customerID + ") has reserved " + reserveditem.getKey() + " which is reserved " +  item.getReserved() +  " times and is still available " + item.getCount() + " times"  );
 						item.setReserved(item.getReserved()-reserveditem.getCount());
 						item.setCount(item.getCount()+reserveditem.getCount());
-						flightRM.updateFlight(-1, mkey, item);
+						
+						success &= sendFlightUpdate(id, mkey, item);
+						
 					} else if (key.startsWith("room")){
 						String mkey = key.substring("room-".length()); 
-						Hotel item = roomRM.getRoom(-1, mkey);
+						Hotel item = getRoom(id, mkey);
+						
+						if (item == null){
+							Trace.error(this+":: deleteCustomer(" + id + ", " + customerID + ") failed because the room rm could not be contacted.");
+							return false;
+						}
+						
 						Trace.info(this+":: deleteCustomer(" + id + ", " + customerID + ") has reserved " + reserveditem.getKey() + "which is reserved" +  item.getReserved() +  " times and is still available " + item.getCount() + " times"  );
 						item.setReserved(item.getReserved()-reserveditem.getCount());
 						item.setCount(item.getCount()+reserveditem.getCount());
-						roomRM.updateRoom(-1, mkey, item);
+						
+						success &= sendRoomUpdate(id, mkey, item);
 					}
 				} catch (Exception exc){
 					exc.printStackTrace();
@@ -144,7 +169,7 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 				
 			}
 			
-			if (lockManager.Lock(id, cust.getKey(), TrxnObj.WRITE)){
+			if (success && lockManager.Lock(id, cust.getKey(), TrxnObj.WRITE)){
 				ops.push(new Operation(Operation.ADD, cust.getKey(), cust));
 				// remove the customer from the storage
 				removeData(id, cust.getKey());
@@ -189,13 +214,10 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 			throw new InvalidTransactionException("No transaction with id "+id);
 		}
 		
-		Car car = null;
-		try {
-			car = carRM.getCar(id, location);
-		} catch (ConnectException e){
-			throw new CrashException(e.getMessage(), carRM, true);
-		}
-		
+		Car car = getCar(id, location);
+		if (car == null)
+			return false;
+			
 		boolean success = false;
 		if (lockManager.Lock(id, Customer.getKey(customer), TrxnObj.WRITE)){
 			ops.push(new Operation(Operation.UNRESERVE, Customer.getKey(customer), Car.getKey(location)));
@@ -203,23 +225,43 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 		} 
 		
 		if (!local && success){
-			for (int i = carRMs.size() - 1; i >= 0; i--){
-				try {
-					success &= carRMs.get(i).updateCar(id, location, car);
-					if (!success){
-						for (int j = carRMs.size() - 1; j > i; j--){
-							carRMs.get(j).undoLast(id);
-						}
-						break;
-					}
-				} catch (ConnectException e){
-					throw new CrashException(e.getMessage(), carRMs.get(i));
-				} catch (TransactionException e){
-					return false;
-				} 
-			}
+			return sendCarUpdate(id, location, car);
 		}
 		
+		return success;
+	}
+	
+	private Car getCar(int id, String location) throws DeadlockException, RemoteException, InvalidTransactionException {
+		Car item = null;
+		for (int i = carRMs.size() - 1; i >= 0; i--){
+			try {
+				item = carRMs.get(i).getCar(id, location);
+				if (item != null)
+					break;
+			} catch (ConnectException ex){
+				throw new CrashException(ex.getMessage(), carRMs.get(i), false);
+			}
+		}
+		return item;
+	}
+	
+	private boolean sendCarUpdate(int id, String location, Car car) throws RemoteException, DeadlockException{
+		boolean success = true;
+		for (int i = carRMs.size() - 1; i >= 0; i--){
+			try {
+				success &= carRMs.get(i).updateCar(id, location, car);
+				if (!success){
+					for (int j = carRMs.size() - 1; j > i; j--){
+						carRMs.get(j).undoLast(id);
+					}
+					break;
+				}
+			} catch (ConnectException e){
+				throw new CrashException(e.getMessage(), carRMs.get(i));
+			} catch (TransactionException e){
+				return false;
+			} 
+		}
 		return success;
 	}
 	
@@ -231,12 +273,9 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 			throw new InvalidTransactionException("No transaction with id "+id);
 		}
 		
-		Flight flight = null;
-		try {
-			flight = flightRM.getFlight(id, flightNumber);
-		} catch (ConnectException e){
-			throw new CrashException(e.getMessage(), flightRM, true);
-		}
+		Flight flight = getFlight(id, flightNumber);
+		if (flight == null)
+			return false;
 		
 		boolean success = false;
 		if (lockManager.Lock(id, Customer.getKey(customer), TrxnObj.WRITE)){
@@ -245,23 +284,44 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 		}
 		
 		if (!local && success){
-			for (int i = flightRMs.size() - 1; i >= 0; i--){
-				try {
-					success &= flightRMs.get(i).updateFlight(id, flightNumber, flight);
-					if (!success){
-						for (int j = flightRMs.size() - 1; j > i; j--){
-							flightRMs.get(j).undoLast(id);
-						}
-						break;
-					}
-				} catch (ConnectException e){
-					throw new CrashException(e.getMessage(), flightRMs.get(i));
-				} catch (TransactionException e){
-					return false;
-				}
-			}
+			sendFlightUpdate(id, flightNumber, flight);
 		}
 		
+		return success;
+	}
+	
+	private Flight getFlight(int id, int flightNumber) throws RemoteException, InvalidTransactionException, DeadlockException{
+		Flight item = null;
+		for (int i = flightRMs.size() - 1; i >= 0; i--){
+			try {
+				item = flightRMs.get(i).getFlight(id, flightNumber);
+				if (item != null)
+					break;
+			} catch (ConnectException ex){
+				throw new CrashException(ex.getMessage(), flightRMs.get(i), false);
+			}
+		}
+		return item;
+	}
+	
+	
+	private boolean sendFlightUpdate(int id, int flightNumber, Flight flight) throws RemoteException, DeadlockException{
+		boolean success = true;
+		for (int i = flightRMs.size() - 1; i >= 0; i--){
+			try {
+				success &= flightRMs.get(i).updateFlight(id, flightNumber, flight);
+				if (!success){
+					for (int j = flightRMs.size() - 1; j > i; j--){
+						flightRMs.get(j).undoLast(id);
+					}
+					break;
+				}
+			} catch (ConnectException e){
+				throw new CrashException(e.getMessage(), flightRMs.get(i));
+			} catch (TransactionException e){
+				return false;
+			}
+		}
 		return success;
 	}
 
@@ -272,12 +332,9 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 			throw new InvalidTransactionException("No transaction with id "+id);
 		}
 		
-		Hotel room = null;
-		try {
-			room = roomRM.getRoom(id, location);
-		} catch (ConnectException e){
-			throw new CrashException(e.getMessage(), roomRM, true);
-		}
+		Hotel room = getRoom(id, location);
+		if (room == null)
+			return false;
 		
 		boolean success = false;
 		if (lockManager.Lock(id, Customer.getKey(customer), TrxnObj.WRITE)){
@@ -286,26 +343,46 @@ public class CustomerResourceManager extends AbstractResourceManager implements 
 		}
 		
 		if (!local && success){
-			for (int i = roomRMs.size() - 1; i >= 0; i--){
-				try {
-					success &= roomRMs.get(i).updateRoom(id, location, room);
-					if (!success){
-						for (int j = roomRMs.size() - 1; j > i; j--){
-							roomRMs.get(j).undoLast(id);
-						}
-						break;
-					}
-				} catch (ConnectException e){
-					throw new CrashException(e.getMessage(), roomRMs.get(i));
-				} catch (TransactionException e){
-					return false;
-				}
-			}
+			sendRoomUpdate(id, location, room);
 		}
 		
 		return success;
 	}
-
+	
+	private Hotel getRoom(int id, String location) throws RemoteException, InvalidTransactionException, DeadlockException{
+		Hotel item = null;
+		for (int i = roomRMs.size() - 1; i >= 0; i--){
+			try {
+				item = roomRMs.get(i).getRoom(id, location);
+				if (item != null)
+					break;
+			} catch (ConnectException ex){
+				throw new CrashException(ex.getMessage(), roomRMs.get(i), false);
+			}
+		}
+		return item;
+	}
+	
+	private boolean sendRoomUpdate(int id, String location, Hotel room) throws RemoteException, DeadlockException{
+		boolean success = true;
+		for (int i = roomRMs.size() - 1; i >= 0; i--){
+			try {
+				success &= roomRMs.get(i).updateRoom(id, location, room);
+				if (!success){
+					for (int j = roomRMs.size() - 1; j > i; j--){
+						roomRMs.get(j).undoLast(id);
+					}
+					break;
+				}
+			} catch (ConnectException e){
+				throw new CrashException(e.getMessage(), roomRMs.get(i));
+			} catch (TransactionException e){
+				return false;
+			}
+		}
+		return success;
+	}
+		
 	@Override
 	public boolean itinerary(int id, int customer, Vector<String> flightNumbers, String location, boolean Car, boolean Room, boolean local) throws RemoteException, NumberFormatException, DeadlockException, InvalidTransactionException {
 		boolean success = true;

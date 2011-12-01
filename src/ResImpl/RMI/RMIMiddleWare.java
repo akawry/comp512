@@ -514,6 +514,9 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 			abort(id);
 		} catch (InvalidTransactionException e) {
 			Trace.error("[ERROR] "+e.getMessage());
+		} catch (CrashException e){
+			System.out.println("here!!!!");
+			handleCarRMCrash((ICarResourceManager) e.getOffendingRM());
 		}
 		return false;
 	}
@@ -750,7 +753,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 			} catch (ConnectException e){
 				handleCarRMCrash(carRMs.get(i));
 			} catch (TransactionException e){
-				// TODO : handle this 
+				return false;
 			}
 		}
 		
@@ -760,7 +763,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 			} catch (ConnectException e){
 				handleFlightRMCrash(flightRMs.get(i));
 			} catch (TransactionException e){
-				// TODO : handle this 
+				return false;
 			}
 		}
 		
@@ -770,7 +773,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 			} catch (ConnectException e){
 				handleRoomRMCrash(roomRMs.get(i));
 			} catch (TransactionException e){
-				// TODO : handle this 
+				return false;
 			}
 		}
 		
@@ -788,7 +791,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 			} catch (ConnectException e){
 				handleCarRMCrash(carRMs.get(i));
 			} catch (TransactionException e){
-				// TODO : handle this 
+				
 			}
 		}
 		
@@ -798,7 +801,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 			} catch (ConnectException e){
 				handleFlightRMCrash(flightRMs.get(i));
 			} catch (TransactionException e){
-				// TODO : handle this 
+				
 			}
 		}
 		
@@ -808,7 +811,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 			} catch (ConnectException e){
 				handleRoomRMCrash(roomRMs.get(i));
 			} catch (TransactionException e){
-				// TODO : handle this 
+				 
 			}
 		}
 	}
