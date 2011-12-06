@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 function print_usage() {
 	echo "Usage : $0 rmi/tcp portcar portflight portroom portmiddleware manual/automatic [loop:trsec:type]"
@@ -9,7 +9,7 @@ if [ $# != 7 -a $# != 6 ] ; then
   print_usage
 fi	
 
-( ./launch_server_localhost.sh $1 $2 $3 $4 $5)
+./launch_server_localhost.sh $1 $2 $3 $4 $5
 
 case "$6" in
   "manual" )

@@ -125,7 +125,8 @@ public abstract class AbstractResourceManager {
 		Stack<Operation> ops = activeTransactions.get(id);
 		if (ops == null)
 			throw new InvalidTransactionException("No transaction with id " + id);
-		undo(id, ops.pop());
+		if (ops.size() > 0)
+			undo(id, ops.pop());
 	}
 	
 	protected void undoAll(int id) throws InvalidTransactionException{
@@ -184,7 +185,9 @@ public abstract class AbstractResourceManager {
 	public boolean enlist(int id) throws RemoteException, InvalidTransactionException {
 		Trace.info(this+":: Enlisting transaction "+id+"...");
 		Stack<Operation> ops = activeTransactions.get(id);
+		System.out.println(this+":: stack is: "+ops);
 		if (ops != null){
+			System.out.println(this+":: SIZE = "  + ops.size() + " duplicate transaction id: "+id);
 			throw new InvalidTransactionException("Transaction with id "+id+" already exsist");
 		}
 		activeTransactions.put(id, new Stack<Operation>());
