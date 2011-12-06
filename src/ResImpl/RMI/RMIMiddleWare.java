@@ -97,36 +97,36 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 		
 	}
 
-	public CarFrontend getCarResourceManager() {
+	public synchronized CarFrontend getCarResourceManager() {
 		return carRM;
 	}
 
-	public FlightFrontend getFlightResourceManager() {
+	public synchronized FlightFrontend getFlightResourceManager() {
 		return flightRM;
 	}
 
-	public RoomFrontend getRoomResourceManager() {
+	public synchronized RoomFrontend getRoomResourceManager() {
 		return roomRM;
 	}
 	
-	public CustomerResourceManager getCustomerResourceManager(){
+	public synchronized CustomerResourceManager getCustomerResourceManager(){
 		return customerRM;
 	}
 
-	public void setCarResourceManager(CarRMIResourceManager carRM) {
+	public synchronized void setCarResourceManager(CarRMIResourceManager carRM) {
 		this.carRM = carRM;
 	}
 
-	public void setFlightResourceManager(FlightRMIResourceManager flightRM) {
+	public synchronized void setFlightResourceManager(FlightRMIResourceManager flightRM) {
 		this.flightRM = flightRM;
 	}
 
-	public void setRoomResourceManager(RoomRMIResourceManager roomRM) {
+	public synchronized void setRoomResourceManager(RoomRMIResourceManager roomRM) {
 		this.roomRM = roomRM;
 	}
 
 	@Override
-	public boolean addFlight(int id, int flightNum, int flightSeats, int flightPrice) throws RemoteException {
+	public synchronized boolean addFlight(int id, int flightNum, int flightSeats, int flightPrice) throws RemoteException {
 
 		boolean success = true;
 		keepAlive(id);
@@ -155,7 +155,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	}
 
 	@Override
-	public boolean deleteFlight(int id, int flightNum) throws RemoteException {
+	public synchronized boolean deleteFlight(int id, int flightNum) throws RemoteException {
 
 		boolean success = true;
 		keepAlive(id);
@@ -183,7 +183,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	}
 
 	@Override
-	public int queryFlight(int id, int flightNumber) throws RemoteException {
+	public synchronized int queryFlight(int id, int flightNumber) throws RemoteException {
 		try {
 			keepAlive(id);
 			int flight = flightRM.queryFlight(id, flightNumber);
@@ -205,7 +205,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	}
 
 	@Override
-	public int queryFlightPrice(int id, int flightNumber) throws RemoteException {
+	public synchronized int queryFlightPrice(int id, int flightNumber) throws RemoteException {
 		try {
 			keepAlive(id);
 			int price = flightRM.queryFlightPrice(id, flightNumber);
@@ -226,7 +226,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	}
 
 	@Override
-	public boolean reserveFlight(int id, int customer, int flightNumber, boolean local) throws RemoteException {
+	public synchronized boolean reserveFlight(int id, int customer, int flightNumber, boolean local) throws RemoteException {
 		try {
 			transactions.put(id, Calendar.getInstance().getTime().getTime());
 			return customerRM.reserveFlight(id, customer, flightNumber, local);
@@ -244,7 +244,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	}
 
 	@Override
-	public boolean addRooms(int id, String location, int numRooms, int price) throws RemoteException {
+	public synchronized boolean addRooms(int id, String location, int numRooms, int price) throws RemoteException {
 		
 		boolean success = true;
 		keepAlive(id);
@@ -273,7 +273,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	}
 
 	@Override
-	public boolean deleteRooms(int id, String location) throws RemoteException {
+	public synchronized boolean deleteRooms(int id, String location) throws RemoteException {
 
 		boolean success = true;
 		keepAlive(id);
@@ -301,7 +301,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	}
 
 	@Override
-	public int queryRooms(int id, String location) throws RemoteException {
+	public synchronized int queryRooms(int id, String location) throws RemoteException {
 		try {
 			keepAlive(id);
 			int rooms = roomRM.queryRooms(id, location);
@@ -324,7 +324,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	}
 
 	@Override
-	public int queryRoomsPrice(int id, String location) throws RemoteException {
+	public synchronized int queryRoomsPrice(int id, String location) throws RemoteException {
 		try {
 			keepAlive(id);
 			int price = roomRM.queryRoomsPrice(id, location);
@@ -346,7 +346,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	}
 
 	@Override
-	public boolean reserveRoom(int id, int customer, String location, boolean local) throws RemoteException {
+	public synchronized boolean reserveRoom(int id, int customer, String location, boolean local) throws RemoteException {
 		try {
 			transactions.put(id, Calendar.getInstance().getTime().getTime());
 			return customerRM.reserveRoom(id, customer, location, local);
@@ -364,7 +364,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	}
 
 	@Override
-	public boolean addCars(int id, String location, int numCars, int price) throws RemoteException {
+	public synchronized boolean addCars(int id, String location, int numCars, int price) throws RemoteException {
 		
 		boolean success = true;
 		keepAlive(id);
@@ -393,7 +393,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	}
 
 	@Override
-	public boolean deleteCars(int id, String location) throws RemoteException {
+	public synchronized boolean deleteCars(int id, String location) throws RemoteException {
 
 		boolean success = true;
 		keepAlive(id);
@@ -421,7 +421,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	}
 
 	@Override
-	public int queryCars(int id, String location) throws RemoteException {
+	public synchronized int queryCars(int id, String location) throws RemoteException {
 		try {
 			keepAlive(id);
 			int cars = carRM.queryCars(id, location);
@@ -442,7 +442,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	}
 
 	@Override
-	public int queryCarsPrice(int id, String location) throws RemoteException {
+	public synchronized int queryCarsPrice(int id, String location) throws RemoteException {
 		try {
 			keepAlive(id);
 			int price = carRM.queryCarsPrice(id, location);
@@ -464,7 +464,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	}
 
 	@Override
-	public boolean reserveCar(int id, int customer, String location, boolean local)
+	public synchronized boolean reserveCar(int id, int customer, String location, boolean local)
 			throws RemoteException {
 		try {
 			transactions.put(id, Calendar.getInstance().getTime().getTime());
@@ -482,7 +482,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	}
 
 	@Override
-	public int newCustomer(int id) throws RemoteException {
+	public synchronized int newCustomer(int id) throws RemoteException {
 		try {
 			keepAlive(id);
 			return customerRM.newCustomer(id);
@@ -495,7 +495,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	}
 
 	@Override
-	public boolean newCustomer(int id, int customerID) throws RemoteException {
+	public synchronized boolean newCustomer(int id, int customerID) throws RemoteException {
 		try {
 			keepAlive(id);
 			return customerRM.newCustomer(id, customerID);
@@ -508,7 +508,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	}
 
 	@Override
-	public boolean deleteCustomer(int id, int customerID) throws RemoteException {
+	public synchronized boolean deleteCustomer(int id, int customerID) throws RemoteException {
 		try {
 			keepAlive(id);
 			return customerRM.deleteCustomer(id, customerID);
@@ -523,7 +523,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	}
 
 	@Override
-	public String queryCustomerInfo(int id, int customerID) throws RemoteException {
+	public synchronized String queryCustomerInfo(int id, int customerID) throws RemoteException {
 		try {
 			keepAlive(id);
 			return customerRM.queryCustomerInfo(id, customerID);
@@ -536,7 +536,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	}
 
 	@Override
-	public boolean itinerary(int id, int customer,
+	public synchronized boolean itinerary(int id, int customer,
 			Vector<String> flightNumbers, String location, boolean Car,
 			boolean Room, boolean local) throws RemoteException {
 		try {
@@ -560,7 +560,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 		return false;
 	}
 
-	public String usage() {
+	public synchronized String usage() {
 		return "Usage: java MiddleWare [opts]\n"
 				+ "where opts must include all of:\n\n" + "\t-car=[host]\n"
 				+ "\t-flight=[host]\n" + "\t-room=[host]\n"
@@ -574,7 +574,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	 *            command line arguments
 	 * 
 	 */
-	public static void main(String[] args) {
+	public synchronized static void main(String[] args) {
 
 		RMIMiddleWare mw = new RMIMiddleWare();
 		mw.parseArgs(args);
@@ -700,7 +700,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	}
 
 	@Override
-	public int start() throws RemoteException, InvalidTransactionException {
+	public synchronized int start() throws RemoteException, InvalidTransactionException {
 	
 		for (int i = carRMs.size() - 1; i >= 0; i--){
 			try {
@@ -730,7 +730,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	}
 
 	@Override
-	public boolean commitCustomerRM(int transactionId) throws RemoteException {	
+	public synchronized boolean commitCustomerRM(int transactionId) throws RemoteException {	
 		try {
 			transactions.remove(transactionId);
 			return customerRM.commit(transactionId);
@@ -740,7 +740,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	}
 	
 	@Override
-	public boolean commit(int transactionId) throws RemoteException {
+	public synchronized boolean commit(int transactionId) throws RemoteException {
 		boolean success = true;
 		for (int i = carRMs.size() - 1; i >= 0; i--){
 			try {
@@ -779,7 +779,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	}
 
 	@Override
-	public void abort(int transactionId) throws RemoteException{
+	public synchronized void abort(int transactionId) throws RemoteException{
 		for (int i = carRMs.size() - 1; i >= 0; i--){
 			try {
 				carRMs.get(i).abort(transactionId);
@@ -812,7 +812,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	}
 
 	@Override
-	public boolean shutdown() throws RemoteException{
+	public synchronized boolean shutdown() throws RemoteException{
 		boolean success = true;
 		
 		for (int i = carRMs.size() - 1; i >= 0; i--){
@@ -844,7 +844,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	}
 
 	@Override
-	public boolean enlist(int transactionId) throws RemoteException {
+	public synchronized boolean enlist(int transactionId) throws RemoteException {
 		
 		boolean success = true;
 			int i ;
@@ -900,7 +900,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	 * 
 	 * For now, uses simple round robin technique 
 	 */
-	public void scheduleNextCarRM(){
+	public synchronized void scheduleNextCarRM(){
 		if (carRMs.size() > 0){
 			int idx = carRMs.indexOf(carRM);
 			if (idx < carRMs.size() - 1)
@@ -919,7 +919,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	 * 
 	 * For now, uses simple round robin technique 
 	 */
-	public void scheduleNextFlightRM(){
+	public synchronized void scheduleNextFlightRM(){
 		if (flightRMs.size() > 0){
 			int idx = flightRMs.indexOf(flightRM);
 			if (idx < flightRMs.size() - 1)
@@ -937,7 +937,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	 * 
 	 * For now, uses simple round robin technique 
 	 */
-	public void scheduleNextRoomRM(){
+	public synchronized void scheduleNextRoomRM(){
 		if (roomRMs.size() > 0){
 			int idx = roomRMs.indexOf(roomRM);
 			if (idx < roomRMs.size() - 1)
@@ -955,7 +955,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	 * a flight resource manager is no longer connected. 
 	 * @param e the original exception 
 	 */
-	public void handleFlightRMCrash(IFlightResourceManager flightRM){
+	public synchronized void handleFlightRMCrash(IFlightResourceManager flightRM){
 		if (flightRMs.size() > 0)
 			Trace.error("[ERROR] One of the flight resource managers crashed ... ");
 		else
@@ -969,7 +969,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	 * a car resource manager is no longer connected. 
 	 * @param e the original exception 
 	 */
-	public void handleCarRMCrash(ICarResourceManager carRM){
+	public synchronized void handleCarRMCrash(ICarResourceManager carRM){
 		if (carRMs.size() > 0)
 			Trace.error("[ERROR] One of the car resource managers crashed ... ");
 		else
@@ -983,7 +983,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	 * a room resource manager is no longer connected. 
 	 * @param e the original exception 
 	 */
-	public void handleRoomRMCrash(IRoomResourceManager roomRM){
+	public synchronized void handleRoomRMCrash(IRoomResourceManager roomRM){
 		if (roomRMs.size() > 0)
 			Trace.error("[ERROR] One of the room resource managers crashed ... ");
 		else
@@ -993,7 +993,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	}
 
 	@Override
-	public void crashHost(String host, int num) throws RemoteException {
+	public synchronized void crashHost(String host, int num) throws RemoteException {
 		for (Object o : hosts.keySet()){
 			if (hosts.get(o).equalsIgnoreCase(host)){
 				((ICrashable) o).crash();
@@ -1011,7 +1011,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	}
 
 	@Override
-	public void crashType(String type, int num) throws RemoteException {
+	public synchronized void crashType(String type, int num) throws RemoteException {
 		Random rand = new Random();
 		for (int i = 0; i < num; i++){
 			if (type.equalsIgnoreCase("car")){
@@ -1041,22 +1041,22 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	}
 
 	@Override
-	public void undoLast(int id) throws RemoteException, InvalidTransactionException {
+	public synchronized void undoLast(int id) throws RemoteException, InvalidTransactionException {
 		customerRM.undoLast(id);
 	}
 
 	@Override
-	public void keepAlive(int id) throws RemoteException {
+	public synchronized void keepAlive(int id) throws RemoteException {
 		transactions.put(id, Calendar.getInstance().getTime().getTime());
 	}
 
 	@Override
-	public int startCustomerRM() throws RemoteException {
+	public synchronized int startCustomerRM() throws RemoteException {
 		return customerRM.start();
 	}
 
 	@Override
-	public boolean enlistCustomerRM(int id) throws RemoteException {
+	public synchronized boolean enlistCustomerRM(int id) throws RemoteException {
 		try {
 			return customerRM.enlist(id);
 		} catch (InvalidTransactionException e) {
@@ -1065,7 +1065,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	}
 
 	@Override
-	public void abortCustomerRM(int transactionId) throws RemoteException {
+	public synchronized void abortCustomerRM(int transactionId) throws RemoteException {
 		try {
 			transactions.remove(transactionId);
 			customerRM.abort(transactionId);
@@ -1075,7 +1075,7 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 	}
 
 	@Override
-	public boolean shutdownCustomerRM() throws RemoteException {
+	public synchronized boolean shutdownCustomerRM() throws RemoteException {
 		transactions.clear();
 		return customerRM.shutdown();
 	}

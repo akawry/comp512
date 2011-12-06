@@ -35,12 +35,12 @@ public class RMIMiddlewareGroupManager implements ResourceFrontend {
 		this.suspectedCrashed = new ArrayList<Suspect>();
 		hosts = new Hashtable<IMiddleWare, String>();
 		ports = new Hashtable<IMiddleWare, Integer>();
-		for (IMiddleWare mw : rms){
+		for (int i = middlewares.size() - 1; i >= 0; i--){
 			try {
-				hosts.put(mw, mw.getHost());
-				ports.put(mw, mw.getPort());
+				hosts.put(middlewares.get(i), middlewares.get(i).getHost());
+				ports.put(middlewares.get(i), middlewares.get(i).getPort());
 			} catch (RemoteException e){
-				handleMiddlewareCrash(mw);
+				handleMiddlewareCrash(middlewares.get(i));
 			}
 		}
 	}
@@ -65,7 +65,6 @@ public class RMIMiddlewareGroupManager implements ResourceFrontend {
 			Trace.error("[ERROR] No more middlewares alive ... ");
 		}
 		middlewares.remove(middleware2);
-		this.suspectedCrashed.add(new Suspect(hosts.get(middleware2), ports.get(middleware2), Suspect.MIDDLEWARE));	
 	}
 
 	@Override
