@@ -725,8 +725,6 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 			}
 		}
 		
-		enlist(txnId);
-		
 		return txnId;
 	}
 

@@ -466,6 +466,7 @@ public class RMIMiddlewareGroupManager implements ResourceFrontend {
 		for (int i = middlewares.size() - 1; i >= 0; i--){
 			try {
 				middlewares.get(i).start();
+				middlewares.get(i).enlist(id);
 				break;
 			} catch (ConnectException e){
 				handleMiddlewareCrash(middlewares.get(i));
