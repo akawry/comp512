@@ -779,8 +779,8 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 			}
 		}
 		
-		//if (!success)
-			//abort(transactionId);
+		if (!success)
+			abort(transactionId);
 		
 		return success;
 	}
@@ -896,7 +896,6 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 			System.out.println(this+":: room rm fucked up:");
 
 		if (!success) {
-			System.out.println(" F*C" ) ;
 			abort(transactionId);
 		}
 		

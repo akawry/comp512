@@ -123,12 +123,9 @@ public class LoopClient implements Callable {
 		try {
 			long startTime = System.nanoTime() ;
 			int tid = rm.start() ;
-			System.out.println(" GOT ID " + tid ) ;
-			Thread.sleep(5);
+			//System.out.println(" GOT ID " + tid ) ;
 			String loc1 = "ROOM" + tid ;
 			rm.addRooms(tid,loc1 , tid, tid) ;
-			rm.addCars(tid, "CAR"+tid, tid,  tid) ;
-			rm.addFlight(tid, tid, tid, tid) ;
 			rm.queryRooms(tid, loc1);
 			rm.queryRooms(tid, loc1);
 			rm.queryRooms(tid, loc1);
