@@ -39,10 +39,8 @@ public class RMIMiddlewareGroupManager implements ResourceFrontend {
 			try {
 				hosts.put(mw, mw.getHost());
 				ports.put(mw, mw.getPort());
-			} catch (ConnectException e){
+			} catch (RemoteException e){
 				handleMiddlewareCrash(mw);
-			} catch (RemoteException e) {
-				e.printStackTrace();
 			}
 		}
 	}
@@ -75,7 +73,7 @@ public class RMIMiddlewareGroupManager implements ResourceFrontend {
 		boolean success = false;
 		try {
 			success = middleware.addCars(id, location, numCars, price);
-		} catch (ConnectException e){
+		} catch (RemoteException e){
 			handleMiddlewareCrash(middleware);
 			scheduleNextMiddleware();
 			if (middlewares.size() > 0)
@@ -90,7 +88,7 @@ public class RMIMiddlewareGroupManager implements ResourceFrontend {
 		boolean success = false;
 		try {
 			success = middleware.deleteCars(id, location);
-		} catch (ConnectException e){
+		} catch (RemoteException e){
 			handleMiddlewareCrash(middleware);
 			scheduleNextMiddleware();
 			if (middlewares.size() > 0)
@@ -106,7 +104,7 @@ public class RMIMiddlewareGroupManager implements ResourceFrontend {
 		int cars = -1;
 		try {
 			cars = middleware.queryCars(id, location);
-		} catch (ConnectException e){
+		} catch (RemoteException e){
 			handleMiddlewareCrash(middleware);
 			scheduleNextMiddleware();
 			if (middlewares.size() > 0)
@@ -122,7 +120,7 @@ public class RMIMiddlewareGroupManager implements ResourceFrontend {
 		int price = -1;
 		try {
 			price = middleware.queryCarsPrice(id, location);
-		} catch (ConnectException e){
+		} catch (RemoteException e){
 			handleMiddlewareCrash(middleware);
 			scheduleNextMiddleware();
 			if (middlewares.size() > 0)
@@ -139,7 +137,7 @@ public class RMIMiddlewareGroupManager implements ResourceFrontend {
 		boolean success = false;
 		try {
 			success = middleware.addRooms(id, location, numRooms, price);
-		} catch (ConnectException e){
+		} catch (RemoteException e){
 			handleMiddlewareCrash(middleware);
 			scheduleNextMiddleware();
 			if (middlewares.size() > 0)
@@ -155,7 +153,7 @@ public class RMIMiddlewareGroupManager implements ResourceFrontend {
 		boolean success = false;
 		try {
 			success = middleware.deleteRooms(id, location);
-		} catch (ConnectException e){
+		} catch (RemoteException e){
 			handleMiddlewareCrash(middleware);
 			scheduleNextMiddleware();
 			if (middlewares.size() > 0)
@@ -171,7 +169,7 @@ public class RMIMiddlewareGroupManager implements ResourceFrontend {
 		int rooms = -1;
 		try {
 			rooms = middleware.queryRooms(id, location);
-		} catch (ConnectException e){
+		} catch (RemoteException e){
 			handleMiddlewareCrash(middleware);
 			scheduleNextMiddleware();
 			if (middlewares.size() > 0)
@@ -187,7 +185,7 @@ public class RMIMiddlewareGroupManager implements ResourceFrontend {
 		int price = -1;
 		try {
 			price = middleware.queryRoomsPrice(id, location);
-		} catch (ConnectException e){
+		} catch (RemoteException e){
 			handleMiddlewareCrash(middleware);
 			scheduleNextMiddleware();
 			if (middlewares.size() > 0)
@@ -204,7 +202,7 @@ public class RMIMiddlewareGroupManager implements ResourceFrontend {
 		boolean success = false;
 		try {
 			success = middleware.addFlight(id, flightNum, flightSeats, flightPrice);
-		} catch (ConnectException e){
+		} catch (RemoteException e){
 			handleMiddlewareCrash(middleware);
 			scheduleNextMiddleware();
 			if (middlewares.size() > 0)
@@ -220,7 +218,7 @@ public class RMIMiddlewareGroupManager implements ResourceFrontend {
 		boolean success = false;
 		try {
 			success = middleware.deleteFlight(id, flightNum);
-		} catch (ConnectException e){
+		} catch (RemoteException e){
 			handleMiddlewareCrash(middleware);
 			scheduleNextMiddleware();
 			if (middlewares.size() > 0)
@@ -236,7 +234,7 @@ public class RMIMiddlewareGroupManager implements ResourceFrontend {
 		int flights = -1;
 		try {
 			flights = middleware.queryFlight(id, flightNumber);
-		} catch (ConnectException e){
+		} catch (RemoteException e){
 			handleMiddlewareCrash(middleware);
 			scheduleNextMiddleware();
 			if (middlewares.size() > 0)
@@ -253,7 +251,7 @@ public class RMIMiddlewareGroupManager implements ResourceFrontend {
 		int price = -1;
 		try {
 			price = middleware.queryFlightPrice(id, flightNumber);
-		} catch (ConnectException e){
+		} catch (RemoteException e){
 			handleMiddlewareCrash(middleware);
 			scheduleNextMiddleware();
 			if (middlewares.size() > 0)
@@ -272,7 +270,7 @@ public class RMIMiddlewareGroupManager implements ResourceFrontend {
 			try {
 				cid = middlewares.get(i).newCustomer(id);
 				break;
-			} catch (ConnectException e){
+			} catch (RemoteException e){
 				handleMiddlewareCrash(middlewares.get(i));
 			}
 		}
@@ -286,7 +284,7 @@ public class RMIMiddlewareGroupManager implements ResourceFrontend {
 						}
 						break;
 					}
-				} catch (ConnectException e){
+				} catch (RemoteException e){
 					handleMiddlewareCrash(middlewares.get(j));
 				}
 			}
@@ -300,7 +298,7 @@ public class RMIMiddlewareGroupManager implements ResourceFrontend {
 		for (int i = middlewares.size() - 1; i >= 0; i--){
 			try {
 				success &= middlewares.get(i).newCustomer(id, cid);
-			} catch (ConnectException e){
+			} catch (RemoteException e){
 				handleMiddlewareCrash(middlewares.get(i));
 			}
 			if (!success){
@@ -319,7 +317,7 @@ public class RMIMiddlewareGroupManager implements ResourceFrontend {
 		for (int i = middlewares.size() - 1; i >= 0; i--){
 			try {
 				success &= middlewares.get(i).deleteCustomer(id, customer);
-			} catch (ConnectException e){
+			} catch (RemoteException e){
 				handleMiddlewareCrash(middlewares.get(i));
 			}
 			if (!success){
@@ -337,7 +335,7 @@ public class RMIMiddlewareGroupManager implements ResourceFrontend {
 		String cust = null;
 		try {
 			cust = middleware.queryCustomerInfo(id, customer);
-		} catch (ConnectException e){
+		} catch (RemoteException e){
 			handleMiddlewareCrash(middleware);
 			scheduleNextMiddleware();
 			if (middlewares.size() > 0)
@@ -363,7 +361,7 @@ public class RMIMiddlewareGroupManager implements ResourceFrontend {
 				} else {
 					updateLocal = true;
 				}
-			} catch (ConnectException e){
+			} catch (RemoteException e){
 				handleMiddlewareCrash(middlewares.get(i));
 			}
 		}
@@ -389,7 +387,7 @@ public class RMIMiddlewareGroupManager implements ResourceFrontend {
 				} else {
 					updateLocal = true;
 				}
-			} catch (ConnectException e){
+			} catch (RemoteException e){
 				handleMiddlewareCrash(middlewares.get(i));
 			}
 		}
@@ -415,7 +413,7 @@ public class RMIMiddlewareGroupManager implements ResourceFrontend {
 				} else {
 					updateLocal = true;
 				}
-			} catch (ConnectException e){
+			} catch (RemoteException e){
 				handleMiddlewareCrash(middlewares.get(i));
 			}
 		}
@@ -442,7 +440,7 @@ public class RMIMiddlewareGroupManager implements ResourceFrontend {
 				} else {
 					updateLocal = true;
 				}
-			} catch (ConnectException e){
+			} catch (RemoteException e){
 				handleMiddlewareCrash(middlewares.get(i));
 			}
 		}
@@ -458,7 +456,7 @@ public class RMIMiddlewareGroupManager implements ResourceFrontend {
 				id = middlewares.get(i).nextTransactionId();
 				middlewares.get(i).startCustomerRM();
 				middlewares.get(i).enlistCustomerRM(id);
-			} catch (ConnectException e){
+			} catch (RemoteException e){
 				handleMiddlewareCrash(middlewares.get(i));
 			}
 		}
@@ -468,7 +466,7 @@ public class RMIMiddlewareGroupManager implements ResourceFrontend {
 				middlewares.get(i).start();
 				middlewares.get(i).enlist(id);
 				break;
-			} catch (ConnectException e){
+			} catch (RemoteException e){
 				handleMiddlewareCrash(middlewares.get(i));
 			}
 		}
@@ -483,7 +481,7 @@ public class RMIMiddlewareGroupManager implements ResourceFrontend {
 		boolean success = false;
 		try {
 			success = middleware.commit(transactionId);
-		} catch (ConnectException e){
+		} catch (RemoteException e){
 			handleMiddlewareCrash(middleware);
 			scheduleNextMiddleware();
 			if (middlewares.size() > 0)
@@ -494,7 +492,7 @@ public class RMIMiddlewareGroupManager implements ResourceFrontend {
 			for (int i = middlewares.size() - 1; i >= 0; i--){
 				try {
 					middlewares.get(i).commitCustomerRM(transactionId);
-				} catch (ConnectException e){
+				} catch (RemoteException e){
 					handleMiddlewareCrash(middlewares.get(i));
 				}
 			}
@@ -508,7 +506,7 @@ public class RMIMiddlewareGroupManager implements ResourceFrontend {
 			InvalidTransactionException {
 		try {
 			middleware.abort(transactionId);
-		} catch (ConnectException e){
+		} catch (RemoteException e){
 			handleMiddlewareCrash(middleware);
 			scheduleNextMiddleware();
 			if (middlewares.size() > 0)
@@ -519,7 +517,7 @@ public class RMIMiddlewareGroupManager implements ResourceFrontend {
 		for (int i = middlewares.size() - 1; i >= 0; i--){
 			try {
 				middlewares.get(i).abortCustomerRM(transactionId);
-			} catch (ConnectException e){
+			} catch (RemoteException e){
 				handleMiddlewareCrash(middlewares.get(i));
 			}
 		}
@@ -530,7 +528,7 @@ public class RMIMiddlewareGroupManager implements ResourceFrontend {
 		boolean success = true;
 		try {
 			success = middleware.shutdown();
-		} catch (ConnectException e){
+		} catch (RemoteException e){
 			handleMiddlewareCrash(middleware);
 			scheduleNextMiddleware();
 			if (middlewares.size() > 0)
@@ -540,7 +538,7 @@ public class RMIMiddlewareGroupManager implements ResourceFrontend {
 		for (int i = middlewares.size() - 1; i >= 0; i--){
 			try {
 				middlewares.get(i).shutdownCustomerRM();
-			} catch (ConnectException e){
+			} catch (RemoteException e){
 				handleMiddlewareCrash(middlewares.get(i));
 			}
 		}
@@ -564,7 +562,7 @@ public class RMIMiddlewareGroupManager implements ResourceFrontend {
 	public void crashHost(String host, int num) throws RemoteException {
 		try {
 			middleware.crashHost(host, num);
-		} catch (ConnectException e){
+		} catch (RemoteException e){
 			handleMiddlewareCrash(middleware);
 			scheduleNextMiddleware();
 			if (middlewares.size() > 0)
@@ -589,7 +587,7 @@ public class RMIMiddlewareGroupManager implements ResourceFrontend {
 		} else {
 			try {
 				middleware.crashType(type, num);
-			} catch (ConnectException e){
+			} catch (RemoteException e){
 				handleMiddlewareCrash(middleware);
 				scheduleNextMiddleware();
 				if (middlewares.size() > 0)
