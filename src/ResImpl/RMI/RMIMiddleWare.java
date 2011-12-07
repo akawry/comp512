@@ -859,9 +859,6 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 			}
 		}
 
-		if (!success)
-			System.out.println(this+":: car rm fucked up");	
-
 		for (i = flightRMs.size() - 1; i >= 0; i--){
 			try {
 				success &= flightRMs.get(i).enlist(transactionId);
@@ -871,9 +868,6 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 				success = false;
 			}
 		}
-		
-		if (!success)
-			System.out.println(this+":: flight rm fucked up:");
 
 		for (i = roomRMs.size() - 1; i >= 0; i--){
 			try {
@@ -884,9 +878,6 @@ public class RMIMiddleWare extends AbstractRMIResourceManager implements Remote,
 				success = false;
 			}
 		}
-
-		if (!success)
-			System.out.println(this+":: room rm fucked up:");
 
 		if (!success) {
 			abort(transactionId);

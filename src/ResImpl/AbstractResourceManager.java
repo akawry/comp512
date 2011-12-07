@@ -185,9 +185,7 @@ public abstract class AbstractResourceManager {
 	public boolean enlist(int id) throws RemoteException, InvalidTransactionException {
 		Trace.info(this+":: Enlisting transaction "+id+"...");
 		Stack<Operation> ops = activeTransactions.get(id);
-		System.out.println(this+":: stack is: "+ops);
 		if (ops != null){
-			System.out.println(this+":: SIZE = "  + ops.size() + " duplicate transaction id: "+id);
 			throw new InvalidTransactionException("Transaction with id "+id+" already exsist");
 		}
 		activeTransactions.put(id, new Stack<Operation>());
